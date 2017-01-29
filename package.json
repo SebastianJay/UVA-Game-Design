@@ -1,0 +1,26 @@
+{
+  "name": "uva-game-design",
+  "version": "1.0.0",
+  "description": "TypeScript game engine for HTML5 Canvas",
+  "main": "./dist/bundle.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SebastianJay/UVA-Game-Design.git"
+  },
+  "author": "Jay Sebastian",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SebastianJay/UVA-Game-Design/issues"
+  },
+  "homepage": "https://github.com/SebastianJay/UVA-Game-Design#readme",
+  "devDependencies": {
+    "browserify": "^14.0.0",
+    "gulp": "^3.9.1",
+    "tsify": "^3.0.1",
+    "typescript": "^2.1.5",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}
