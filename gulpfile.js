@@ -7,7 +7,7 @@ gulp.task("default", function () {
     return browserify({
         basedir: '.',
         debug: true,
-        entries: ['src/lab1test/LabOneGame.ts'],
+        entries: ['src/labs/LabTwoGame.ts'],
     })
     .plugin(tsify)
     .bundle()
