@@ -1,9 +1,11 @@
 "use strict";
 
-import { Game } from '../engine/display/Game';
+import { Game } from '../engine/core/Game';
 import { Sprite } from '../engine/display/Sprite';
 import { ArrayList } from '../engine/util/ArrayList';
 import { GameClock } from '../engine/util/GameClock';
+import { InputHandler } from '../engine/input/InputHandler';
+import { InputKeyCode } from '../engine/input/InputPrimitives';
 
 /**
  * Main class. Instantiate or extend Game to create a new game of your own.
@@ -31,20 +33,28 @@ export class LabOneGame extends Game{
 		this.gameState = 0;
 	}
 
-	update(pressedKeys : ArrayList<number>){
-		super.update(pressedKeys);
-		if (pressedKeys.contains(37)) {	// left
+	update(){
+		super.update();
+		if (InputHandler.instance.keyHeld(InputKeyCode.Left)) {
 			this.marioX = Math.max(this.marioX - 10, 0);
 		}
-		if (pressedKeys.contains(38)) {	// up
+		if (InputHandler.instance.keyHeld(InputKeyCode.Up)) {
 			this.marioY = Math.max(this.marioY - 10, 0);
 		}
-		if (pressedKeys.contains(39)) {	// right
+		if (InputHandler.instance.keyHeld(InputKeyCode.Right)) {
 			this.marioX = Math.min(this.marioX + 10, this.width - 128);
 		}
-		if (pressedKeys.contains(40)) {	// down
+		if (InputHandler.instance.keyHeld(InputKeyCode.Down)) {
 			this.marioY = Math.min(this.marioY + 10, this.height - 128);
 		}
+
+		var event = InputHandler.instance.mouseDown();
+		if (event != null
+			&& event.x > this.marioX && event.x < this.marioX + 128
+			&& event.y > this.marioY && event.y < this.marioY + 128) {
+			this.marioHealth -= 1;
+		}
+
 		this.mario.update();
 		if (this.gameState == 0) {
 			var time = this.clock.getElapsedTime();
@@ -71,13 +81,6 @@ export class LabOneGame extends Game{
 		}
 		g.translate(this.marioX, this.marioY);
 		this.mario.draw(g);
-	}
-
-	onClick(event : MouseEvent){
-		if (event.clientX > this.marioX && event.clientX < this.marioX + 128
-			&& event.clientY > this.marioY && event.clientY < this.marioY + 128) {
-			this.marioHealth -= 1;
-		}
 	}
 }
 

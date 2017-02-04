@@ -1,10 +1,12 @@
 "use strict";
 
-import { Game } from '../engine/display/Game';
+import { Game } from '../engine/core/Game';
 import { Sprite } from '../engine/display/Sprite';
 import { ArrayList } from '../engine/util/ArrayList';
 import { GameClock } from '../engine/util/GameClock';
 import { Vector } from '../engine/util/Vector';
+import { InputHandler } from '../engine/input/InputHandler';
+import { InputKeyCode } from '../engine/input/InputPrimitives';
 
 /**
  * Mario Clicker 2.0
@@ -26,56 +28,60 @@ export class LabTwoGame extends Game{
 		this.gameState = 0;
 	}
 
-	update(pressedKeys : ArrayList<number>){
-		super.update(pressedKeys);
+	update(){
     // handle key presses
-		if (pressedKeys.contains(37)) {	// left
+		if (InputHandler.instance.keyHeld(InputKeyCode.Left)) {
 			this.mario.position.x = Math.max(this.mario.position.x - 10, 0);
 		}
-		if (pressedKeys.contains(38)) {	// up
+		if (InputHandler.instance.keyHeld(InputKeyCode.Up)) {
 			this.mario.position.y = Math.max(this.mario.position.y - 10, 0);
 		}
-		if (pressedKeys.contains(39)) {	// right
+		if (InputHandler.instance.keyHeld(InputKeyCode.Right)) {
 			this.mario.position.x = Math.min(this.mario.position.x + 10, this.width - this.mario.width);
 		}
-		if (pressedKeys.contains(40)) {	// down
+		if (InputHandler.instance.keyHeld(InputKeyCode.Down)) {
 			this.mario.position.y = Math.min(this.mario.position.y + 10, this.height - this.mario.height);
 		}
-    if (pressedKeys.contains('Q'.charCodeAt(0))) {
+    if (InputHandler.instance.keyHeld('q')) {
       this.mario.rotation += 3.0;
     }
-    if (pressedKeys.contains('W'.charCodeAt(0))) {
+    if (InputHandler.instance.keyHeld('w')) {
       this.mario.rotation -= 3.0;
     }
-    if (pressedKeys.contains('A'.charCodeAt(0))) {
+    if (InputHandler.instance.keyHeld('a')) {
       this.mario.localScale.x = Math.min(this.mario.localScale.x + 0.1, 2.0);
       this.mario.localScale.y = Math.min(this.mario.localScale.y + 0.1, 2.0);
     }
-    if (pressedKeys.contains('S'.charCodeAt(0))) {
+    if (InputHandler.instance.keyHeld('s')) {
       this.mario.localScale.x = Math.max(this.mario.localScale.x - 0.1, 0.5);
       this.mario.localScale.y = Math.max(this.mario.localScale.y - 0.1, 0.5);
     }
-    if (pressedKeys.contains('Z'.charCodeAt(0))) {
+    if (InputHandler.instance.keyHeld('z')) {
       this.mario.alpha = Math.min(this.mario.alpha + 0.05, 1.0);
     }
-    if (pressedKeys.contains('X'.charCodeAt(0))) {
+    if (InputHandler.instance.keyHeld('x')) {
       this.mario.alpha = Math.max(this.mario.alpha - 0.05, 0.0);
     }
-    if (pressedKeys.contains('V'.charCodeAt(0))) {
+    if (InputHandler.instance.keyDown('v')) {
       this.mario.visible = !this.mario.visible;
     }
-    if (pressedKeys.contains('J'.charCodeAt(0))) {
+    if (InputHandler.instance.keyHeld('j')) {
       this.mario.pivotPoint.x = Math.max(this.mario.pivotPoint.x - 0.04, 0);
     }
-    if (pressedKeys.contains('I'.charCodeAt(0))) {
+    if (InputHandler.instance.keyHeld('i')) {
       this.mario.pivotPoint.y = Math.max(this.mario.pivotPoint.y - 0.04, 0);
     }
-    if (pressedKeys.contains('L'.charCodeAt(0))) {
+    if (InputHandler.instance.keyHeld('l')) {
       this.mario.pivotPoint.x = Math.min(this.mario.pivotPoint.x + 0.04, 1);
     }
-    if (pressedKeys.contains('K'.charCodeAt(0))) {
+    if (InputHandler.instance.keyHeld('k')) {
       this.mario.pivotPoint.y = Math.min(this.mario.pivotPoint.y + 0.04, 1);
     }
+
+		var event = InputHandler.instance.mouseDown();
+		if (event != null && this.mario.isInRect(event)) {
+			this.marioHealth -= 1;
+		}
 
 		this.mario.update();
 		if (this.gameState == 0) {
@@ -102,12 +108,6 @@ export class LabTwoGame extends Game{
 			g.strokeText('Health: '+ this.marioHealth + '\tTime: ' + this.marioTime.toFixed(2), 10, 10);
 		}
 		this.mario.draw(g);
-	}
-
-	onClick(event : MouseEvent){
-		if (this.mario.isInRect(new Vector(event.clientX, event.clientY))) {
-			this.marioHealth -= 1;
-		}
 	}
 }
 
