@@ -48,7 +48,6 @@ export class DisplayObject {
 	 * Invoked every frame, manually for now, but later automatically if this DO is in DisplayTree
 	 */
 	update() : void{
-
 	}
 
 	/**
@@ -58,10 +57,15 @@ export class DisplayObject {
 		if(this.displayImage && this.visible){
 			this.applyTransformations(g);
 			if(this._loaded) {
-				g.drawImage(this.displayImage,0,0);
+				this.drawImage(g);
 			}
 			this.reverseTransformations(g);
 		}
+	}
+
+	/** Helper intended to be overriden by display objects using spritesheets */
+	protected drawImage(g: CanvasRenderingContext2D) {
+		g.drawImage(this.displayImage,0,0);
 	}
 
 	/**

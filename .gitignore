@@ -1,3 +1,5 @@
 dist/
 built/
 node_modules/
+# GIMP files
+resources/**/*.xcf

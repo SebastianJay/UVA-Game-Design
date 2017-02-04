@@ -21,7 +21,7 @@ export class Sprite extends DisplayObject{
 	/**
 	 * Draws this image to the screen
 	 */
-	draw(g){
+	draw(g : CanvasRenderingContext2D){
 		super.draw(g);
 	}
 }

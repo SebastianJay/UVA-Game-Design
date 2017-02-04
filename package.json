@@ -17,10 +17,12 @@
   },
   "homepage": "https://github.com/SebastianJay/UVA-Game-Design#readme",
   "devDependencies": {
+    "@types/yamljs": "^0.2.30",
     "browserify": "^14.0.0",
     "gulp": "^3.9.1",
     "tsify": "^3.0.1",
     "typescript": "^2.1.5",
-    "vinyl-source-stream": "^1.1.0"
+    "vinyl-source-stream": "^1.1.0",
+    "yamljs": "^0.2.8"
   }
 }

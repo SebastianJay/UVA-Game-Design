@@ -1,8 +1,7 @@
 "use strict";
 
 import { Game } from '../engine/core/Game';
-import { Sprite } from '../engine/display/Sprite';
-import { ArrayList } from '../engine/util/ArrayList';
+import { AnimatedSprite } from '../engine/display/AnimatedSprite';
 import { GameClock } from '../engine/util/GameClock';
 import { Vector } from '../engine/util/Vector';
 import { InputHandler } from '../engine/input/InputHandler';
@@ -13,7 +12,7 @@ import { InputKeyCode } from '../engine/input/InputPrimitives';
  */
 export class LabTwoGame extends Game{
 
-	mario : Sprite;
+	mario : AnimatedSprite;
 	marioHealth : number;
 	marioTime : number;
 	clock : GameClock;
@@ -21,9 +20,9 @@ export class LabTwoGame extends Game{
 
 	constructor(canvas : HTMLCanvasElement){
 		super("Lab One Game", 500, 300, canvas);
-		this.mario = new Sprite("Mario", "Mario.png");
+		this.mario = new AnimatedSprite("Mario", "animations/mario_moving.png");
 		this.marioHealth = 5;
-		this.marioTime = 30;
+		this.marioTime = 60;
 		this.clock = new GameClock();
 		this.gameState = 0;
 	}
