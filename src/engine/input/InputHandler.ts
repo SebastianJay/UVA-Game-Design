@@ -117,52 +117,45 @@ export class InputHandler{
 
   private onMouseDownWrapper() {
     return (event:MouseEvent) => {
-      this.pressedButtons[event.button] = {
-        timestamp: this.clock.getElapsedTime(),
-        location: new Vector(event.clientX, event.clientY),
-        state: 1,
+      if (this.pressedButtons[event.button].state == 0) {
+        this.pressedButtons[event.button].timestamp = this.clock.getElapsedTime();
       }
+      this.pressedButtons[event.button].state = 1;
+      this.pressedButtons[event.button].location = new Vector(event.clientX, event.clientY);
     }
   }
 
   private onMouseMoveWrapper() {
     return (event:MouseEvent) => {
-      if (this.pressedButtons[event.button] == null) {
-        this.pressedButtons[event.button] = {
-          timestamp: this.clock.start,
-          location: new Vector(event.clientX, event.clientY),
-          state: 0,
-        };
-      }
       this.pressedButtons[event.button].location = new Vector(event.clientX, event.clientY);
     }
   }
 
   private onMouseUpWrapper() {
     return (event:MouseEvent) => {
-      this.pressedButtons[event.button] = {
-        timestamp: this.clock.getElapsedTime(),
-        location: new Vector(event.clientX, event.clientY),
-        state: 0,
+      if (this.pressedButtons[event.button].state == 1) {
+        this.pressedButtons[event.button].timestamp = this.clock.getElapsedTime();
       }
+      this.pressedButtons[event.button].state = 0;
+      this.pressedButtons[event.button].location = new Vector(event.clientX, event.clientY);
     }
   }
 
   private onKeyDownWrapper() {
     return (event:KeyboardEvent) => {
-      this.pressedKeys[event.keyCode] = {
-        timestamp: this.clock.getElapsedTime(),
-        state: 1,
+      if (this.pressedKeys[event.keyCode].state == 0) {
+        this.pressedKeys[event.keyCode].timestamp = this.clock.getElapsedTime();
       }
+      this.pressedKeys[event.keyCode].state = 1;
     }
   }
 
   private onKeyUpWrapper() {
     return (event:KeyboardEvent) => {
-      this.pressedKeys[event.keyCode] = {
-        timestamp: this.clock.getElapsedTime(),
-        state: 0,
+      if (this.pressedKeys[event.keyCode].state == 1) {
+        this.pressedKeys[event.keyCode].timestamp = this.clock.getElapsedTime();
       }
+      this.pressedKeys[event.keyCode].state = 0;
     }
   }
 }
