@@ -60,12 +60,14 @@ export class Vector {
     return this.divide(this.length());
   };
 
-  min() : number {
-    return Math.min(Math.min(this.x, this.y), this.z);
+  min(v : number | Vector) : Vector {
+    if (v instanceof Vector) return new Vector(Math.min(this.x, v.x), Math.min(this.y, v.y), Math.min(this.z, v.z));
+    else return new Vector(Math.min(this.x, v), Math.min(this.y, v), Math.min(this.z, v));
   };
 
-  max() : number {
-    return Math.max(Math.max(this.x, this.y), this.z);
+  max(v : number | Vector) : Vector {
+    if (v instanceof Vector) return new Vector(Math.max(this.x, v.x), Math.max(this.y, v.y), Math.max(this.z, v.z));
+    else return new Vector(Math.max(this.x, v), Math.max(this.y, v), Math.max(this.z, v));
   };
 
   toAngles() : any {

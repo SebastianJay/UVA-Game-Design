@@ -1,5 +1,12 @@
+# compiled and bundled JS
 dist/
+# compiled JS
 built/
+# Node modules
 node_modules/
+
+# class docs
+writeups/
+
 # GIMP files
 resources/**/*.xcf

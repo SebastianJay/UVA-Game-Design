@@ -19,9 +19,10 @@ export class LabTwoGame extends Game{
 	gameState : number;
 
 	constructor(canvas : HTMLCanvasElement){
-		super("Lab One Game", 500, 300, canvas);
+		super("Lab Two Game", 500, 300, canvas);
 		this.mario = new AnimatedSprite("Mario", "animations/mario_moving.png");
-		this.marioHealth = 5;
+		this.mario.localScale = new Vector(2.0, 2.0);
+		this.marioHealth = 10;
 		this.marioTime = 60;
 		this.clock = new GameClock();
 		this.gameState = 0;
@@ -30,16 +31,16 @@ export class LabTwoGame extends Game{
 	update(){
     // handle key presses
 		if (InputHandler.instance.keyHeld(InputKeyCode.Left)) {
-			this.mario.position.x = Math.max(this.mario.position.x - 10, 0);
+			this.mario.position.x -= 10;
 		}
 		if (InputHandler.instance.keyHeld(InputKeyCode.Up)) {
-			this.mario.position.y = Math.max(this.mario.position.y - 10, 0);
+			this.mario.position.y -= 10;
 		}
 		if (InputHandler.instance.keyHeld(InputKeyCode.Right)) {
-			this.mario.position.x = Math.min(this.mario.position.x + 10, this.width - this.mario.width);
+			this.mario.position.x += 10;
 		}
 		if (InputHandler.instance.keyHeld(InputKeyCode.Down)) {
-			this.mario.position.y = Math.min(this.mario.position.y + 10, this.height - this.mario.height);
+			this.mario.position.y += 10;
 		}
     if (InputHandler.instance.keyHeld('q')) {
       this.mario.rotation += 3.0;
@@ -48,18 +49,18 @@ export class LabTwoGame extends Game{
       this.mario.rotation -= 3.0;
     }
     if (InputHandler.instance.keyHeld('a')) {
-      this.mario.localScale.x = Math.min(this.mario.localScale.x + 0.1, 2.0);
-      this.mario.localScale.y = Math.min(this.mario.localScale.y + 0.1, 2.0);
+      this.mario.localScale.x = Math.min(this.mario.localScale.x + 0.1, 4.0);
+      this.mario.localScale.y = Math.min(this.mario.localScale.y + 0.1, 4.0);
     }
     if (InputHandler.instance.keyHeld('s')) {
-      this.mario.localScale.x = Math.max(this.mario.localScale.x - 0.1, 0.5);
-      this.mario.localScale.y = Math.max(this.mario.localScale.y - 0.1, 0.5);
+      this.mario.localScale.x = Math.max(this.mario.localScale.x - 0.1, 1.0);
+      this.mario.localScale.y = Math.max(this.mario.localScale.y - 0.1, 1.0);
     }
     if (InputHandler.instance.keyHeld('z')) {
-      this.mario.alpha = Math.min(this.mario.alpha + 0.05, 1.0);
+      this.mario.alpha = Math.min(this.mario.alpha - 0.05, 1.0);
     }
     if (InputHandler.instance.keyHeld('x')) {
-      this.mario.alpha = Math.max(this.mario.alpha - 0.05, 0.0);
+      this.mario.alpha = Math.max(this.mario.alpha + 0.05, 0.0);
     }
     if (InputHandler.instance.keyDown('v')) {
       this.mario.visible = !this.mario.visible;
@@ -77,11 +78,25 @@ export class LabTwoGame extends Game{
       this.mario.pivotPoint.y = Math.min(this.mario.pivotPoint.y + 0.04, 1);
     }
 
+		// handle mouse clicks
 		var event = InputHandler.instance.mouseDown();
 		if (event != null && this.mario.isInRect(event)) {
-			this.marioHealth -= 1;
+			// take off health according to how many buffs/debuffs the player has
+			this.marioHealth -= ((this.mario.visible ? 0 : 10) +
+				((1.0 - this.mario.alpha) * 10) +
+				((2.0 / this.mario.localScale.x) * 1)
+			);
 		}
 
+		// adjust Mario's position to be in-bounds
+		this.mario.position.x = Math.min(Math.max(this.mario.position.x,
+			this.mario.pivotPoint.x * this.mario.width),
+			this.width - this.mario.width + this.mario.pivotPoint.x * this.mario.width);
+		this.mario.position.y = Math.min(Math.max(this.mario.position.y,
+			this.mario.pivotPoint.y * this.mario.height),
+			this.height - this.mario.height + this.mario.pivotPoint.y * this.mario.height);
+
+		// check for endgame state
 		this.mario.update();
 		if (this.gameState == 0) {
 			var time = this.clock.getElapsedTime();
@@ -104,7 +119,7 @@ export class LabTwoGame extends Game{
 		} else if (this.gameState == 2) {
 			g.strokeText('Mario died. =(', 10, 10);
 		} else {
-			g.strokeText('Health: '+ this.marioHealth + '\tTime: ' + this.marioTime.toFixed(2), 10, 10);
+			g.strokeText('Health: '+ this.marioHealth.toFixed(2) + '\tTime: ' + this.marioTime.toFixed(2), 10, 10);
 		}
 		this.mario.draw(g);
 	}

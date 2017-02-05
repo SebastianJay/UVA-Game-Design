@@ -109,10 +109,10 @@ export class DisplayObject {
 	set position(mPosition: Vector){this._position = mPosition;}
 	get position() : Vector{return this._position;}
 
-	set pivotPoint(mPivotPoint : Vector){this._pivotPoint = mPivotPoint;}
+	set pivotPoint(mPivotPoint : Vector){this._pivotPoint = mPivotPoint.max(0).min(1);}
 	get pivotPoint() : Vector{return this._pivotPoint;}
 
-	set localScale(mLocalScale : Vector){this._localScale = mLocalScale;}
+	set localScale(mLocalScale : Vector){this._localScale = mLocalScale.max(0);}
 	get localScale() : Vector{return this._localScale;}
 
 	set rotation(mRotation: number){this._rotation = mRotation;}
