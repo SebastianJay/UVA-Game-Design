@@ -13,7 +13,7 @@ export class InputHandler{
 
   private static _instance : InputHandler;
 
-  private element : HTMLElement;
+  private _element : HTMLElement;
   private clock : GameClock;
   private lastTimestamp : number;
 
@@ -38,17 +38,18 @@ export class InputHandler{
     return this._instance || (this._instance = new this());
   }
 
+  /** Given the canvas element, registers mouse and keyboard listeners to capture input */
   registerInputFocus(element : HTMLElement){
-    if (this.element != null) {
-      this.element.onmousedown = null;
-      this.element.onmousemove = null;
-      this.element.onmouseup = null;
+    if (this._element != null) {
+      this._element.onmousedown = null;
+      this._element.onmousemove = null;
+      this._element.onmouseup = null;
     }
     // register mouse listener with canvas
-    this.element = element;
-    this.element.onmousedown = this.onMouseDownWrapper();
-    this.element.onmousemove = this.onMouseMoveWrapper();
-    this.element.onmouseup = this.onMouseUpWrapper();
+    this._element = element;
+    this._element.onmousedown = this.onMouseDownWrapper();
+    this._element.onmousemove = this.onMouseMoveWrapper();
+    this._element.onmouseup = this.onMouseUpWrapper();
     // register key listener with global window
     window.onkeydown = this.onKeyDownWrapper();
     window.onkeyup = this.onKeyUpWrapper();
@@ -59,6 +60,7 @@ export class InputHandler{
     this.lastTimestamp = this.clock.getElapsedTime();
   }
 
+  /** Gives location of mouse click if the given button has been pressed down since the last update(), null otherwise */
   mouseDown(button? : InputMouseButton) : Vector {
     var b = button || InputMouseButton.Left;
     if (this.pressedButtons[b].timestamp > this.lastTimestamp
@@ -68,6 +70,7 @@ export class InputHandler{
     return null;
   }
 
+  /** Gives location of mouse click if the given button has been unpressed down since the last update(), null otherwise */
   mouseUp(button? : InputMouseButton) : Vector {
     var b = button || InputMouseButton.Left;
     if (this.pressedButtons[b].timestamp > this.lastTimestamp
@@ -77,6 +80,7 @@ export class InputHandler{
     return null;
   }
 
+  /** Gives location of mouse if the given button is currently pressed down, null otherwise */
   mouseHeld(button? : InputMouseButton) : Vector {
     var b = button || InputMouseButton.Left;
     if (this.pressedButtons[b].state == 1) {
@@ -85,23 +89,27 @@ export class InputHandler{
     return null;
   }
 
+  /** Gives location of mouse pointer */
   mouseLocation(button? : InputMouseButton) : Vector {
     var b = button || InputMouseButton.Left;
     return this.pressedButtons[b].location;
   }
 
+  /** Tells whether the given key was pressed down since the last update() */
   keyDown(code : string | InputKeyCode) : boolean {
     var c = this.parseKeyParam(code);
     return (this.pressedKeys[c].timestamp > this.lastTimestamp
       && this.pressedKeys[c].state == 1);
   }
 
+  /** Tells whether the given key was unpressed since the last update() */
   keyUp(code : string | InputKeyCode) {
     var c = this.parseKeyParam(code);
     return (this.pressedKeys[c].timestamp > this.lastTimestamp
       && this.pressedKeys[c].state == 0);
   }
 
+  /** Tells whether the given key is currently pressed */
   keyHeld(code : string | InputKeyCode) {
     var c = this.parseKeyParam(code);
     return (this.pressedKeys[c].state == 1);

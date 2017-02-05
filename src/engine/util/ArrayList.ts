@@ -5,7 +5,7 @@
  *
  * */
 export class ArrayList<T> {
-	contents: T[];
+	private contents: T[];
 
 	constructor(){
 		this.contents = [];

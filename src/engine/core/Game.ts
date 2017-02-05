@@ -8,24 +8,24 @@ import { InputHandler } from '../input/InputHandler';
 export class Game{
 	static instance : Game;
 
-	gameId : string;
-	width : number;
-	height : number;
-	canvas : HTMLCanvasElement;
-	g : CanvasRenderingContext2D;
-	playing : boolean;
+	private _gameId : string;
+	private _width : number;
+	private _height : number;
+	private _canvas : HTMLCanvasElement;
+	private _g : CanvasRenderingContext2D;
+	private _playing : boolean;
 
 	constructor(gameId : string, width : number, height : number, canvas : HTMLCanvasElement){
 		Game.instance = this;
 
-		this.gameId = gameId;
-		this.width = width;
-		this.height = height;
-		this.canvas = canvas;
-		this.g = canvas.getContext('2d'); //the graphics object
-		this.playing = false;
+		this._gameId = gameId;
+		this._width = width;
+		this._height = height;
+		this._canvas = canvas;
+		this._g = canvas.getContext('2d'); //the graphics object
+		this._playing = false;
 
-		InputHandler.instance.registerInputFocus(this.canvas);
+		InputHandler.instance.registerInputFocus(this._canvas);
 	}
 
 	static getInstance(){ return Game.instance; }
@@ -34,21 +34,25 @@ export class Game{
 	draw(g : CanvasRenderingContext2D){}
 
 	start(){
-		this.playing = true;
+		this._playing = true;
 		window.requestAnimationFrame(this.nextFrameWrapper());
 	}
 
 	pause(){
-		this.playing = false;
+		this._playing = false;
 	}
+
+	get width(): number { return this._width; }
+	get height(): number { return this._height; }
+	get playing(): boolean { return this._playing; }
 
 	private nextFrameWrapper(){
 		var __this = this;
 		return () => {
 			__this.update();
-			__this.draw(__this.g);
+			__this.draw(__this._g);
 			InputHandler.instance.update();
-			if(__this.playing) {
+			if(__this._playing) {
 				window.requestAnimationFrame(__this.nextFrameWrapper());
 			}
 		}

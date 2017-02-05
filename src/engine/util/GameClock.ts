@@ -6,7 +6,7 @@
  * */
 export class GameClock{
 
-	start : number;
+	private _start : number;
 
 	constructor(){
 		this.resetGameClock();
@@ -16,10 +16,12 @@ export class GameClock{
 	 * Returns Milliseconds passed since the last time resetGameClock() was called
 	 */
 	getElapsedTime() : number{
-		return new Date().getTime() - this.start;
+		return new Date().getTime() - this._start;
 	}
 
 	resetGameClock() : void {
-		this.start = new Date().getTime();
+		this._start = new Date().getTime();
 	}
+
+	get start(): number { return this._start; }
 }

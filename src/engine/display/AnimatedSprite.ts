@@ -24,20 +24,20 @@ export class AnimatedSprite extends Sprite {
 
   private _isAnimating : boolean;
   private _currentAnimId: string;
-  private currentFrame : number;
-  private frameCounter : number;
-  private configDict : {[name: string]: AnimationConfig};
-  private animClock : GameClock;
+  private _currentFrame : number;
+  private _frameCounter : number;
+  private _configDict : {[name: string]: AnimationConfig};
+  private _animClock : GameClock;
 
   constructor (id : string, filename : string) {
     super(id, filename);
     this._isAnimating = false;
     this._currentAnimId = '';
-    this.currentFrame = 0;
-    this.frameCounter = 0;
-    this.configDict = {};
-    this.animClock = new GameClock();
-    // load YAML file into configDict
+    this._currentFrame = 0;
+    this._frameCounter = 0;
+    this._configDict = {};
+    this._animClock = new GameClock();
+    // load YAML file into _configDict
     var yamlName = filename.slice(0, filename.lastIndexOf('.')) + '.yml';
     var nativeConfig = YAML.load('resources/' + yamlName);
     for (var key in nativeConfig) {
@@ -45,7 +45,7 @@ export class AnimatedSprite extends Sprite {
         // default is a special id that indicates an animation to start out with
         this.animate(nativeConfig[key]);
       } else {
-        this.configDict[key] = nativeConfig[key];
+        this._configDict[key] = nativeConfig[key];
       }
     }
   }
@@ -54,16 +54,16 @@ export class AnimatedSprite extends Sprite {
     super.update();
     if (this.isAnimating) {
       // advance frame counter until it hits the number of frames for animation slide
-      this.frameCounter += 1;
-      if (this.frameCounter == this.currentConfig.speed) {
-        this.currentFrame += 1;
-        this.frameCounter = 0;
+      this._frameCounter += 1;
+      if (this._frameCounter == this.currentConfig.speed) {
+        this._currentFrame += 1;
+        this._frameCounter = 0;
       }
       // if reached end of animation, do end behavior
-      if (this.currentFrame == this.currentConfig.numFrames) {
+      if (this._currentFrame == this.currentConfig.numFrames) {
         switch (this.currentConfig.endBehavior.name) {
           case 'loop':
-            this.currentFrame = 0;
+            this._currentFrame = 0;
             break;
           default:
             console.log("unrecognized animation end behavior: "
@@ -77,7 +77,7 @@ export class AnimatedSprite extends Sprite {
   protected drawImage(g : CanvasRenderingContext2D) {
     if (this.isAnimating) {
       g.drawImage(this.displayImage,
-        this.currentConfig.width * this.currentFrame, this.currentConfig.startRowPixel,
+        this.currentConfig.width * this._currentFrame, this.currentConfig.startRowPixel,
         this.currentConfig.width, this.currentConfig.height,
         0, 0, this.currentConfig.width, this.currentConfig.height);
     }
@@ -90,7 +90,7 @@ export class AnimatedSprite extends Sprite {
   get isAnimating(): boolean { return this._isAnimating; }
   get currentAnimId() : string { return this._currentAnimId; }
 
-  private get currentConfig() : AnimationConfig { return this.configDict[this.currentAnimId]; }
+  private get currentConfig() : AnimationConfig { return this._configDict[this.currentAnimId]; }
 
   animate(animId: string) : void {
     this._currentAnimId = animId;
