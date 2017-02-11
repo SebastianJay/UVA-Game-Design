@@ -98,4 +98,13 @@ export class Vector {
     this.x = x; this.y = y; this.z = z;
     return this;
   };
+
+  set r(mR: number){ this.x = mR; }
+  get r() : number { return this.x; }
+
+  set g(mG: number){ this.y = mG; }
+  get g() : number { return this.y; }
+
+  set b(mB: number){ this.z = mB; }
+  get b() : number { return this.z; }
 }

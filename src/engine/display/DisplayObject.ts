@@ -6,6 +6,7 @@ import { Vector } from '../util/Vector';
  * A very basic display object for a javascript based gaming engine
  */
 export class DisplayObject {
+	private static _objectHash : {[id: string]: DisplayObject} = {};
 
 	private _id : string;
 	private _filename : string;	// path to file containing image
@@ -17,6 +18,7 @@ export class DisplayObject {
 	private _localScale : Vector;			// 2D scale vector
 	private _rotation : number; 	// amount in degrees to rotate clockwise
 	private _alpha : number;		// transparency of object (1.0 = opaque)
+	private _parent : DisplayObject;	// reference to this object's parent
 
 	constructor(id : string, filename : string){
 		this._id = id;
@@ -30,18 +32,22 @@ export class DisplayObject {
 		this.localScale = new Vector(1.0, 1.0);
 		this.rotation = 0.0;
 		this.alpha = 1.0;
+		this.parent = null;
+		DisplayObject._objectHash[id] = this;
 	}
 
 	/**
 	 * Loads the image, sets a flag called 'loaded' when the image is ready to be drawn
 	 */
 	loadImage(filename : string) : void{
-		var t = this;
-		this._displayImage = new Image();
-		this._displayImage.onload = () => {
-			t._loaded = true;
-		};
-		this._displayImage.src = 'resources/' + filename;
+		if (filename) {
+			var t = this;
+			this._displayImage = new Image();
+			this._displayImage.onload = () => {
+				t._loaded = true;
+			};
+			this._displayImage.src = 'resources/' + filename;
+		}
 	}
 
 	/**
@@ -72,22 +78,28 @@ export class DisplayObject {
 	 * Applies transformations for this display object to the given graphics object
 	 * */
 	applyTransformations(g : CanvasRenderingContext2D) {
+		if (this.parent) {
+			g.translate(this.parent.pivotDistance.x, this.parent.pivotDistance.y);
+		}
 		g.translate(this.position.x, this.position.y);
 		g.scale(this.localScale.x, this.localScale.y);
 		g.rotate(Math.PI * this.rotation / 180.0);
 		g.translate(-this.pivotDistance.x, -this.pivotDistance.y);
-		g.globalAlpha = this.alpha;
+		g.globalAlpha *= this.alpha;
 	}
 
 	/**
 	 * Reverses transformations for this display object to the given graphics object
 	 * */
 	reverseTransformations(g : CanvasRenderingContext2D) {
-		g.globalAlpha = 1.0;	// set to opaque
+		g.globalAlpha /= this.alpha;
 		g.translate(this.pivotDistance.x, this.pivotDistance.y);
 		g.rotate(Math.PI * -this.rotation / 180.0);
 		g.scale(1 / this.localScale.x, 1 / this.localScale.y);
 		g.translate(-this.position.x, -this.position.y);
+		if (this.parent) {
+			g.translate(-this.parent.pivotDistance.x, -this.parent.pivotDistance.y);
+		}
 	}
 
 	/**
@@ -109,10 +121,10 @@ export class DisplayObject {
 	set position(mPosition: Vector){this._position = mPosition;}
 	get position() : Vector{return this._position;}
 
-	set pivotPoint(mPivotPoint : Vector){this._pivotPoint = mPivotPoint.max(0).min(1);}
+	set pivotPoint(mPivotPoint : Vector){this._pivotPoint = mPivotPoint;}
 	get pivotPoint() : Vector{return this._pivotPoint;}
 
-	set localScale(mLocalScale : Vector){this._localScale = mLocalScale.max(0);}
+	set localScale(mLocalScale : Vector){this._localScale = mLocalScale;}
 	get localScale() : Vector{return this._localScale;}
 
 	set rotation(mRotation: number){this._rotation = mRotation;}
@@ -120,6 +132,9 @@ export class DisplayObject {
 
 	set alpha(mAlpha : number){this._alpha = Math.min(Math.max(mAlpha, 0.0), 1.0);}
 	get alpha() : number{return this._alpha;}
+
+	set parent(mParent : DisplayObject) { this._parent = mParent; }
+	get parent() : DisplayObject{return this._parent;}
 
 	get displayImage() : HTMLImageElement{return this._displayImage;}
 
@@ -130,10 +145,14 @@ export class DisplayObject {
 
 	get width() : number{return this.unscaledWidth * this.localScale.x;}
 	get height() : number{return this.unscaledHeight * this.localScale.y;}
-	get unscaledWidth() : number {return this.displayImage.width;}
-	get unscaledHeight() : number {return this.displayImage.height;}
+	get unscaledWidth() : number {return this.displayImage != null ? this.displayImage.width : 0;}
+	get unscaledHeight() : number {return this.displayImage != null ? this.displayImage.height : 0;}
 
 	private get pivotDistance() : Vector{
 		return new Vector(this.pivotPoint.x * this.unscaledWidth, this.pivotPoint.y * this.unscaledHeight);
+	}
+
+	static getById(id : string) : DisplayObject {
+		return this._objectHash[id];
 	}
 }
