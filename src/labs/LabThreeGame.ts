@@ -1,6 +1,6 @@
 "use strict";
 
-import { Game } from '../engine/core/Game';
+import { Game } from '../engine/display/Game';
 import { DisplayObject } from '../engine/display/DisplayObject';
 import { DisplayObjectContainer } from '../engine/display/DisplayObjectContainer';
 import { Sprite } from '../engine/display/Sprite';

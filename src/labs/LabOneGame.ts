@@ -1,6 +1,6 @@
 "use strict";
 
-import { Game } from '../engine/core/Game';
+import { Game } from '../engine/display/Game';
 import { Sprite } from '../engine/display/Sprite';
 import { ArrayList } from '../engine/util/ArrayList';
 import { GameClock } from '../engine/util/GameClock';
