@@ -2,6 +2,7 @@
 
 import { Sprite } from './Sprite';
 import { GameClock } from '../util/GameClock';
+import { applyMixins } from '../util/mixins';
 import YAML = require('yamljs');
 
 /** Struct describing properties of one animation state -- these must be followed in YAML */
@@ -17,10 +18,32 @@ interface AnimationConfig {
   };
 }
 
+/** Interface for publicly visible members of AnimatedSprite */
+export interface IAnimatedSprite {
+  animate : (animId: string) => void;
+  isPaused : () => boolean;
+  setPaused : (b : boolean) => void;
+  setGlobalSpeed : (speed: number) => void;
+  getGlobalSpeed : () => number;
+}
+
 /**
- * A Sprite that runs through animations specified by a YAML file
+ * A Sprite that runs through animations specified by a YAML file.
+ *
+ * Classes applying the AnimatedSpriteBase should (1) implement IAnimatedSprite
+ * (2) include the following interfaces in their class
+animate : (animId: string) => void;
+isPaused : () => boolean;
+setPaused : (b : boolean) => void;
+setGlobalSpeed : (speed: number) => void;
+getGlobalSpeed : () => number;
+protected initAnimation : (filename : string) => void;
+protected updateAnimation : () => void;
+protected drawAnimatedImage : (g : CanvasRenderingContext2D, displayImage : HTMLImageElement) => void;
+ * (3) execute this line after the class definition
+applyMixins(ConcreteClass, [AnimatedSpriteBase,])
  */
-export class AnimatedSprite extends Sprite {
+export abstract class AnimatedSpriteBase {
 
   private _isAnimating : boolean;
   private _isPaused : boolean;
@@ -32,8 +55,7 @@ export class AnimatedSprite extends Sprite {
   private _animClock : GameClock;
   private _globalSpeed : number;
 
-  constructor (id : string, filename : string) {
-    super(id, filename);
+  protected initAnimation(filename : string) : void {
     this._isAnimating = false;
     this._isPaused = false;
     this._isReversed = false;
@@ -56,12 +78,11 @@ export class AnimatedSprite extends Sprite {
     }
   }
 
-	update(){
-    super.update();
-    if (this.isAnimating && !this.isPaused) {
+	protected updateAnimation() : void {
+    if (this._isAnimating && !this._isPaused) {
       // advance frame counter until it hits the number of frames for animation slide
       this._frameCounter += 1;
-      if (this._frameCounter >= this.currentConfig.framesPerState / this.globalSpeed) {
+      if (this._frameCounter >= this.getCurrentConfig().framesPerState / this._globalSpeed) {
         if (this._isReversed) {
           this._currentState -= 1;
         } else {
@@ -71,50 +92,76 @@ export class AnimatedSprite extends Sprite {
       }
       // if reached end of animation, do end behavior
       if ((this._isReversed && this._currentState < 0)
-        || this._currentState == this.currentConfig.numStates) {
-        switch (this.currentConfig.endBehavior.name) {
+        || this._currentState == this.getCurrentConfig().numStates) {
+        switch (this.getCurrentConfig().endBehavior.name) {
           case 'loop':
             this._currentState = 0;
             break;
           case 'reverse':
-            this._currentState = (this._isReversed ? 1 : this.currentConfig.numStates - 2);
+            this._currentState = (this._isReversed ? 1 : this.getCurrentConfig().numStates - 2);
             this._isReversed = !this._isReversed;
             break;
           default:
             console.log("unrecognized animation end behavior: "
-              + this.currentConfig.endBehavior.name
-              + " on animation accompanying " + this.id);
+              + this.getCurrentConfig().endBehavior.name);
         }
       }
     }
 	}
 
-  protected drawImage(g : CanvasRenderingContext2D) {
-    if (this.isAnimating) {
-      g.drawImage(this.displayImage,
-        this.currentConfig.width * this._currentState, this.currentConfig.startRowPixel,
-        this.currentConfig.width, this.currentConfig.height,
-        0, 0, this.currentConfig.width, this.currentConfig.height);
+  protected drawAnimatedImage(g : CanvasRenderingContext2D, displayImage : HTMLImageElement) : void {
+    if (this._isAnimating) {
+      g.drawImage(displayImage,
+        this.getCurrentConfig().width * this._currentState, this.getCurrentConfig().startRowPixel,
+        this.getCurrentConfig().width, this.getCurrentConfig().height,
+        0, 0, this.getCurrentConfig().width, this.getCurrentConfig().height);
     }
 	}
 
+  // helper getter
+  private getCurrentConfig() : AnimationConfig { return this._configDict[this._currentAnimId]; }
+
   // override width to only be the part of the image being drawn
-  get unscaledWidth() : number { return (this.isAnimating ? this.currentConfig.width : 0);}
-  get unscaledHeight() : number { return (this.isAnimating ? this.currentConfig.height : 0);}
+  get unscaledWidth() : number { return (this._isAnimating ? this.getCurrentConfig().width : 0);}
+  get unscaledHeight() : number { return (this._isAnimating ? this.getCurrentConfig().height : 0);}
 
-  get isAnimating(): boolean { return this._isAnimating; }
-  get currentAnimId() : string { return this._currentAnimId; }
+  // implementations of public methods
+  isPaused(): boolean { return this._isPaused; }
+  setPaused(p : boolean) { this._isPaused = p; }
 
-  get isPaused(): boolean { return this._isPaused; }
-  set isPaused(p : boolean) { this._isPaused = p; }
-
-  get globalSpeed() : number { return this._globalSpeed; }
-  set globalSpeed(p : number) { this._globalSpeed = p; }
-
-  private get currentConfig() : AnimationConfig { return this._configDict[this.currentAnimId]; }
+  setGlobalSpeed(p : number) { this._globalSpeed = p; }
+  getGlobalSpeed() : number { return this._globalSpeed; }
 
   animate(animId: string) : void {
     this._currentAnimId = animId;
     this._isAnimating = true;
   }
 }
+
+/** Finally, a concrete implementation of the animated sprite */
+export class AnimatedSprite extends Sprite implements IAnimatedSprite {
+
+  constructor (id : string, filename : string) {
+    super(id, filename);
+    this.initAnimation(filename);
+  }
+
+  update() : void {
+    super.update();
+    this.updateAnimation();
+  }
+
+  protected drawImage(g: CanvasRenderingContext2D) {
+    this.drawAnimatedImage(g, this.displayImage);
+  }
+
+  animate : (animId: string) => void;
+  isPaused : () => boolean;
+  setPaused : (b : boolean) => void;
+  setGlobalSpeed : (speed: number) => void;
+  getGlobalSpeed : () => number;
+  protected initAnimation : (filename : string) => void;
+  protected updateAnimation : () => void;
+  protected drawAnimatedImage : (g : CanvasRenderingContext2D, displayImage : HTMLImageElement) => void;
+}
+applyMixins(AnimatedSprite, [AnimatedSpriteBase]);

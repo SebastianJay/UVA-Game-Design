@@ -15,7 +15,7 @@ export class EventArgs {
 /** type alias for callback function */
 export type EventCallback = (args : EventArgs) => any;
 
-/** interface for publically visible members of an event dispatcher */
+/** interface for publicly visible members of an event dispatcher */
 export interface IEventDispatcher {
   addEventListener : (type : string, callback : EventCallback) => void;
   removeEventListener : (type : string, callback : EventCallback) => void;
@@ -25,6 +25,7 @@ export interface IEventDispatcher {
 /**
  * Simple event dispatcher implementation. Listeners can be registered on
  * per-instance or global scope. Class is abstract so it is used as mixin.
+ * 
  * Classes applying the EventDispatcher should (1) implement IEventDispatcher
  * (2) include the following interfaces in their class
 addEventListener : (type : string, callback : EventCallback) => void;

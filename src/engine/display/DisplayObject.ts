@@ -77,7 +77,7 @@ export class DisplayObject {
 	/**
 	 * Applies transformations for this display object to the given graphics object
 	 * */
-	applyTransformations(g : CanvasRenderingContext2D) {
+	protected applyTransformations(g : CanvasRenderingContext2D) : void {
 		if (this.parent) {
 			g.translate(this.parent.pivotDistance.x, this.parent.pivotDistance.y);
 		}
@@ -91,7 +91,7 @@ export class DisplayObject {
 	/**
 	 * Reverses transformations for this display object to the given graphics object
 	 * */
-	reverseTransformations(g : CanvasRenderingContext2D) {
+	protected reverseTransformations(g : CanvasRenderingContext2D) : void {
 		g.globalAlpha /= this.alpha;
 		g.translate(this.pivotDistance.x, this.pivotDistance.y);
 		g.rotate(Math.PI * -this.rotation / 180.0);
@@ -147,6 +147,9 @@ export class DisplayObject {
 	get height() : number{return this.unscaledHeight * this.localScale.y;}
 	get unscaledWidth() : number {return this.displayImage != null ? this.displayImage.width : 0;}
 	get unscaledHeight() : number {return this.displayImage != null ? this.displayImage.height : 0;}
+	// NOTE these setters are specified so overriding them in a mixin works properly
+	set unscaledWidth(w : number) { console.log('set unscaledWidth not implemented'); }
+	set unscaledHeight(h : number ) { console.log('set unscaledHeight not implemented'); }
 
 	private get pivotDistance() : Vector{
 		return new Vector(this.pivotPoint.x * this.unscaledWidth, this.pivotPoint.y * this.unscaledHeight);
