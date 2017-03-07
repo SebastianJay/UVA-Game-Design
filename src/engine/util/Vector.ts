@@ -53,8 +53,12 @@ export class Vector {
   };
 
   length() : number {
-    return Math.sqrt(this.dot(this));
+    return Math.sqrt(this.lengthSquared());
   };
+
+  lengthSquared() : number {
+    return this.dot(this);
+  }
 
   unit() : Vector {
     return this.divide(this.length());
@@ -78,7 +82,7 @@ export class Vector {
   };
 
   angleTo(a : Vector) : number {
-    return Math.acos(this.dot(a) / (this.length() * a.length()));
+    return Math.acos(this.dot(a) / this.lengthSquared());
   };
 
   rotate(cwRadians : number) : Vector {
@@ -107,4 +111,7 @@ export class Vector {
 
   set b(mB: number){ this.z = mB; }
   get b() : number { return this.z; }
+
+  static get zero() : Vector { return new Vector(0.0, 0.0, 0.0); }
+  static get one() : Vector { return new Vector(1.0, 1.0, 1.0); }
 }

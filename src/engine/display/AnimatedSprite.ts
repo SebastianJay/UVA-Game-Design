@@ -23,8 +23,8 @@ export interface IAnimatedSprite {
   animate : (animId: string) => void;
   isPaused : () => boolean;
   setPaused : (b : boolean) => void;
-  setGlobalSpeed : (speed: number) => void;
   getGlobalSpeed : () => number;
+  setGlobalSpeed : (speed: number) => void;
 }
 
 /**
@@ -39,11 +39,10 @@ setGlobalSpeed : (speed: number) => void;
 getGlobalSpeed : () => number;
 protected initAnimation : (filename : string) => void;
 protected updateAnimation : () => void;
-protected drawAnimatedImage : (g : CanvasRenderingContext2D, displayImage : HTMLImageElement) => void;
  * (3) execute this line after the class definition
 applyMixins(ConcreteClass, [AnimatedSpriteBase,])
  */
-export abstract class AnimatedSpriteBase {
+export abstract class AnimatedSpriteBase extends Sprite {
 
   private _isAnimating : boolean;
   private _isPaused : boolean;
@@ -109,21 +108,22 @@ export abstract class AnimatedSpriteBase {
     }
 	}
 
-  protected drawAnimatedImage(g : CanvasRenderingContext2D, displayImage : HTMLImageElement) : void {
+  // override drawImage to only take part of spritesheet
+  protected drawImage(g: CanvasRenderingContext2D) {
     if (this._isAnimating) {
-      g.drawImage(displayImage,
+      g.drawImage(this.displayImage,
         this.getCurrentConfig().width * this._currentState, this.getCurrentConfig().startRowPixel,
         this.getCurrentConfig().width, this.getCurrentConfig().height,
         0, 0, this.getCurrentConfig().width, this.getCurrentConfig().height);
     }
-	}
+  }
 
   // helper getter
   private getCurrentConfig() : AnimationConfig { return this._configDict[this._currentAnimId]; }
 
-  // override width to only be the part of the image being drawn
-  get unscaledWidth() : number { return (this._isAnimating ? this.getCurrentConfig().width : 0);}
-  get unscaledHeight() : number { return (this._isAnimating ? this.getCurrentConfig().height : 0);}
+  // override dimensions to only be the part of the image being drawn
+  protected getUnscaledWidth() : number { return (this._isAnimating ? this.getCurrentConfig().width : 0); }
+  protected getUnscaledHeight() : number { return (this._isAnimating ? this.getCurrentConfig().height : 0); }
 
   // implementations of public methods
   isPaused(): boolean { return this._isPaused; }
@@ -151,10 +151,6 @@ export class AnimatedSprite extends Sprite implements IAnimatedSprite {
     this.updateAnimation();
   }
 
-  protected drawImage(g: CanvasRenderingContext2D) {
-    this.drawAnimatedImage(g, this.displayImage);
-  }
-
   animate : (animId: string) => void;
   isPaused : () => boolean;
   setPaused : (b : boolean) => void;
@@ -162,6 +158,5 @@ export class AnimatedSprite extends Sprite implements IAnimatedSprite {
   getGlobalSpeed : () => number;
   protected initAnimation : (filename : string) => void;
   protected updateAnimation : () => void;
-  protected drawAnimatedImage : (g : CanvasRenderingContext2D, displayImage : HTMLImageElement) => void;
 }
 applyMixins(AnimatedSprite, [AnimatedSpriteBase]);

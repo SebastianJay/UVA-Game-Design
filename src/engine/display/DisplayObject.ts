@@ -1,6 +1,9 @@
 "use strict";
 
 import { Vector } from '../util/Vector';
+import { Circle } from '../util/Circle';
+import { Rectangle } from '../util/Rectangle';
+import { ICollider } from './ColliderSprite';
 
 /**
  * A very basic display object for a javascript based gaming engine
@@ -69,6 +72,73 @@ export class DisplayObject {
 		}
 	}
 
+	/**
+	 * Tells whether the given point (screen coordinates) is within the rectangular hitbox of the object/
+	 * Used for checking if mouse clicks hit the object -- inter-object collision is handled with collidesWith()
+	 */
+	isInRect(point: Vector) : boolean {
+		// apply inverse forward transform to point
+		var test = point.subtract(this.position).divide(this.localScale)
+			.rotate(Math.PI * -this.rotation / 180.0).add(this.pivotDistance);
+		return test.x > 0 && test.x < this.unscaledWidth && test.y > 0 && test.y < this.unscaledHeight;
+	}
+
+	/**
+	 * Tells whether this object has collided with the given object. Both object must be colliders to perform check.
+	 * TODO this method doesn't involve DisplayObject properties, so may not make sense residing here.
+	 */
+	collidesWith(obj : DisplayObject) : boolean {
+		// Helper method definitions
+		var isCollider = (o : any) : o is ICollider => {
+			return 'getHitbox' in o;
+		}
+		var rrCol = (a : Rectangle, b : Rectangle) : boolean => {
+			return a.left < b.right && a.right > b.left
+				&& a.top < b.bottom && a.bottom > b.top;
+		}
+		var rcCol = (a : Rectangle, b : Circle) : boolean => {
+			// NOTE this is an approximate solution, but not complete
+			var pointInCircle = (p : Vector, c : Circle) : boolean => {
+				return (p.x - c.center.x) * (p.x - c.center.x)
+					+ (p.y - c.center.y) * (p.y - c.center.y) <= c.radius * c.radius;
+			}
+			var pointInRect = (p : Vector, r : Rectangle) : boolean => {
+				return p.x > r.left && p.x < r.right && p.y > r.top && p.y < r.bottom;
+			}
+			return pointInRect(b.center, a)
+				|| pointInRect(b.center.add(new Vector(0, b.radius)), a)
+				|| pointInRect(b.center.add(new Vector(b.radius, 0)), a)
+				|| pointInRect(b.center.add(new Vector(0, -b.radius)), a)
+				|| pointInRect(b.center.add(new Vector(-b.radius, 0)), a)
+				|| pointInCircle(a.centerPoint, b)
+				|| pointInCircle(a.topRightPoint, b)
+				|| pointInCircle(a.topLeftPoint, b)
+				|| pointInCircle(a.bottomRightPoint, b)
+				|| pointInCircle(a.bottomLeftPoint, b);
+		}
+		var ccCol = (a : Circle, b : Circle) : boolean => {
+			return a.center.subtract(b.center).lengthSquared() < (a.radius + b.radius) * (a.radius + b.radius);
+		}
+
+		// first do a typeguard to see if both objects are colliders
+		if (!isCollider(this) || !isCollider(obj)) {
+			return false;
+		}
+		// then perform the appropriate hitbox calc
+		var thisHitbox = this.getHitbox();
+		var objHitbox = obj.getHitbox();
+		if (thisHitbox instanceof Circle && objHitbox instanceof Circle) {
+			return ccCol(thisHitbox, objHitbox);
+		} else if (thisHitbox instanceof Rectangle && objHitbox instanceof Circle) {
+			return rcCol(thisHitbox, objHitbox);
+		} else if (thisHitbox instanceof Circle && objHitbox instanceof Rectangle) {
+			return rcCol(objHitbox, thisHitbox);
+		} else if (thisHitbox instanceof Rectangle && objHitbox instanceof Rectangle) {
+			return rrCol(thisHitbox, objHitbox);
+		}
+		return false;	// shouldn't get here
+	}
+
 	/** Helper intended to be overriden by display objects using spritesheets */
 	protected drawImage(g: CanvasRenderingContext2D) {
 		g.drawImage(this.displayImage,0,0);
@@ -102,16 +172,6 @@ export class DisplayObject {
 		}
 	}
 
-	/**
-	* Tells whether the given point (screen coordinates) is within the rectangular hitbox of the object
-	* */
-	isInRect(point: Vector) : boolean {
-		// apply inverse forward transform to point
-		var test = point.subtract(this.position).divide(this.localScale)
-			.rotate(Math.PI * -this.rotation / 180.0).add(this.pivotDistance);
-		return test.x > 0 && test.x < this.unscaledWidth && test.y > 0 && test.y < this.unscaledHeight;
-	}
-
 	set id(mId : string){this._id = mId;}
 	get id() : string{return this._id;}
 
@@ -143,13 +203,14 @@ export class DisplayObject {
 	set y(mY : number){this.position.y = mY;}
 	get y() : number{return this.position.y;}
 
+	// these protected methods (not getters) are specified so overriding in mixin works properly
+	protected getUnscaledWidth() : number { return this.displayImage != null ? this.displayImage.width : 0; }
+	protected getUnscaledHeight() : number { return this.displayImage != null ? this.displayImage.height : 0; }
+	// these getters are publicly visible
+	get unscaledWidth() : number {return this.getUnscaledWidth();}
+	get unscaledHeight() : number {return this.getUnscaledHeight();}
 	get width() : number{return this.unscaledWidth * this.localScale.x;}
 	get height() : number{return this.unscaledHeight * this.localScale.y;}
-	get unscaledWidth() : number {return this.displayImage != null ? this.displayImage.width : 0;}
-	get unscaledHeight() : number {return this.displayImage != null ? this.displayImage.height : 0;}
-	// NOTE these setters are specified so overriding them in a mixin works properly
-	set unscaledWidth(w : number) { console.log('set unscaledWidth not implemented'); }
-	set unscaledHeight(h : number ) { console.log('set unscaledHeight not implemented'); }
 
 	private get pivotDistance() : Vector{
 		return new Vector(this.pivotPoint.x * this.unscaledWidth, this.pivotPoint.y * this.unscaledHeight);

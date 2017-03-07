@@ -29,6 +29,19 @@ export class DisplayObjectContainer extends DisplayObject {
     }
   }
 
+  // override to include collisions with all children in display tree
+  collidesWith(obj : DisplayObject) : boolean {
+    if (super.collidesWith(obj)) {
+      return true;
+    }
+    for (var i = 0; i < this.children.size(); i++) {
+      if (this.children.get(i).collidesWith(obj)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   // Functional programming on the tree
   map(func : (obj : DisplayObject) => void) : void {
     func(this);
