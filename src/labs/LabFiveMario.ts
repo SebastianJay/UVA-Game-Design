@@ -3,18 +3,20 @@
 import { Sprite } from '../engine/display/Sprite';
 import { IRectCollider, RectColliderSpriteBase } from '../engine/display/ColliderSprite';
 import { IPhysicsSprite, PhysicsSpriteBase } from '../engine/display/PhysicsSprite';
+import { IAnimatedSprite, AnimatedSpriteBase } from '../engine/display/AnimatedSprite';
 import { CollisionEventArgs, CollisionType } from '../engine/events/EventTypes';
 import { EventDispatcher } from '../engine/events/EventDispatcher';
 import { Rectangle } from '../engine/util/Rectangle';
 import { Vector } from '../engine/util/Vector';
 import { applyMixins } from '../engine/util/mixins';
 
-export class LabFiveMario extends Sprite implements IRectCollider, IPhysicsSprite {
+export class LabFiveMario extends Sprite implements IRectCollider, IPhysicsSprite, IAnimatedSprite {
   grounded : boolean;
 
   constructor(id: string, filename: string) {
     super(id, filename);
     this.initPhysics();
+    this.initAnimation(filename);
     this.collisionLayer = 1;
     this.isTrigger = false;
     this.elasticity = 0.0;
@@ -25,6 +27,7 @@ export class LabFiveMario extends Sprite implements IRectCollider, IPhysicsSprit
   update() : void {
     super.update();
     this.updatePhysics();
+    this.updateAnimation();
   }
 
   private get collisionHandler() {
@@ -53,5 +56,13 @@ export class LabFiveMario extends Sprite implements IRectCollider, IPhysicsSprit
   addForce : (f : Vector) => void;
   protected initPhysics : () => void;
   protected updatePhysics : () => void;
+
+  animate : (animId: string) => void;
+  isPaused : () => boolean;
+  setPaused : (b : boolean) => void;
+  setGlobalSpeed : (speed: number) => void;
+  getGlobalSpeed : () => number;
+  protected initAnimation : (filename : string) => void;
+  protected updateAnimation : () => void;
 }
-applyMixins(LabFiveMario, [RectColliderSpriteBase, PhysicsSpriteBase]);
+applyMixins(LabFiveMario, [RectColliderSpriteBase, PhysicsSpriteBase, AnimatedSpriteBase]);

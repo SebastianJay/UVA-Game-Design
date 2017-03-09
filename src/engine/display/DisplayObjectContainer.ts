@@ -95,6 +95,12 @@ export class DisplayObjectContainer extends DisplayObject {
     return this;
   }
 
+  removeSelf() : void {
+    if (this.parent != null && this.parent instanceof DisplayObjectContainer) {
+      (this.parent as DisplayObjectContainer).removeChild(this);
+    }
+  }
+
   clearChildren() : DisplayObjectContainer {
     this._children = new ArrayList<DisplayObject>();
     return this;

@@ -1,7 +1,6 @@
 "use strict";
 
 import { Sprite } from './Sprite';
-import { GameClock } from '../util/GameClock';
 import { applyMixins } from '../util/mixins';
 import YAML = require('yamljs');
 
@@ -51,7 +50,6 @@ export abstract class AnimatedSpriteBase extends Sprite {
   private _currentState : number;
   private _frameCounter : number;
   private _configDict : {[name: string]: AnimationConfig};
-  private _animClock : GameClock;
   private _globalSpeed : number;
 
   protected initAnimation(filename : string) : void {
@@ -62,7 +60,6 @@ export abstract class AnimatedSpriteBase extends Sprite {
     this._currentState = 0;
     this._frameCounter = 0;
     this._configDict = {};
-    this._animClock = new GameClock();
     this._globalSpeed = 1.0;
     // load YAML file into _configDict
     var yamlName = filename.slice(0, filename.lastIndexOf('.')) + '.yml';
@@ -133,8 +130,12 @@ export abstract class AnimatedSpriteBase extends Sprite {
   getGlobalSpeed() : number { return this._globalSpeed; }
 
   animate(animId: string) : void {
-    this._currentAnimId = animId;
-    this._isAnimating = true;
+    if (this._currentAnimId != animId) {
+      this._currentAnimId = animId;
+      this._currentState = 0;
+      this._frameCounter = 0;
+      this._isAnimating = true;
+    }
   }
 }
 
