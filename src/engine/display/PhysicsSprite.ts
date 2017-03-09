@@ -2,7 +2,6 @@
 
 import { Sprite } from './Sprite';
 import { Vector } from '../util/Vector';
-import { GameClock } from '../util/GameClock';
 import { Physics } from '../util/Physics';
 import { applyMixins } from '../util/mixins';
 
@@ -12,6 +11,7 @@ export interface IPhysicsSprite {
   elasticity : number;
   acceleration : Vector;
   velocity : Vector;
+  previousPosition : Vector;
   addForce : (f : Vector) => void;
 }
 
@@ -24,20 +24,20 @@ mass : number;
 elasticity : number;
 acceleration : Vector;
 velocity : Vector;
+previousPosition : Vector;
 addForce : (f : Vector) => void;
 protected initPhysics : () => void;
-protected updatePhysics : (pos : Vector) => Vector;
+protected updatePhysics : () => void;
  * (3) execute this line after the class definition
 applyMixins(ConcreteClass, [PhysicsSpriteBase,])
  */
-export abstract class PhysicsSpriteBase implements IPhysicsSprite {
+export abstract class PhysicsSpriteBase extends Sprite implements IPhysicsSprite {
   mass : number;
   elasticity : number;
   acceleration : Vector;
   velocity : Vector;
+  previousPosition : Vector;
   private _currentForce : Vector;
-  private _physicsClock : GameClock;
-  private _currentTimestamp : number;
 
   addForce(f : Vector) : void {
     this._currentForce = this._currentForce.add(f);
@@ -45,24 +45,21 @@ export abstract class PhysicsSpriteBase implements IPhysicsSprite {
 
   protected initPhysics() : void {
     this.mass = 1.0;
-    this.elasticity = 1.0;
+    this.elasticity = 0.0;
     this.acceleration = Vector.zero;
     this.velocity = Vector.zero;
+    this.previousPosition = Vector.zero;
     this._currentForce = Vector.zero;
-    this._physicsClock = new GameClock();
-    this._currentTimestamp = this._physicsClock.getElapsedTime();
   }
 
-  protected updatePhysics(currentPosition : Vector) : Vector {
-    var nextTimestamp = this._physicsClock.getElapsedTime();
-    var deltaT = (nextTimestamp - this._currentTimestamp) / 1000;
+  protected updatePhysics() : void {
+    var dt = Physics.DeltaTime;
+    this.previousPosition = this.position;
     this.acceleration = this._currentForce.divide(this.mass);
-    this.velocity = this.velocity.add(this.acceleration.multiply(deltaT));
-    var position = currentPosition.add((this.velocity.multiply(deltaT))
-      .add(this.acceleration.multiply(deltaT*deltaT)).multiply(Physics.PixelsPerMeter));
+    this.velocity = this.velocity.add(this.acceleration.multiply(dt));
+    this.position = this.position.add((this.velocity.multiply(dt))
+      .add(this.acceleration.multiply(dt*dt)).multiply(Physics.PixelsPerMeter));
     this._currentForce = Vector.zero;
-    this._currentTimestamp = nextTimestamp;
-    return position;
   }
 }
 
@@ -75,15 +72,16 @@ export class PhysicsSprite extends Sprite implements IPhysicsSprite {
 
   update() : void {
     super.update();
-    this.position = this.updatePhysics(this.position);
+    this.updatePhysics();
   }
 
   mass : number;
   elasticity : number;
   acceleration : Vector;
   velocity : Vector;
+  previousPosition : Vector;
   addForce : (f : Vector) => void;
   protected initPhysics : () => void;
-  protected updatePhysics : (pos : Vector) => Vector;
+  protected updatePhysics : () => void;
 }
 applyMixins(PhysicsSprite, [PhysicsSpriteBase]);

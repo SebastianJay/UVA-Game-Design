@@ -2,14 +2,14 @@
 
 import { InputHandler } from '../input/InputHandler';
 import { DisplayObjectContainer } from '../display/DisplayObjectContainer';
+import { Physics } from '../util/Physics';
 
 /**
  * Main class. Instantiate or extend Game to create a new game of your own
  */
 export class Game extends DisplayObjectContainer {
-	static instance : Game;
+	private static _instance : Game;
 
-	private _gameId : string;
 	private _width : number;
 	private _height : number;
 	private _canvas : HTMLCanvasElement;
@@ -18,9 +18,7 @@ export class Game extends DisplayObjectContainer {
 
 	constructor(gameId : string, width : number, height : number, canvas : HTMLCanvasElement){
 		super(gameId, '');
-		Game.instance = this;
 
-		this._gameId = gameId;
 		this._width = width;
 		this._height = height;
 		this._canvas = canvas;
@@ -29,10 +27,14 @@ export class Game extends DisplayObjectContainer {
 		this._canvas.height = height;
 		this._playing = false;
 
+		Game._instance = this;
 		InputHandler.instance.registerInputFocus(this._canvas);
 	}
 
-	static getInstance(){ return Game.instance; }
+	update() : void {
+		super.update();
+		Physics.CollisionUpdate(this);
+	}
 
 	draw(g : CanvasRenderingContext2D){
 		// clear screen and reset transformation matrices
@@ -44,30 +46,32 @@ export class Game extends DisplayObjectContainer {
 
 	start(){
 		this._playing = true;
-		window.requestAnimationFrame(this.nextFrameWrapper());
+		window.requestAnimationFrame(this.nextFrameWrapper);
 	}
 
 	pause(){
 		this._playing = false;
 	}
 
+	get isPlaying(): boolean { return this._playing; }
+
 	// override width, height to report this class's fields
-	get width(): number { return this._width; }
-	get height(): number { return this._height; }
-	get unscaledWidth() : number {return this.width;}
-	get unscaledHeight() : number {return this.height;}
+	get width(): number { return this.getUnscaledWidth(); }
+	get height(): number { return this.getUnscaledHeight(); }
+	protected getUnscaledWidth() : number { return this._width; }
+	protected getUnscaledHeight() : number { return this._height; }
 
-	get playing(): boolean { return this._playing; }
-
-	private nextFrameWrapper(){
-		var __this = this;
+	private get nextFrameWrapper() {
+		var self = this;
 		return () => {
-			__this.update();
-			__this.draw(__this._g);
+			self.update();
+			self.draw(self._g);
 			InputHandler.instance.update();
-			if(__this._playing) {
-				window.requestAnimationFrame(__this.nextFrameWrapper());
+			if(self._playing) {
+				window.requestAnimationFrame(self.nextFrameWrapper);
 			}
 		}
 	}
+
+	static get instance() : Game { return Game._instance; }
 }

@@ -1,6 +1,7 @@
 'use strict';
 
 import { DisplayObject } from './DisplayObject';
+import { ICollider } from './ColliderSprite';
 import { ArrayList } from '../util/ArrayList';
 
 export class DisplayObjectContainer extends DisplayObject {
@@ -30,7 +31,7 @@ export class DisplayObjectContainer extends DisplayObject {
   }
 
   // override to include collisions with all children in display tree
-  collidesWith(obj : DisplayObject) : boolean {
+  collidesWith(obj : ICollider) : boolean {
     if (super.collidesWith(obj)) {
       return true;
     }

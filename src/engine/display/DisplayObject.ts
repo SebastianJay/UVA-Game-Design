@@ -1,8 +1,8 @@
 "use strict";
 
 import { Vector } from '../util/Vector';
-import { Circle } from '../util/Circle';
-import { Rectangle } from '../util/Rectangle';
+import { Physics } from '../util/Physics';
+import { isCollider } from '../util/typecheck';
 import { ICollider } from './ColliderSprite';
 
 /**
@@ -85,58 +85,18 @@ export class DisplayObject {
 
 	/**
 	 * Tells whether this object has collided with the given object. Both object must be colliders to perform check.
-	 * TODO this method doesn't involve DisplayObject properties, so may not make sense residing here.
 	 */
-	collidesWith(obj : DisplayObject) : boolean {
-		// Helper method definitions
-		var isCollider = (o : any) : o is ICollider => {
-			return 'getHitbox' in o;
-		}
-		var rrCol = (a : Rectangle, b : Rectangle) : boolean => {
-			return a.left < b.right && a.right > b.left
-				&& a.top < b.bottom && a.bottom > b.top;
-		}
-		var rcCol = (a : Rectangle, b : Circle) : boolean => {
-			// NOTE this is an approximate solution, but not complete
-			var pointInCircle = (p : Vector, c : Circle) : boolean => {
-				return (p.x - c.center.x) * (p.x - c.center.x)
-					+ (p.y - c.center.y) * (p.y - c.center.y) <= c.radius * c.radius;
-			}
-			var pointInRect = (p : Vector, r : Rectangle) : boolean => {
-				return p.x > r.left && p.x < r.right && p.y > r.top && p.y < r.bottom;
-			}
-			return pointInRect(b.center, a)
-				|| pointInRect(b.center.add(new Vector(0, b.radius)), a)
-				|| pointInRect(b.center.add(new Vector(b.radius, 0)), a)
-				|| pointInRect(b.center.add(new Vector(0, -b.radius)), a)
-				|| pointInRect(b.center.add(new Vector(-b.radius, 0)), a)
-				|| pointInCircle(a.centerPoint, b)
-				|| pointInCircle(a.topRightPoint, b)
-				|| pointInCircle(a.topLeftPoint, b)
-				|| pointInCircle(a.bottomRightPoint, b)
-				|| pointInCircle(a.bottomLeftPoint, b);
-		}
-		var ccCol = (a : Circle, b : Circle) : boolean => {
-			return a.center.subtract(b.center).lengthSquared() < (a.radius + b.radius) * (a.radius + b.radius);
-		}
-
+	collidesWith(obj : ICollider) : boolean {
 		// first do a typeguard to see if both objects are colliders
-		if (!isCollider(this) || !isCollider(obj)) {
+		if (!isCollider(this)) {
+			return false;
+		}
+		// next check collisions should occur according to matrix
+		if (!Physics.CheckCollisionMat(this.collisionLayer, obj.collisionLayer)) {
 			return false;
 		}
 		// then perform the appropriate hitbox calc
-		var thisHitbox = this.getHitbox();
-		var objHitbox = obj.getHitbox();
-		if (thisHitbox instanceof Circle && objHitbox instanceof Circle) {
-			return ccCol(thisHitbox, objHitbox);
-		} else if (thisHitbox instanceof Rectangle && objHitbox instanceof Circle) {
-			return rcCol(thisHitbox, objHitbox);
-		} else if (thisHitbox instanceof Circle && objHitbox instanceof Rectangle) {
-			return rcCol(objHitbox, thisHitbox);
-		} else if (thisHitbox instanceof Rectangle && objHitbox instanceof Rectangle) {
-			return rrCol(thisHitbox, objHitbox);
-		}
-		return false;	// shouldn't get here
+		return Physics.CheckCollisionHitbox(this.getHitbox(), obj.getHitbox());
 	}
 
 	/** Helper intended to be overriden by display objects using spritesheets */
