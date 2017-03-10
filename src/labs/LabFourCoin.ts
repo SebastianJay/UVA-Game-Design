@@ -7,10 +7,9 @@ import { ArrayList } from '../engine/util/ArrayList';
 import { applyMixins } from '../engine/util/mixins';
 
 export class LabFourCoinEventArgs extends EventArgs {
-  static get className() : string { return "LabFourCoinEventArgs"; }
-  constructor (public src : IEventDispatcher,
-    public pickedUp : boolean) {
-    super(src);
+  static get ClassName() : string { return "LabFourCoinEventArgs"; }
+  constructor (public pickedUp : boolean) {
+    super();
   };
 }
 
@@ -28,7 +27,7 @@ export class LabFourCoin extends Sprite implements IEventDispatcher {
         && obj.y + obj.height * (1 - obj.pivotPoint.y) > this.y - this.height * (this.pivotPoint.y)
         && obj.y - obj.height * (obj.pivotPoint.y) < this.y + this.height * (1 - this.pivotPoint.y)) {
         this.visible = false;
-        this.dispatchEvent(new LabFourCoinEventArgs(this,true));
+        this.dispatchEvent(new LabFourCoinEventArgs(true));
       }
     }
   }

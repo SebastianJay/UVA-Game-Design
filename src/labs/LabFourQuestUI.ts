@@ -10,7 +10,7 @@ export class LabFourQuestUI extends DisplayObjectContainer {
   constructor(id : string, filename : string) {
     super(id, filename);
     this.visible = false;
-    EventDispatcher.addGlobalListener(LabFourCoinEventArgs.className, this.coinEventHandler);
+    EventDispatcher.addGlobalListener(LabFourCoinEventArgs.ClassName, this.coinEventHandler);
   }
 
   // the callback notation is a bit uglier than implementing IEventListener with notify()

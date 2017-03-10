@@ -140,8 +140,7 @@ export class Physics implements IEventDispatcher {
       for (var i = 0; i < Physics._PreviousCollisions[id].length; i++) {
         var id2 = Physics._PreviousCollisions[id][i];
         if (!Physics.PairExistsInMapping(id, id2, currentCollisions)) {
-          var eventSrc = new Physics();
-          eventSrc.dispatchEvent(new CollisionEventArgs(eventSrc, id, id2, Vector.zero, CollisionType.Exit));
+          new Physics().dispatchEvent(new CollisionEventArgs(id, id2, Vector.zero, CollisionType.Exit));
         }
       }
     }
@@ -231,8 +230,7 @@ export class Physics implements IEventDispatcher {
     // fire event
     var type = Physics.PairExistsInMapping(obj1.id, obj2.id, Physics._PreviousCollisions)
       ? CollisionType.Stay : CollisionType.Enter;
-    var eventSrc = new Physics();
-    eventSrc.dispatchEvent(new CollisionEventArgs(eventSrc, obj1.id, obj2.id, normal, type));
+    new Physics().dispatchEvent(new CollisionEventArgs(obj1.id, obj2.id, normal, type));
   }
 
   private static PairExistsInMapping(a: string, b:string, mapping:{[id: string]: string[]}) : boolean {

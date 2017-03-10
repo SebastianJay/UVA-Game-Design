@@ -5,11 +5,12 @@ import { ArrayList } from '../util/ArrayList';
 /** Simple Event arguments struct */
 export class EventArgs {
   // doing reflection in JS is tricky, so we do the lame approach
-  get className() : string { return (<any>this.constructor).className; }
+  get className() : string { return (<any>this.constructor).ClassName; }
+  public src : IEventDispatcher;
 
   // copy into extensions of EventArgs and replace string
-  static get className() : string { return "EventArgs"; }
-  constructor (public src : IEventDispatcher) { };
+  static get ClassName() : string { return "EventArgs"; }
+  constructor () { };
 }
 
 /** type alias for callback function */
@@ -25,7 +26,7 @@ export interface IEventDispatcher {
 /**
  * Simple event dispatcher implementation. Listeners can be registered on
  * per-instance or global scope. Class is abstract so it is used as mixin.
- * 
+ *
  * Classes applying the EventDispatcher should (1) implement IEventDispatcher
  * (2) include the following interfaces in their class
 addEventListener : (type : string, callback : EventCallback) => void;
@@ -96,6 +97,8 @@ export abstract class EventDispatcher implements IEventDispatcher {
         }
       }
     }
+    // set emitter src in args
+    args.src = this;
     // broadcast to local listeners
     helper(this._listeners[args.className]);
     // broadcast to global listeners

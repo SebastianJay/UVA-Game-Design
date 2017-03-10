@@ -16,7 +16,7 @@ export class LabFiveCoin extends Sprite implements ICircleCollider {
     super(id, filename);
     this.collisionLayer = 0;
     this.isTrigger = true;
-    EventDispatcher.addGlobalListener(CollisionEventArgs.className, this.coinGetHandler);
+    EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.coinGetHandler);
   }
 
   private get coinGetHandler() {
