@@ -10,6 +10,7 @@ import { DisplayObject } from '../display/DisplayObject';
 import { DisplayObjectContainer } from '../display/DisplayObjectContainer';
 import { IEventDispatcher, EventDispatcher, EventCallback, EventArgs } from '../events/EventDispatcher';
 import { CollisionEventArgs, CollisionType } from '../events/EventTypes';
+import { TweenManager } from '../tween/TweenManager';
 import { applyMixins } from './mixins';
 
 /**
@@ -117,6 +118,9 @@ export class Physics implements IEventDispatcher {
 				for (var k = (layer1 == layer2 ? j+1 : 0); k < colliders[layer2].length; k++) {
 					var obj1 = colliders[layer1][j];
 					var obj2 = colliders[layer2][k];
+          if (TweenManager.instance.isTweening(obj1) || TweenManager.instance.isTweening(obj2)) {
+            continue; // no collisions should occur between objects that are animating
+          }
 					if (obj1.collidesWith(obj2)) {
             // update mapping
             if (!(obj1.id in currentCollisions)) {

@@ -74,6 +74,30 @@ export class ArrayList<T> {
 		this.contents = newContents;
 	}
 
+	/**
+	 * Functional programming ftw
+	 * These methods do not modify the list in-place, but rather return new lists
+	 */
+	/** Return a new list with func applied to each element */
+	map<S>(func : (e : T) => S) : ArrayList<S> {
+		var retVal = new ArrayList<S>();
+		for (var i = 0; i < this.contents.length; i++) {
+			retVal.push(func(this.contents[i]));
+		}
+		return retVal;
+	}
+
+	/** Return a new list with elements that fulfill the condition in func */
+	filter(func : (e : T) => boolean) : ArrayList<T> {
+		var retVal = new ArrayList<T>();
+		for (var i = 0; i < this.contents.length; i++) {
+			if (func(this.contents[i])) {
+				retVal.push(this.contents[i]);
+			}
+		}
+		return retVal;
+	}
+
 	print() : void{
 		for(var i=0; i<this.contents.length; i++){
 			console.log(this.contents[i] + ", ");

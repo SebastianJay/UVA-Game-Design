@@ -3,6 +3,7 @@
 import { Sprite } from './Sprite';
 import { Vector } from '../util/Vector';
 import { Physics } from '../util/Physics';
+import { TweenManager } from '../tween/TweenManager';
 import { applyMixins } from '../util/mixins';
 
 /** Interface for publicly visible members of PhysicsSprite */
@@ -53,8 +54,11 @@ export abstract class PhysicsSpriteBase extends Sprite implements IPhysicsSprite
   }
 
   protected updatePhysics() : void {
-    var dt = Physics.DeltaTime;
     this.previousPosition = this.position;
+    if (TweenManager.instance.isTweening(this)) {
+      return; // do nothing further than note previous position
+    }
+    var dt = Physics.DeltaTime;
     this.acceleration = this._currentForce.divide(this.mass);
     this.velocity = this.velocity.add(this.acceleration.multiply(dt));
     this.position = this.position.add((this.velocity.multiply(dt))

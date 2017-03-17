@@ -1,6 +1,7 @@
 "use strict";
 
 import { InputHandler } from '../input/InputHandler';
+import { TweenManager } from '../tween/TweenManager';
 import { DisplayObjectContainer } from '../display/DisplayObjectContainer';
 import { Physics } from '../util/Physics';
 
@@ -67,6 +68,7 @@ export class Game extends DisplayObjectContainer {
 			self.update();
 			self.draw(self._g);
 			InputHandler.instance.update();
+			TweenManager.instance.update();
 			if(self._playing) {
 				window.requestAnimationFrame(self.nextFrameWrapper);
 			}
