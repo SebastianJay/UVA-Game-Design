@@ -34,11 +34,11 @@ export class LabFiveMario extends Sprite implements IRectCollider, IPhysicsSprit
     var self = this;
     return (args : CollisionEventArgs) => {
       if ((args.type == CollisionType.Enter || args.type == CollisionType.Stay) && args.normal.y < 0) {
-        console.log('grounded');
+        //console.log('grounded');
         this.grounded = true;
       }
       else if (args.type == CollisionType.Exit) {
-        console.log('not grounded');
+        //console.log('not grounded');
         this.grounded = false;
       }
     }

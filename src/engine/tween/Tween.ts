@@ -26,7 +26,7 @@ export class Tween implements IEventDispatcher {
     return this;
   }
 
-  /** Called by TweenManager in main loop to step forward the animation by dt */
+  /** Called by TweenManager in main loop to step forward the animation by dt (which should be seconds) */
   update(dt : number) : void {
     // apply transformations specified in params
     for (var i = 0; i < this._paramList.size(); i++) {
@@ -49,7 +49,6 @@ export class Tween implements IEventDispatcher {
       } else if (type == TweenAttributeType.Alpha) {
         this._object.alpha = newVal;
       }
-      this.dispatchEvent(new TweenEventArgs(this._object, this._paramList.get(i)[0], p));
     }
 
     // remove those tweens which are complete
@@ -61,6 +60,9 @@ export class Tween implements IEventDispatcher {
     this._paramList = this._paramList.map((e : [TweenParam, number]) => {
       return [e[0], Math.min(e[1] + dt, e[0].duration)] as [TweenParam, number];
     });
+
+    // fire event
+    this.dispatchEvent(new TweenEventArgs());
   }
 
   /** Returns true if no outstanding tweens are remaining */

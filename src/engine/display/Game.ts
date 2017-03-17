@@ -35,6 +35,7 @@ export class Game extends DisplayObjectContainer {
 	update() : void {
 		super.update();
 		Physics.CollisionUpdate(this);
+		TweenManager.instance.update();
 	}
 
 	draw(g : CanvasRenderingContext2D){
@@ -68,7 +69,6 @@ export class Game extends DisplayObjectContainer {
 			self.update();
 			self.draw(self._g);
 			InputHandler.instance.update();
-			TweenManager.instance.update();
 			if(self._playing) {
 				window.requestAnimationFrame(self.nextFrameWrapper);
 			}

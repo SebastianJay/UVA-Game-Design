@@ -115,14 +115,14 @@ export class DisplayObject {
 		g.scale(this.localScale.x, this.localScale.y);
 		g.rotate(Math.PI * this.rotation / 180.0);
 		g.translate(-this.pivotDistance.x, -this.pivotDistance.y);
-		g.globalAlpha *= this.alpha;
+		g.globalAlpha = this.alpha;
 	}
 
 	/**
 	 * Reverses transformations for this display object to the given graphics object
 	 * */
 	protected reverseTransformations(g : CanvasRenderingContext2D) : void {
-		g.globalAlpha /= this.alpha;
+		g.globalAlpha = 1.0;	// set to opaque
 		g.translate(this.pivotDistance.x, this.pivotDistance.y);
 		g.rotate(Math.PI * -this.rotation / 180.0);
 		g.scale(1 / this.localScale.x, 1 / this.localScale.y);
