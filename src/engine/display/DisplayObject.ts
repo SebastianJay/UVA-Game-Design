@@ -63,11 +63,9 @@ export class DisplayObject {
 	 * Draws this image to the screen
 	 */
 	draw(g : CanvasRenderingContext2D){
-		if(this.displayImage && this.visible){
+		if (this._loaded && this.displayImage && this.visible) {
 			this.applyTransformations(g);
-			if(this._loaded) {
-				this.drawImage(g);
-			}
+			this.drawImage(g);
 			this.reverseTransformations(g);
 		}
 	}
