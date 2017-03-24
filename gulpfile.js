@@ -9,7 +9,7 @@ gulp.task("default", function () {
     return browserify({
         basedir: '.',
         debug: true,
-        entries: ['src/labs/Lab' + (('lab' in yargs.argv) ? wordMappings[yargs.argv.lab] : wordMappings[1]) + 'Game.ts'],
+        entries: ('lab' in yargs.argv) ? ['src/labs/Lab' + wordMappings[yargs.argv.lab] + 'Game.ts'] : ['src/cakewalk/MainGame.ts']
     })
     .plugin(tsify)
     .bundle()
