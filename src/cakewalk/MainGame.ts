@@ -35,8 +35,10 @@ export class MainGame extends Game {
     w2.position = new Vector(0, this.height / 2);
     this.player1.position = new Vector(50, 50);
     this.player2.position = new Vector(50, 50);
-    p1.position = new Vector(25, 200);
-    p2.position = new Vector(25, 200);
+    p1.position = new Vector(0, 200);
+    p1.width = this.width;
+    p2.position = new Vector(0, 200);
+    p2.width = this.width;
     this.player1.localScale = new Vector(4.0, 4.0);
     this.player2.localScale = new Vector(4.0, 4.0);
     p1.localScale = new Vector(4.0, 4.0);

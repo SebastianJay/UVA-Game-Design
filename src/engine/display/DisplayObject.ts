@@ -17,6 +17,7 @@ export class DisplayObject {
 	private _displayImage : HTMLImageElement;	// the HTML element corresponding to the image
 	private _visible : boolean;	// whether the DisplayObject should be drawn
 	private _position : Vector;	// 2D position
+	private _altDimensions : Vector;	// if displayImage is not initialized, a width and height representing size
 	private _pivotPoint : Vector;	// origin of the object relative to top-left corner. Ranges from (0, 0) to (1, 1)
 	private _localScale : Vector;			// 2D scale vector
 	private _rotation : number; 	// amount in degrees to rotate clockwise
@@ -30,9 +31,10 @@ export class DisplayObject {
 		this.loadImage(filename);
 
 		this.visible = true;
-		this.position = new Vector(0, 0);
-		this.pivotPoint = new Vector(0, 0);
-		this.localScale = new Vector(1.0, 1.0);
+		this.position = Vector.zero;
+		this.pivotPoint = Vector.zero;
+		this.localScale = Vector.one;
+		this._altDimensions = Vector.zero;
 		this.rotation = 0.0;
 		this.alpha = 1.0;
 		this.parent = null;
@@ -44,10 +46,18 @@ export class DisplayObject {
 	 */
 	loadImage(filename : string) : void{
 		if (filename) {
-			var t = this;
+			var self = this;
 			this._displayImage = new Image();
 			this._displayImage.onload = () => {
-				t._loaded = true;
+				self._loaded = true;
+				// if we tried to set dimensions before loading complete,
+				//  then altDimensions contains info to set the scale accordingly
+				if (self._altDimensions.x != 0) {
+					self.localScale.x = self._altDimensions.x / self.displayImage.width;
+				}
+				if (self._altDimensions.y != 0) {
+					self.localScale.y = self._altDimensions.y / self.displayImage.height;
+				}
 			};
 			this._displayImage.src = 'resources/' + filename;
 		}
@@ -178,14 +188,29 @@ export class DisplayObject {
 	get y() : number{return this.position.y;}
 
 	// these protected methods (not getters) are specified so overriding in mixin works properly
-	protected getUnscaledWidth() : number { return this.displayImage != null ? this.displayImage.width : 0; }
-	protected getUnscaledHeight() : number { return this.displayImage != null ? this.displayImage.height : 0; }
+	protected getUnscaledWidth() : number { return this.displayImage != null ? this.displayImage.width : this._altDimensions.x; }
+	protected getUnscaledHeight() : number { return this.displayImage != null ? this.displayImage.height : this._altDimensions.y; }
 	// these getters are publicly visible
 	get unscaledWidth() : number {return this.getUnscaledWidth();}
 	get unscaledHeight() : number {return this.getUnscaledHeight();}
 	get width() : number{return this.unscaledWidth * this.localScale.x;}
 	get height() : number{return this.unscaledHeight * this.localScale.y;}
 	get dimensions() : Vector{ return new Vector(this.width, this.height); }
+	// if displayImage not empty, adjust localScale; otherwise, set altDimensions field
+	set width(w : number){
+		if(this.displayImage != null && this.displayImage.width != 0) {
+			this.localScale.x = w / this.displayImage.width;
+		} else {
+			this._altDimensions.x = w;
+		}
+	}
+	set height(h : number){
+		if(this.displayImage != null && this.displayImage.height != 0) {
+			this.localScale.y = h / this.displayImage.height;
+		} else {
+			this._altDimensions.y = h;
+		}
+	}
 
 	private get pivotDistance() : Vector{
 		return new Vector(this.pivotPoint.x * this.unscaledWidth, this.pivotPoint.y * this.unscaledHeight);
