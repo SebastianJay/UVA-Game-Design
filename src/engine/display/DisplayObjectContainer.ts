@@ -57,12 +57,15 @@ export class DisplayObjectContainer extends DisplayObject {
 
   // Children getters and setters
   // Note that the getters are not recursive
-  addChild(child : DisplayObject, index? : number) : DisplayObjectContainer {
-    if (index == null) {
-      index = this.children.size();
+  addChild(child : DisplayObject) : DisplayObjectContainer {
+    return this.setChild(child, this.children.size());
+  }
+
+  setChild(child : DisplayObject, index : number) : DisplayObjectContainer {
+    if (index >= 0 && index <= this.children.size()) {
+      this.children.set(index, child);
+      child.parent = this;
     }
-    this.children.set(index, child);
-    child.parent = this;
     return this;
   }
 

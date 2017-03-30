@@ -68,9 +68,6 @@ export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprit
     var self = this;
     return (args : CollisionEventArgs) => {
       if (DisplayObject.getById(args.obj1) === self || DisplayObject.getById(args.obj2) === self) {
-        if (args.type == CollisionType.Enter) {
-          console.log(args.normal);
-        }
         if ((args.type == CollisionType.Enter || args.type == CollisionType.Stay) && args.normal.y < 0) {
           this.grounded = true;
         }

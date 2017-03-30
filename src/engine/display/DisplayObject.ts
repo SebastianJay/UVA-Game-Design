@@ -212,7 +212,7 @@ export class DisplayObject {
 		}
 	}
 
-	private get pivotDistance() : Vector{
+	protected get pivotDistance() : Vector{
 		return new Vector(this.pivotPoint.x * this.unscaledWidth, this.pivotPoint.y * this.unscaledHeight);
 	}
 
