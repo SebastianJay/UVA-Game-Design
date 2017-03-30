@@ -82,6 +82,22 @@ export class DisplayObject {
 	}
 
 	/**
+	 * Translates local coordinates into global coordinates of top-left corner of object
+	 */
+	getGlobalPosition() : Vector {
+		var retPos = Vector.zero;
+		var obj : DisplayObject = this;
+		while (obj != null) {
+			retPos = retPos.subtract(obj.pivotDistance)
+				.rotate(Math.PI * obj.rotation / 180.0)
+				.multiply(obj.localScale)
+				.add(obj.position);
+			obj = obj.parent;
+		}
+		return retPos;
+	}
+
+	/**
 	 * Tells whether this object has collided with the given object. Both object must be colliders to perform check.
 	 */
 	collidesWith(obj : ICollider) : boolean {
@@ -169,6 +185,7 @@ export class DisplayObject {
 	get unscaledHeight() : number {return this.getUnscaledHeight();}
 	get width() : number{return this.unscaledWidth * this.localScale.x;}
 	get height() : number{return this.unscaledHeight * this.localScale.y;}
+	get dimensions() : Vector{ return new Vector(this.width, this.height); }
 
 	private get pivotDistance() : Vector{
 		return new Vector(this.pivotPoint.x * this.unscaledWidth, this.pivotPoint.y * this.unscaledHeight);

@@ -41,10 +41,9 @@ export abstract class RectColliderSpriteBase extends Sprite implements IRectColl
   collisionLayer : number;
   isTrigger : boolean;
   getHitbox() : Rectangle {
-    var left = this.position.x - this.width * this.pivotPoint.x;
-    var top = this.position.y - this.height * this.pivotPoint.y;
     // TODO handle rotation
-    return Rectangle.fromPointDim(new Vector(left, top), this.width, this.height);
+    var myPos = this.getGlobalPosition();
+    return Rectangle.fromPointDim(myPos, this.width, this.height);
   }
 }
 
@@ -52,8 +51,7 @@ export abstract class CircleColliderSpriteBase extends Sprite implements ICircle
   collisionLayer : number;
   isTrigger : boolean;
   getHitbox() : Circle {
-    var centerX = this.position.x - this.width * (this.pivotPoint.x - 0.5);
-    var centerY = this.position.y - this.height * (this.pivotPoint.y - 0.5);
-    return new Circle(new Vector(centerX, centerY), this.width / 2);
+    var myPos = this.getGlobalPosition().add(this.dimensions.divide(2));
+    return new Circle(myPos, this.width / 2);
   }
 }
