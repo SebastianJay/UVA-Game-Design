@@ -98,6 +98,14 @@ export class MainGame extends Game {
       }
     }
 
+    /*
+    if (InputHandler.instance.keyHeld('Z')) {
+      this.world1.screenPosition.x -= 5;
+    } else if (InputHandler.instance.keyHeld('X')) {
+      this.world1.screenPosition.x += 5;
+    }
+    */
+
     this.player1.addForce(Physics.Gravity.multiply(this.player1.mass));
     this.player2.addForce(Physics.Gravity.multiply(this.player2.mass));
   }
