@@ -12,9 +12,15 @@ export class Camera extends DisplayObjectContainer {
 
   get screenPosition() : Vector { return this._screenPosition; }
   set screenPosition(v : Vector) { this._screenPosition = v; }
-
   // TODO make methods for smooth panning, zooming, etc.
 
+  //This function scrolls over the screen position.
+  //A positive value causes a right scroll and a negative a left scroll
+  // TODO make this scroll responsive to player speed & position so character is always visible
+  //anm5je 3/30/17
+scroll(ammount : number) {
+  this._screenPosition.init(this._screenPosition.x + ammount, this._screenPosition.y, this._screenPosition.z);
+}
   // copied from DisplayObject, but uses screenPosition instead of real position
 	protected applyTransformations(g : CanvasRenderingContext2D) : void {
 		if (this.parent) {

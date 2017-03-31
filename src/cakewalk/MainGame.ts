@@ -24,14 +24,26 @@ export class MainGame extends Game {
 
     // set up display tree
     var p1, p2;
+    //b1start b1end etc are invisible walls at the begining and end of level
+    //anm5je 3/30/17
+    var b1start, b2start, b1end, b2end;
+    //b1a and b2a are blocks to jump over
+    //anm5j3 3/30/17
+    var b1a, b2a;
     this.addChild(new DisplayObjectContainer('root', '')
       .addChild(new DisplayObjectContainer('root_UI', ''))
       .addChild(new DisplayObjectContainer('root_env', '')
         .addChild(this.world1 = new Camera('world1')
           .addChild(this.player1 = new PlayerObject('player1', 'animations/mario_moving.png'))
+          .addChild(b1start = new Platform('brick1start', 'lab5/brick.png'))
+          .addChild(b1end = new Platform('brick1end', 'lab5/brick.png'))
+          .addChild(b1a = new Platform('brick1a', 'lab5/brick.png'))
           .addChild(p1 = new Platform('platform1', 'lab5/brick.png')) as Camera)
         .addChild(this.world2 = new Camera('world2')
           .addChild(this.player2 = new PlayerObject('player2', 'animations/mario_moving_funky.png'))
+          .addChild(b2start = new Platform('brick2end', 'lab5/brick.png'))
+          .addChild(b2end = new Platform('brick2end', 'lab5/brick.png'))
+          .addChild(b2a = new Platform('brick2a', 'lab5/brick.png'))
           .addChild(p2 = new Platform('platform2', 'lab5/brick.png')) as Camera)
         )
       );
@@ -43,13 +55,27 @@ export class MainGame extends Game {
     this.player1.position = new Vector(50, 50);
     this.player2.position = new Vector(50, 50);
     p1.position = new Vector(0, 200);
-    p1.width = this.width;
+    p1.width = this.width * 2;
     p2.position = new Vector(0, 200);
-    p2.width = this.width;
+    p2.width = this.width * 2;
     this.player1.localScale = new Vector(4.0, 4.0);
     this.player2.localScale = new Vector(4.0, 4.0);
     p1.localScale = new Vector(4.0, 4.0);
     p2.localScale = new Vector(4.0, 4.0);
+    b1start.position = new Vector(-50,0);
+    b1start.localScale = new Vector(1.0, 100.0);
+    b1start.visible = false;
+    b1end.position = new Vector(2400,0);
+    b1end.localScale = new Vector(1.0, 100.0);
+    b1end.visible = false;
+    b2start.position = new Vector(-50,0);
+    b2start.localScale = new Vector(1.0, 100.0);
+    b2start.visible = false;
+    b2end.position = new Vector(2400,0);
+    b2end.localScale = new Vector(1.0, 100.0);
+    b2end.visible = false;
+    b1a.position = new Vector(1500,150);
+    b2a.position = new Vector(1500,150);
     Physics.SetCollisionMat(0, 1);  // check collisions between player and platforms
   }
 
@@ -59,8 +85,10 @@ export class MainGame extends Game {
     // handle input
     if (InputHandler.instance.keyHeld(InputKeyCode.Left)) {
       this.player1.run(-1);
+      this.world1.scroll(5);
     } else if (InputHandler.instance.keyHeld(InputKeyCode.Right)) {
       this.player1.run(1);
+      this.world1.scroll(-5);
     } else {
       this.player1.run(0);
     }
@@ -70,8 +98,10 @@ export class MainGame extends Game {
 
     if (InputHandler.instance.keyHeld('A')) {
       this.player2.run(-1);
+      this.world2.scroll(5);
     } else if (InputHandler.instance.keyHeld('D')) {
       this.player2.run(1);
+      this.world2.scroll(-5);
     } else {
       this.player2.run(0);
     }
