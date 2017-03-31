@@ -37,14 +37,14 @@ export class MainGame extends Game {
           .addChild(this.player1 = new PlayerObject('player1', 'animations/mario_moving.png'))
           .addChild(b1start = new Platform('brick1start', 'lab5/brick.png'))
           .addChild(b1end = new Platform('brick1end', 'lab5/brick.png'))
-          .addChild(b1a = new Platform('brick1a', 'lab5/brick.png'))
-          .addChild(p1 = new Platform('platform1', 'lab5/brick.png')) as Camera)
+          .addChild(b1a = new Platform('brick1a', 'CakeWalk/YellowCake.png'))
+          .addChild(p1 = new Platform('platform1', 'CakeWalk/tableCombined.png')) as Camera)
         .addChild(this.world2 = new Camera('world2')
           .addChild(this.player2 = new PlayerObject('player2', 'animations/mario_moving_funky.png'))
           .addChild(b2start = new Platform('brick2end', 'lab5/brick.png'))
           .addChild(b2end = new Platform('brick2end', 'lab5/brick.png'))
-          .addChild(b2a = new Platform('brick2a', 'lab5/brick.png'))
-          .addChild(p2 = new Platform('platform2', 'lab5/brick.png')) as Camera)
+          .addChild(b2a = new Platform('brick2a', 'CakeWalk/cake2.png'))
+          .addChild(p2 = new Platform('platform2', 'CakeWalk/tableCombined.png')) as Camera)
         )
       );
 
@@ -58,10 +58,10 @@ export class MainGame extends Game {
     p1.width = this.width * 2;
     p2.position = new Vector(0, 200);
     p2.width = this.width * 2;
-    this.player1.localScale = new Vector(4.0, 4.0);
-    this.player2.localScale = new Vector(4.0, 4.0);
-    p1.localScale = new Vector(4.0, 4.0);
-    p2.localScale = new Vector(4.0, 4.0);
+    this.player1.localScale = new Vector(2.0, 2.0);
+    this.player2.localScale = new Vector(2.0, 2.0);
+    p1.localScale = new Vector(3.0, 0.3);
+    p2.localScale = new Vector(3.0, 0.3);
     b1start.position = new Vector(-50,0);
     b1start.localScale = new Vector(1.0, 100.0);
     b1start.visible = false;
@@ -74,8 +74,10 @@ export class MainGame extends Game {
     b2end.position = new Vector(2400,0);
     b2end.localScale = new Vector(1.0, 100.0);
     b2end.visible = false;
-    b1a.position = new Vector(1500,150);
-    b2a.position = new Vector(1500,150);
+    b1a.position = new Vector(1500,120);
+    b2a.position = new Vector(500,120);
+    b1a.localScale = new Vector (0.3, 0.3)
+    b2a.localScale = new Vector (0.6, 0.6)
     Physics.SetCollisionMat(0, 1);  // check collisions between player and platforms
   }
 
