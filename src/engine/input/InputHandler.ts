@@ -3,7 +3,8 @@
 import { ArrayList } from '../util/ArrayList';
 import { Vector } from '../util/Vector';
 import { GameClock } from '../util/GameClock';
-import { InputKeyCode, InputMouseButton } from './InputPrimitives';
+import { InputKeyCode, InputMouseButton, InputGamepadButton, InputGamepadAxis } from './InputPrimitives';
+import { InputGamepad } from './InputGamepad';
 
 /*
  * Input Handler captures mouse and keyboard input and makes it accessible to Game through getters
@@ -17,20 +18,35 @@ export class InputHandler{
   private clock : GameClock;
   private lastTimestamp : number;
 
+  // the following mappings keep track of the most recent state changes of inputs
+  // keyboard keys
   private pressedKeys : {timestamp: number, state: number}[];
+  // mouse buttons
   private pressedButtons : {timestamp: number, state: number, location: Vector}[];
+  // gamepad buttons
+  private pressedGamepadButtons: {timestamp: number, state: number}[][];
+
+  private gamepadStates : InputGamepad[];
 
   private constructor() {
     this.clock = new GameClock();
     this.lastTimestamp = this.clock.getElapsedTime();
     this.pressedKeys = [];
     this.pressedButtons = [];
+    this.pressedGamepadButtons = [];
+    this.gamepadStates = [];
     // initialize arrays with dummy data
     for (var i = 0; i < 256; i++) {
       this.pressedKeys[i] = {timestamp: this.clock.start, state: 0};
     }
     for (var i = 0; i < 3; i++) {
       this.pressedButtons[i] = {timestamp: this.clock.start, location: new Vector(0, 0), state: 0};
+    }
+    for (var i = 0; i < 4; i++) {
+      this.pressedGamepadButtons[i] = [];
+      for (var j = 0; j < 16; j++) {
+        this.pressedGamepadButtons[i][j] = {timestamp: this.clock.start, state: 0};
+      }
     }
   }
   public static get instance() : InputHandler
@@ -39,7 +55,7 @@ export class InputHandler{
   }
 
   /** Given the canvas element, registers mouse and keyboard listeners to capture input */
-  registerInputFocus(element : HTMLElement){
+  registerInputFocus(element : HTMLElement) : void {
     if (this._element != null) {
       this._element.onmousedown = null;
       this._element.onmousemove = null;
@@ -56,8 +72,21 @@ export class InputHandler{
   }
 
   /** Indicates that a frame has passed, resetting latest timestamp */
-  update() {
+  update() : void {
     this.lastTimestamp = this.clock.getElapsedTime();
+    // gamepads poll instead of listen, so we refresh here
+    this.gamepadStates = this.pollGamepads();
+    for (var i = 0; i < this.gamepadStates.length; i++) {
+      for (var j = 0; j < 16; j++) {
+        var buttonState = this.gamepadStates[i].isButtonPressed(j) ? 1 : 0;
+        if (buttonState != this.pressedGamepadButtons[i][j].state) {
+          this.pressedGamepadButtons[i][j] = {
+            timestamp: this.clock.getElapsedTime(),
+            state: buttonState
+          };
+        }
+      }
+    }
   }
 
   /** Gives location of mouse click if the given button has been pressed down since the last update(), null otherwise */
@@ -103,16 +132,58 @@ export class InputHandler{
   }
 
   /** Tells whether the given key was unpressed since the last update() */
-  keyUp(code : string | InputKeyCode) {
+  keyUp(code : string | InputKeyCode) : boolean {
     var c = this.parseKeyParam(code);
     return (this.pressedKeys[c].timestamp > this.lastTimestamp
       && this.pressedKeys[c].state == 0);
   }
 
   /** Tells whether the given key is currently pressed */
-  keyHeld(code : string | InputKeyCode) {
+  keyHeld(code : string | InputKeyCode) : boolean {
     var c = this.parseKeyParam(code);
     return (this.pressedKeys[c].state == 1);
+  }
+
+  /** Tells whether the given player index controller is connected to game */
+  gamepadPresent(controller : number) : boolean {
+    return (this.gamepadStates[controller] != null);
+  }
+
+  /** Tells whether the given button of given player index controller was pressed down since last update() */
+  gamepadButtonDown(controller : number, code : InputGamepadButton) : boolean {
+    return (this.gamepadPresent(controller)
+      && this.pressedGamepadButtons[controller][code].timestamp > this.lastTimestamp
+      && this.pressedGamepadButtons[controller][code].state == 1);
+  }
+
+  /** Tells whether the given button of given player index controller was unpressed down since last update() */
+  gamepadButtonUp(controller : number, code : InputGamepadButton) : boolean {
+    return (this.gamepadPresent(controller)
+      && this.pressedGamepadButtons[controller][code].timestamp > this.lastTimestamp
+      && this.pressedGamepadButtons[controller][code].state == 0);
+  }
+
+  /** Tells whether the given button of given player index controller is currently pressed */
+  gamepadButtonHeld(controller : number, code : InputGamepadButton) : boolean {
+    return (this.gamepadPresent(controller)
+      && this.pressedGamepadButtons[controller][code].state == 1);
+  }
+
+  /** Value of given axis of given player index controller */
+  gamepadAxis(controller : number, axis : InputGamepadAxis) : number {
+    if (this.gamepadStates[controller] == null) {
+      return 0;
+    }
+    if (axis == InputGamepadAxis.LeftHorizontal) {
+      return this.gamepadStates[controller].getLeftStickXAxis();
+    } else if (axis == InputGamepadAxis.LeftVertical) {
+      return this.gamepadStates[controller].getLeftStickYAxis();
+    } else if (axis == InputGamepadAxis.RightHorizontal) {
+      return this.gamepadStates[controller].getRightStickXAxis();
+    } else if (axis == InputGamepadAxis.RightVertical) {
+      return this.gamepadStates[controller].getRightStickYAxis();
+    }
+    return 0;
   }
 
   private parseKeyParam(code : string | InputKeyCode) : number {
@@ -165,5 +236,15 @@ export class InputHandler{
       }
       this.pressedKeys[event.keyCode].state = 0;
     }
+  }
+
+  private pollGamepads() : InputGamepad[] {
+    var gamepads : Gamepad[] = navigator.getGamepads ? navigator.getGamepads() : [];
+    var toReturn : InputGamepad[] = [];
+    for (var i = 0; i < gamepads.length; i++) {
+      var gp = gamepads[i];
+      toReturn.push(new InputGamepad(gp));
+    }
+    return toReturn;
   }
 }
