@@ -4,10 +4,18 @@ import { DisplayObjectContainer } from './DisplayObjectContainer';
 import { Vector } from '../util/Vector';
 
 export class Camera extends DisplayObjectContainer {
-  private _screenPosition : Vector;
+  private _screenPosition : Vector; // where the object appears relative to the parent
+                                    // real world coordinates can be different to separate collisions
+  private _focusIndex : number;  // index of the child that is focus of the camera
+  private _focusThreshold : number; // width of area in middle that focus should occupy
+  private _focusWidth : number; // total width spanned by camera
+
   constructor(id : string){
     super(id, '');
     this._screenPosition = Vector.zero;
+    this._focusIndex = -1;
+    this._focusThreshold = 0;
+    this._focusWidth = 0;
   }
 
   get screenPosition() : Vector { return this._screenPosition; }
@@ -16,11 +24,29 @@ export class Camera extends DisplayObjectContainer {
 
   //This function scrolls over the screen position.
   //A positive value causes a right scroll and a negative a left scroll
-  // TODO make this scroll responsive to player speed & position so character is always visible
-  //anm5je 3/30/17
-scroll(ammount : number) {
-  this._screenPosition.init(this._screenPosition.x + ammount, this._screenPosition.y, this._screenPosition.z);
-}
+  scroll(amount : number) {
+    this.screenPosition = new Vector(this.screenPosition.x + amount, this.screenPosition.y);
+  }
+
+  // makes the camera focus on a particular child
+  setFocus(childIndex : number, thresholdWidth : number, totalWidth: number) {
+    this._focusIndex = childIndex;
+    this._focusThreshold = thresholdWidth;
+    this._focusWidth = totalWidth;
+  }
+
+  update() : void {
+    super.update();
+    if (this._focusIndex >= 0 && this._focusIndex < this.children.size()) {
+      var child = this.children.get(this._focusIndex);
+      if (child.position.x + this.screenPosition.x < (this._focusWidth - this._focusThreshold) / 2) {
+        this.scroll(5);
+      } else if (child.position.x + this.screenPosition.x > (this._focusWidth + this._focusThreshold) / 2) {
+        this.scroll(-5);
+      }
+    }
+  }
+
   // copied from DisplayObject, but uses screenPosition instead of real position
 	protected applyTransformations(g : CanvasRenderingContext2D) : void {
 		if (this.parent) {

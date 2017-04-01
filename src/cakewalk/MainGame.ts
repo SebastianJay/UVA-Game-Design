@@ -52,6 +52,8 @@ export class MainGame extends Game {
     this.world2.position = new Vector(1e6, 1e6); // arbitrarily far away, so 2 worlds do not collide
     this.world1.screenPosition = new Vector(0, 0);
     this.world2.screenPosition = new Vector(0, this.height / 2);
+    this.world1.setFocus(0, this.width * 3 / 4, this.width);
+    this.world2.setFocus(0, this.width * 3 / 4, this.width);
     this.player1.position = new Vector(50, 50);
     this.player2.position = new Vector(50, 50);
     p1.position = new Vector(0, 200);
@@ -87,10 +89,8 @@ export class MainGame extends Game {
     // handle input
     if (InputHandler.instance.keyHeld(InputKeyCode.Left)) {
       this.player1.run(-1);
-      this.world1.scroll(5);
     } else if (InputHandler.instance.keyHeld(InputKeyCode.Right)) {
       this.player1.run(1);
-      this.world1.scroll(-5);
     } else {
       this.player1.run(0);
     }
@@ -100,10 +100,8 @@ export class MainGame extends Game {
 
     if (InputHandler.instance.keyHeld('A')) {
       this.player2.run(-1);
-      this.world2.scroll(5);
     } else if (InputHandler.instance.keyHeld('D')) {
       this.player2.run(1);
-      this.world2.scroll(-5);
     } else {
       this.player2.run(0);
     }
