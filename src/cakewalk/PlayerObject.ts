@@ -40,11 +40,11 @@ export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprit
    * Direction is negative moving left, positive moving right, or zero if no input
    */
   run(direction : number) : void {
-    if (direction < 0) {
+    if (direction < -0.5) {
       this.addForce(this.moveForce.multiply(-1));
       this.animate('walk_left');
       this.currentDirectionRight = false;
-    } else if (direction > 0) {
+    } else if (direction > 0.5) {
       this.addForce(this.moveForce);
       this.animate('walk');
       this.currentDirectionRight = true;

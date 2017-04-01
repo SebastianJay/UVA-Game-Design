@@ -5,13 +5,14 @@ import { DisplayObject } from '../engine/display/DisplayObject';
 import { DisplayObjectContainer } from '../engine/display/DisplayObjectContainer';
 import { Camera } from '../engine/display/Camera';
 import { InputHandler } from '../engine/input/InputHandler';
-import { InputKeyCode } from '../engine/input/InputPrimitives';
+import { InputKeyCode, InputGamepadButton, InputGamepadAxis } from '../engine/input/InputPrimitives';
 import { Sprite } from '../engine/display/Sprite';
 import { Vector } from '../engine/util/Vector';
 import { Physics } from '../engine/util/Physics';
 
 import { PlayerObject } from './PlayerObject';
 import { Platform } from './Platform';
+import { MainGameActions } from './MainGameActions';
 
 export class MainGame extends Game {
   private world1 : Camera;
@@ -20,15 +21,13 @@ export class MainGame extends Game {
   private player2 : PlayerObject;
 
   constructor (canvas : HTMLCanvasElement) {
-    super("Lab Five Game", 1200, 600, canvas);
+    super("Cakewalk Game", 1280, 720, canvas);
 
     // set up display tree
     var p1, p2;
     //b1start b1end etc are invisible walls at the begining and end of level
-    //anm5je 3/30/17
     var b1start, b2start, b1end, b2end;
     //b1a and b2a are blocks to jump over
-    //anm5j3 3/30/17
     var b1a, b2a;
     this.addChild(new DisplayObjectContainer('root', '')
       .addChild(new DisplayObjectContainer('root_UI', ''))
@@ -87,29 +86,17 @@ export class MainGame extends Game {
     super.update();
 
     // handle input
-    if (InputHandler.instance.keyHeld(InputKeyCode.Left)) {
-      this.player1.run(-1);
-    } else if (InputHandler.instance.keyHeld(InputKeyCode.Right)) {
-      this.player1.run(1);
-    } else {
-      this.player1.run(0);
-    }
-    if (InputHandler.instance.keyDown(InputKeyCode.Up)) {
+    this.player1.run(this.getActionInput(MainGameActions.PlayerOneRun));
+    if (this.getActionInput(MainGameActions.PlayerOneJump) > 0) {
       this.player1.jump();
     }
 
-    if (InputHandler.instance.keyHeld('A')) {
-      this.player2.run(-1);
-    } else if (InputHandler.instance.keyHeld('D')) {
-      this.player2.run(1);
-    } else {
-      this.player2.run(0);
-    }
-    if (InputHandler.instance.keyDown('W')) {
+    this.player2.run(this.getActionInput(MainGameActions.PlayerTwoRun));
+    if (this.getActionInput(MainGameActions.PlayerTwoJump) > 0) {
       this.player2.jump();
     }
 
-    if (InputHandler.instance.keyDown(' ')) {
+    if (this.getActionInput(MainGameActions.PlayerOneSwap) > 0 || this.getActionInput(MainGameActions.PlayerTwoSwap)) {
       // swap player attributes
       var tmp = this.player1.position;
       this.player1.position = this.player2.position;
@@ -128,16 +115,56 @@ export class MainGame extends Game {
       }
     }
 
-    /*
-    if (InputHandler.instance.keyHeld('Z')) {
-      this.world1.screenPosition.x -= 5;
-    } else if (InputHandler.instance.keyHeld('X')) {
-      this.world1.screenPosition.x += 5;
-    }
-    */
-
+    // apply global physics
     this.player1.addForce(Physics.Gravity.multiply(this.player1.mass));
     this.player2.addForce(Physics.Gravity.multiply(this.player2.mass));
+  }
+
+  /**
+   * Retrieves player input for a given action, discerning between gamepad and keyboard.
+   * For buttons, returns 1 if pressed and 0 if not. For axes, returns a range between -1 and 1
+   */
+  private getActionInput(action : MainGameActions) : number {
+    if (action == MainGameActions.PlayerOneRun) {
+      if (InputHandler.instance.gamepadPresent(0)) {
+        return InputHandler.instance.gamepadAxis(0, InputGamepadAxis.LeftHorizontal);
+      } else {
+        return InputHandler.instance.keyHeld(InputKeyCode.Left) != InputHandler.instance.keyHeld(InputKeyCode.Left)
+          ? (InputHandler.instance.keyHeld(InputKeyCode.Left) ? -1 : 1) : 0;
+      }
+    } else if (action == MainGameActions.PlayerOneJump) {
+      if (InputHandler.instance.gamepadPresent(0)) {
+        return InputHandler.instance.gamepadButtonHeld(0, InputGamepadButton.A) ? 1 : 0;
+      } else {
+        return InputHandler.instance.keyHeld(InputKeyCode.Up) ? 1 : 0;
+      }
+    } else if (action == MainGameActions.PlayerOneSwap) {
+      if (InputHandler.instance.gamepadPresent(0)) {
+        return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.X) ? 1 : 0;
+      } else {
+        return InputHandler.instance.keyDown(InputKeyCode.Return) ? 1 : 0;
+      }
+    } else if (action == MainGameActions.PlayerTwoRun) {
+      if (InputHandler.instance.gamepadPresent(1)) {
+        return InputHandler.instance.gamepadAxis(1, InputGamepadAxis.LeftHorizontal);
+      } else {
+        return InputHandler.instance.keyHeld('A') != InputHandler.instance.keyHeld('D')
+          ? (InputHandler.instance.keyHeld('A') ? -1 : 1) : 0;
+      }
+    } else if (action == MainGameActions.PlayerTwoJump) {
+      if (InputHandler.instance.gamepadPresent(1)) {
+        return InputHandler.instance.gamepadButtonHeld(1, InputGamepadButton.A) ? 1 : 0;
+      } else {
+        return InputHandler.instance.keyHeld('W') ? 1 : 0;
+      }
+    } else if (action == MainGameActions.PlayerTwoSwap) {
+      if (InputHandler.instance.gamepadPresent(1)) {
+        return InputHandler.instance.gamepadButtonDown(1, InputGamepadButton.X) ? 1 : 0;
+      } else {
+        return InputHandler.instance.keyDown(InputKeyCode.Space) ? 1 : 0;
+      }
+    }
+    return 0;
   }
 }
 

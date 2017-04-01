@@ -1,13 +1,25 @@
 "use strict";
 
-import { Vector } from '../util/Vector'
-
 /** Mappings from readable metakeys to numbers used in DOM events */
 export const enum InputKeyCode {
+  // arrow keys
   Left  =37,
   Up    =38,
   Right =39,
   Down  =40,
+  // whitespace keys, these correspond to strings, but putting them in enum is clearer
+  Return=13,
+  Tab   =9,
+  Space =32,
+  // meta keys
+  Shift =16,
+  Ctrl  =17,
+  Alt   =18,
+  // function keys
+  F1    =112,
+  F2    =113,
+  F3    =114,
+  F5    =115,
 }
 
 /** Mapping mouse buttons to numbers used in DOM events */

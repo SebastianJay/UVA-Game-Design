@@ -81,7 +81,7 @@ export class InputHandler{
         var buttonState = this.gamepadStates[i].isButtonPressed(j) ? 1 : 0;
         if (buttonState != this.pressedGamepadButtons[i][j].state) {
           this.pressedGamepadButtons[i][j] = {
-            timestamp: this.clock.getElapsedTime(),
+            timestamp: this.lastTimestamp + 0.001,  // add marginal time so up and down methods work
             state: buttonState
           };
         }
