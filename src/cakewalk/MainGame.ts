@@ -129,7 +129,7 @@ export class MainGame extends Game {
       if (InputHandler.instance.gamepadPresent(0)) {
         return InputHandler.instance.gamepadAxis(0, InputGamepadAxis.LeftHorizontal);
       } else {
-        return InputHandler.instance.keyHeld(InputKeyCode.Left) != InputHandler.instance.keyHeld(InputKeyCode.Left)
+        return InputHandler.instance.keyHeld(InputKeyCode.Left) != InputHandler.instance.keyHeld(InputKeyCode.Right)
           ? (InputHandler.instance.keyHeld(InputKeyCode.Left) ? -1 : 1) : 0;
       }
     } else if (action == MainGameActions.PlayerOneJump) {
