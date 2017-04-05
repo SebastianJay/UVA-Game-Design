@@ -9,12 +9,23 @@ import { CollisionEventArgs, CollisionType } from '../engine/events/EventTypes';
 import { EventDispatcher } from '../engine/events/EventDispatcher';
 import { Rectangle } from '../engine/util/Rectangle';
 import { Vector } from '../engine/util/Vector';
+import { Physics } from '../engine/util/Physics';
 import { applyMixins } from '../engine/util/mixins';
 
 export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprite, IAnimatedSprite {
-  jumpForce : Vector = new Vector(0, -500);
-  moveForce : Vector = new Vector(30, 0);
-  grounded : boolean;
+  jumpTargetSpeed : number = 14; // m/s in y-axis that jump pulls player up to
+  jumpMinSpeed : number = 8;  // m/s in y-axis that cancel jump pulls player to
+
+  moveForce : Vector = new Vector(15, 0); // force for player running right
+  topSpeed : number = 15;     // cap on horizontal speed
+  runningSpeed : number = 5;  // speed to be considered running to qualify for reverse deceleration
+  stillSpeed : number = 0.3;  // threshold speed at which player can stop moving
+  reverseFactor : number = 2; // how strongly to decelerate if reversing direction
+  rampDownFactor : number = 5; // how much to scale down velocity each frame when still (friction)
+  rampDownAirFactor : number = 12; // how much to scale down velocity in midair when still (drag)
+
+  grounded : boolean;  // whether the player is on the ground
+  jumping : boolean;  // whether the player is in process of jumping
   currentDirectionRight : boolean;
 
   constructor(id: string, filename: string) {
@@ -25,6 +36,7 @@ export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprit
     this.isTrigger = false;
     this.elasticity = 0.0;
     this.grounded = false;
+    this.jumping = false;
     this.currentDirectionRight = true;
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
   }
@@ -32,6 +44,9 @@ export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprit
   update() : void {
     super.update();
     this.updatePhysics();
+    if (Math.abs(this.velocity.x) > this.topSpeed) {
+      this.velocity = new Vector(this.topSpeed * (this.velocity.x < 0 ? -1 : 1), this.velocity.y);
+    }
     this.updateAnimation();
   }
 
@@ -41,14 +56,25 @@ export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprit
    */
   run(direction : number) : void {
     if (direction < -0.5) {
-      this.addForce(this.moveForce.multiply(-1));
+      this.addForce(this.moveForce.multiply(-1)
+        .multiply(this.velocity.x > this.runningSpeed && this.grounded ? this.reverseFactor : 1));
       this.animate('walk_left');
       this.currentDirectionRight = false;
     } else if (direction > 0.5) {
-      this.addForce(this.moveForce);
+      this.addForce(this.moveForce
+        .multiply(this.velocity.x < -this.runningSpeed && this.grounded ? this.reverseFactor : 1));
       this.animate('walk');
       this.currentDirectionRight = true;
     } else {
+      if (Math.abs(this.velocity.x) < this.stillSpeed) {
+        // effectively moves velocity back to zero
+        this.addForce(new Vector(-this.velocity.x / Physics.DeltaTime * this.mass, 0));
+      } else {
+        // applies a "friction" related to player velocity
+        this.addForce(new Vector(-(this.velocity.x / (this.grounded ? this.rampDownFactor : this.rampDownAirFactor))
+          / Physics.DeltaTime * this.mass, 0));
+      }
+
       if (this.currentDirectionRight) {
         this.animate('idle');
       } else {
@@ -57,10 +83,27 @@ export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprit
     }
   }
 
-  /** Called when the player wants the player to jump */
+  /**
+  * Called when the player wants the player to jump
+  */
   jump() : void {
     if (this.grounded) {
-      this.addForce(this.jumpForce);
+      // add force that would equate player's y speed to jumpTargetSpeed
+      this.addForce(new Vector(0, -this.jumpTargetSpeed / Physics.DeltaTime * this.mass)
+        .add(Physics.Gravity.multiply(this.mass)));
+      this.jumping = true;
+    }
+  }
+
+  /** Called when player releases jump button */
+  cancelJump() : void {
+    if (this.jumping) {
+      if (this.velocity.y < -this.jumpMinSpeed) {
+        // moves velocity to jumpMinSpeed
+        this.addForce(new Vector(0, -(this.velocity.y + this.jumpMinSpeed) / Physics.DeltaTime * this.mass)
+          .add(Physics.Gravity.multiply(this.mass)));
+      }
+      this.jumping = false;
     }
   }
 

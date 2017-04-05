@@ -89,11 +89,15 @@ export class MainGame extends Game {
     this.player1.run(this.getActionInput(MainGameActions.PlayerOneRun));
     if (this.getActionInput(MainGameActions.PlayerOneJump) > 0) {
       this.player1.jump();
+    } else if (this.getActionInput(MainGameActions.PlayerOneJumpStop) > 0) {
+      this.player1.cancelJump();
     }
 
     this.player2.run(this.getActionInput(MainGameActions.PlayerTwoRun));
     if (this.getActionInput(MainGameActions.PlayerTwoJump) > 0) {
       this.player2.jump();
+    } else if (this.getActionInput(MainGameActions.PlayerTwoJumpStop) > 0) {
+      this.player2.cancelJump();
     }
 
     if (this.getActionInput(MainGameActions.PlayerOneSwap) > 0 || this.getActionInput(MainGameActions.PlayerTwoSwap)) {
@@ -134,9 +138,15 @@ export class MainGame extends Game {
       }
     } else if (action == MainGameActions.PlayerOneJump) {
       if (InputHandler.instance.gamepadPresent(0)) {
-        return InputHandler.instance.gamepadButtonHeld(0, InputGamepadButton.A) ? 1 : 0;
+        return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.A) ? 1 : 0;
       } else {
-        return InputHandler.instance.keyHeld(InputKeyCode.Up) ? 1 : 0;
+        return InputHandler.instance.keyDown(InputKeyCode.Up) ? 1 : 0;
+      }
+    } else if (action == MainGameActions.PlayerOneJumpStop) {
+      if (InputHandler.instance.gamepadPresent(0)) {
+        return InputHandler.instance.gamepadButtonUp(0, InputGamepadButton.A) ? 1 : 0;
+      } else {
+        return InputHandler.instance.keyUp(InputKeyCode.Up) ? 1 : 0;
       }
     } else if (action == MainGameActions.PlayerOneSwap) {
       if (InputHandler.instance.gamepadPresent(0)) {
@@ -153,9 +163,15 @@ export class MainGame extends Game {
       }
     } else if (action == MainGameActions.PlayerTwoJump) {
       if (InputHandler.instance.gamepadPresent(1)) {
-        return InputHandler.instance.gamepadButtonHeld(1, InputGamepadButton.A) ? 1 : 0;
+        return InputHandler.instance.gamepadButtonDown(1, InputGamepadButton.A) ? 1 : 0;
       } else {
-        return InputHandler.instance.keyHeld('W') ? 1 : 0;
+        return InputHandler.instance.keyDown('W') ? 1 : 0;
+      }
+    } else if (action == MainGameActions.PlayerTwoJumpStop) {
+      if (InputHandler.instance.gamepadPresent(1)) {
+        return InputHandler.instance.gamepadButtonUp(1, InputGamepadButton.A) ? 1 : 0;
+      } else {
+        return InputHandler.instance.keyUp('W') ? 1 : 0;
       }
     } else if (action == MainGameActions.PlayerTwoSwap) {
       if (InputHandler.instance.gamepadPresent(1)) {
