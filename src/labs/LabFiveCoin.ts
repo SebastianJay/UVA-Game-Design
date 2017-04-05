@@ -22,10 +22,8 @@ export class LabFiveCoin extends Sprite implements ICircleCollider {
   private get coinGetHandler() {
     var self = this;
     return (args : CollisionEventArgs) => {
-      var obj1 = DisplayObject.getById(args.obj1);
-      var obj2 = DisplayObject.getById(args.obj2);
-      if (obj1 instanceof LabFiveMario && obj2 === self
-        || obj1 === self && obj2 instanceof LabFiveMario) {
+      if (args.obj1 instanceof LabFiveMario && args.obj2 === self
+        || args.obj1 === self && args.obj2 instanceof LabFiveMario) {
         // play sound
         SoundManager.instance.playFX('coin');
         // remove coin from scene

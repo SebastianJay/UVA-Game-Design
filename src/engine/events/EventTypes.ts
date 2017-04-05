@@ -7,8 +7,8 @@ import { Vector } from '../util/Vector';
 
 export class CollisionEventArgs extends EventArgs {
   static get ClassName() : string { return "CollisionEventArgs"; }
-  constructor (public obj1 : string,
-    public obj2 : string,
+  constructor (public obj1 : DisplayObject,
+    public obj2 : DisplayObject,
     public normal : Vector,
     public type : CollisionType
   ) { super(); }

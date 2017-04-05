@@ -12,6 +12,7 @@ export interface IPhysicsSprite {
   elasticity : number;
   acceleration : Vector;
   velocity : Vector;
+  terminalSpeeds : Vector;
   previousPosition : Vector;
   addForce : (f : Vector) => void;
 }
@@ -25,6 +26,7 @@ mass : number;
 elasticity : number;
 acceleration : Vector;
 velocity : Vector;
+terminalSpeeds : Vector;
 previousPosition : Vector;
 addForce : (f : Vector) => void;
 protected initPhysics : () => void;
@@ -37,6 +39,7 @@ export abstract class PhysicsSpriteBase extends Sprite implements IPhysicsSprite
   elasticity : number;
   acceleration : Vector;
   velocity : Vector;
+  terminalSpeeds : Vector;  // set of speeds on each axis that sprite cannot exceed
   previousPosition : Vector;
   private _currentForce : Vector;
 
@@ -49,6 +52,7 @@ export abstract class PhysicsSpriteBase extends Sprite implements IPhysicsSprite
     this.elasticity = 0.0;
     this.acceleration = Vector.zero;
     this.velocity = Vector.zero;
+    this.terminalSpeeds = Vector.zero;  // if zero, no cap
     this.previousPosition = Vector.zero;
     this._currentForce = Vector.zero;
   }
@@ -61,6 +65,12 @@ export abstract class PhysicsSpriteBase extends Sprite implements IPhysicsSprite
     var dt = Physics.DeltaTime;
     this.acceleration = this._currentForce.divide(this.mass);
     this.velocity = this.velocity.add(this.acceleration.multiply(dt));
+    if (this.terminalSpeeds.x != 0 && Math.abs(this.velocity.x) > this.terminalSpeeds.x) {
+      this.velocity.x = (this.velocity.x < 0 ? -1 : 1) * this.terminalSpeeds.x;
+    }
+    if (this.terminalSpeeds.y != 0 && Math.abs(this.velocity.y) > this.terminalSpeeds.y) {
+      this.velocity.y = (this.velocity.y < 0 ? -1 : 1) * this.terminalSpeeds.y;
+    }
     this.position = this.position.add((this.velocity.multiply(dt))
       .add(this.acceleration.multiply(dt*dt)).multiply(Physics.PixelsPerMeter));
     this._currentForce = Vector.zero;
@@ -83,6 +93,7 @@ export class PhysicsSprite extends Sprite implements IPhysicsSprite {
   elasticity : number;
   acceleration : Vector;
   velocity : Vector;
+  terminalSpeeds : Vector;
   previousPosition : Vector;
   addForce : (f : Vector) => void;
   protected initPhysics : () => void;

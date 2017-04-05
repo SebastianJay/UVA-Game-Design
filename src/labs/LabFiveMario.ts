@@ -52,6 +52,7 @@ export class LabFiveMario extends Sprite implements IRectCollider, IPhysicsSprit
   elasticity : number;
   acceleration : Vector;
   velocity : Vector;
+  terminalSpeeds : Vector;
   previousPosition : Vector;
   addForce : (f : Vector) => void;
   protected initPhysics : () => void;

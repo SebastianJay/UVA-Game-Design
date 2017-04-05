@@ -35,6 +35,8 @@ export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprit
     this.collisionLayer = 1;
     this.isTrigger = false;
     this.elasticity = 0.0;
+    this.terminalSpeeds.x = this.topSpeed;
+
     this.grounded = false;
     this.jumping = false;
     this.currentDirectionRight = true;
@@ -44,9 +46,6 @@ export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprit
   update() : void {
     super.update();
     this.updatePhysics();
-    if (Math.abs(this.velocity.x) > this.topSpeed) {
-      this.velocity = new Vector(this.topSpeed * (this.velocity.x < 0 ? -1 : 1), this.velocity.y);
-    }
     this.updateAnimation();
   }
 
@@ -110,7 +109,7 @@ export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprit
   private get collisionHandler() {
     var self = this;
     return (args : CollisionEventArgs) => {
-      if (DisplayObject.getById(args.obj1) === self || DisplayObject.getById(args.obj2) === self) {
+      if (args.obj1 === self || args.obj2 === self) {
         if ((args.type == CollisionType.Enter || args.type == CollisionType.Stay) && args.normal.y < 0) {
           this.grounded = true;
         }
@@ -129,6 +128,7 @@ export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprit
   elasticity : number;
   acceleration : Vector;
   velocity : Vector;
+  terminalSpeeds : Vector;
   previousPosition : Vector;
   addForce : (f : Vector) => void;
   protected initPhysics : () => void;
