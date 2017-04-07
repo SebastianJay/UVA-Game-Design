@@ -1,6 +1,6 @@
 "use strict";
 
-export const enum MainGameActions {
+export const enum MainGameAction {
   // player specific actions
   PlayerOneRun,
   PlayerOneJump,
@@ -14,4 +14,15 @@ export const enum MainGameActions {
   Pause,
   // game over options
   EndGameContinue
+}
+
+export const enum MainGameState {
+  InGame,
+  EndGameLoss,
+}
+
+export const enum MainGameColor {
+  Neutral,
+  Red,
+  Blue
 }

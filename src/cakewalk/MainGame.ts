@@ -12,8 +12,8 @@ import { Physics } from '../engine/util/Physics';
 
 import { PlayerObject } from './PlayerObject';
 import { Platform } from './Platform';
-import { MainGameActions } from './MainGameActions';
-import { MainGameStates } from './MainGameStates';
+import { Flame } from './Flame';
+import { MainGameAction, MainGameState, MainGameColor } from './MainGameEnums';
 import { TimerUI } from './TimerUI';
 import { ScreenTransitionUI } from './ScreenTransitionUI';
 
@@ -26,7 +26,7 @@ export class MainGame extends Game {
   private timer : TimerUI;
   private screenTransition : ScreenTransitionUI
 
-  private gameState : MainGameStates = MainGameStates.InGame;
+  private gameState : MainGameState = MainGameState.InGame;
   private gameDuration : number = 10;  // amount of time before game over
 
   constructor (canvas : HTMLCanvasElement) {
@@ -38,20 +38,27 @@ export class MainGame extends Game {
     var b1start, b2start, b1end, b2end;
     //b1a and b2a are blocks to jump over
     var b1a, b2a;
+    var f1, f2;
     this.addChild(new DisplayObjectContainer('root', '')
       .addChild(new DisplayObjectContainer('root_env', '')
         .addChild(this.world1 = new Camera('world1')
-          .addChild(this.player1 = new PlayerObject('player1', 'animations/mario_moving.png', 0))
-          .addChild(b1start = new Platform('brick1start', 'lab5/brick.png'))
-          .addChild(b1end = new Platform('brick1end', 'lab5/brick.png'))
-          .addChild(b1a = new Platform('brick1a', 'CakeWalk/YellowCake.png'))
-          .addChild(p1 = new Platform('platform1', 'CakeWalk/tableCombined.png')) as Camera)
+          .addChild(this.player1 = new PlayerObject('player1', 'animations/mario_moving.png', MainGameColor.Red))
+          .addChild(new DisplayObjectContainer('env1', '')
+            .addChild(b1start = new Platform('brick1start', 'lab5/brick.png'))
+            .addChild(b1end = new Platform('brick1end', 'lab5/brick.png'))
+            .addChild(b1a = new Platform('brick1a', 'CakeWalk/YellowCake.png', MainGameColor.Red))
+            .addChild(p1 = new Platform('platform1', 'CakeWalk/tableCombined.png'))
+            .addChild(f1 = new Flame('flame1', 'lab5/brick.png', MainGameColor.Red))
+          ) as Camera)
         .addChild(this.world2 = new Camera('world2')
-          .addChild(this.player2 = new PlayerObject('player2', 'animations/mario_moving_funky.png', 1))
-          .addChild(b2start = new Platform('brick2end', 'lab5/brick.png'))
-          .addChild(b2end = new Platform('brick2end', 'lab5/brick.png'))
-          .addChild(b2a = new Platform('brick2a', 'CakeWalk/cake2.png'))
-          .addChild(p2 = new Platform('platform2', 'CakeWalk/tableCombined.png')) as Camera)
+          .addChild(this.player2 = new PlayerObject('player2', 'animations/mario_moving_funky.png', MainGameColor.Blue))
+          .addChild(new DisplayObjectContainer('env2', '')
+            .addChild(b2start = new Platform('brick2end', 'lab5/brick.png'))
+            .addChild(b2end = new Platform('brick2end', 'lab5/brick.png'))
+            .addChild(b2a = new Platform('brick2a', 'CakeWalk/cake2.png', MainGameColor.Blue))
+            .addChild(p2 = new Platform('platform2', 'CakeWalk/tableCombined.png'))
+            .addChild(f2 = new Flame('flame2', 'lab5/brick.png', MainGameColor.Blue))
+          ) as Camera)
         )
       .addChild(new DisplayObjectContainer('root_UI', ''))
         .addChild(this.timer = new TimerUI('timerui', 'CakeWalk/cake2.png', this.gameDuration,
@@ -65,8 +72,8 @@ export class MainGame extends Game {
     this.world2.screenPosition = new Vector(0, this.height / 2);
     this.world1.setFocus(0, this.width / 2, this.width);
     this.world2.setFocus(0, this.width / 2, this.width);
-    this.player1.position = new Vector(50, 50);
-    this.player2.position = new Vector(50, 50);
+    this.player1.position = this.player1.respawnPoint = new Vector(50, 50);
+    this.player2.position = this.player2.respawnPoint = new Vector(50, 50);
     p1.position = new Vector(0, 200);
     p1.width = this.width * 2;
     p2.position = new Vector(0, 200);
@@ -91,44 +98,56 @@ export class MainGame extends Game {
     b2a.position = new Vector(500,120);
     b1a.localScale = new Vector (0.3, 0.3);
     b2a.localScale = new Vector (0.6, 0.6);
+    f1.position = new Vector(400, 120);
+    f2.position = new Vector(700, 120);
     this.timer.pivotPoint = new Vector(0.5, 0.5);
     this.timer.localScale = new Vector(0.4, 0.4);
     this.screenTransition.position = new Vector(this.width / 2, this.height / 2);
     this.screenTransition.dimensions = new Vector(this.width, this.height);
     this.screenTransition.pivotPoint = new Vector(0.5, 0.5);
-    Physics.SetCollisionMat(0, 1);  // check collisions between player and platforms
+
+    // create collision matrix
+    // 0 - neutral objects that collide both players
+    // 1 - red objects that pass through player red
+    // 2 - blue objects that pass through player blue
+    // 3 - player red
+    // 4 - player blue
+    Physics.SetCollisionMat(0, 3);
+    Physics.SetCollisionMat(0, 4);
+    Physics.SetCollisionMat(1, 4);
+    Physics.SetCollisionMat(2, 3);
   }
 
   update() {
     super.update();
 
-    if (this.gameState == MainGameStates.EndGameLoss) {
-      if (this.getActionInput(MainGameActions.EndGameContinue) > 0) {
+    if (this.gameState == MainGameState.EndGameLoss) {
+      if (this.getActionInput(MainGameAction.EndGameContinue) > 0) {
         if (!this.screenTransition.isFading) {
           var self = this;
           this.screenTransition.fadeOut(1.0, () => {
-            self.gameState = MainGameStates.InGame;
+            self.gameState = MainGameState.InGame;
             self.timer.reset();
           });
         }
       }
-    } else if (this.gameState == MainGameStates.InGame) {
+    } else if (this.gameState == MainGameState.InGame) {
       // handle input
-      this.player1.run(this.getActionInput(MainGameActions.PlayerOneRun));
-      if (this.getActionInput(MainGameActions.PlayerOneJump) > 0) {
+      this.player1.run(this.getActionInput(MainGameAction.PlayerOneRun));
+      if (this.getActionInput(MainGameAction.PlayerOneJump) > 0) {
         this.player1.jump();
-      } else if (this.getActionInput(MainGameActions.PlayerOneJumpStop) > 0) {
+      } else if (this.getActionInput(MainGameAction.PlayerOneJumpStop) > 0) {
         this.player1.cancelJump();
       }
 
-      this.player2.run(this.getActionInput(MainGameActions.PlayerTwoRun));
-      if (this.getActionInput(MainGameActions.PlayerTwoJump) > 0) {
+      this.player2.run(this.getActionInput(MainGameAction.PlayerTwoRun));
+      if (this.getActionInput(MainGameAction.PlayerTwoJump) > 0) {
         this.player2.jump();
-      } else if (this.getActionInput(MainGameActions.PlayerTwoJumpStop) > 0) {
+      } else if (this.getActionInput(MainGameAction.PlayerTwoJumpStop) > 0) {
         this.player2.cancelJump();
       }
 
-      if (this.getActionInput(MainGameActions.PlayerOneSwap) > 0 || this.getActionInput(MainGameActions.PlayerTwoSwap)) {
+      if (this.getActionInput(MainGameAction.PlayerOneSwap) > 0 || this.getActionInput(MainGameAction.PlayerTwoSwap)) {
         // swap player attributes
         var tmp = this.player1.position;
         this.player1.position = this.player2.position;
@@ -136,6 +155,9 @@ export class MainGame extends Game {
         tmp = this.player1.velocity;
         this.player1.velocity = this.player2.velocity;
         this.player2.velocity = tmp;
+        tmp = this.player1.respawnPoint;
+        this.player1.respawnPoint = this.player2.respawnPoint;
+        this.player2.respawnPoint = tmp;
 
         // switch two players in display tree
         if (this.world1.getChild(0) == this.player1) {
@@ -153,7 +175,7 @@ export class MainGame extends Game {
         if (this.timer.isFinished) {
           var self = this;
           this.screenTransition.fadeIn(2.0, () => {
-            self.gameState = MainGameStates.EndGameLoss
+            self.gameState = MainGameState.EndGameLoss
           });
         }
       }
@@ -168,58 +190,58 @@ export class MainGame extends Game {
    * Retrieves player input for a given action, discerning between gamepad and keyboard.
    * For buttons, returns 1 if pressed and 0 if not. For axes, returns a range between -1 and 1
    */
-  private getActionInput(action : MainGameActions) : number {
-    if (action == MainGameActions.PlayerOneRun) {
+  private getActionInput(action : MainGameAction) : number {
+    if (action == MainGameAction.PlayerOneRun) {
       if (InputHandler.instance.gamepadPresent(0)) {
         return InputHandler.instance.gamepadAxis(0, InputGamepadAxis.LeftHorizontal);
       } else {
         return InputHandler.instance.keyHeld(InputKeyCode.Left) != InputHandler.instance.keyHeld(InputKeyCode.Right)
           ? (InputHandler.instance.keyHeld(InputKeyCode.Left) ? -1 : 1) : 0;
       }
-    } else if (action == MainGameActions.PlayerOneJump) {
+    } else if (action == MainGameAction.PlayerOneJump) {
       if (InputHandler.instance.gamepadPresent(0)) {
         return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.A) ? 1 : 0;
       } else {
         return InputHandler.instance.keyDown(InputKeyCode.Up) ? 1 : 0;
       }
-    } else if (action == MainGameActions.PlayerOneJumpStop) {
+    } else if (action == MainGameAction.PlayerOneJumpStop) {
       if (InputHandler.instance.gamepadPresent(0)) {
         return InputHandler.instance.gamepadButtonUp(0, InputGamepadButton.A) ? 1 : 0;
       } else {
         return InputHandler.instance.keyUp(InputKeyCode.Up) ? 1 : 0;
       }
-    } else if (action == MainGameActions.PlayerOneSwap) {
+    } else if (action == MainGameAction.PlayerOneSwap) {
       if (InputHandler.instance.gamepadPresent(0)) {
         return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.X) ? 1 : 0;
       } else {
         return InputHandler.instance.keyDown(InputKeyCode.Return) ? 1 : 0;
       }
-    } else if (action == MainGameActions.PlayerTwoRun) {
+    } else if (action == MainGameAction.PlayerTwoRun) {
       if (InputHandler.instance.gamepadPresent(1)) {
         return InputHandler.instance.gamepadAxis(1, InputGamepadAxis.LeftHorizontal);
       } else {
         return InputHandler.instance.keyHeld('A') != InputHandler.instance.keyHeld('D')
           ? (InputHandler.instance.keyHeld('A') ? -1 : 1) : 0;
       }
-    } else if (action == MainGameActions.PlayerTwoJump) {
+    } else if (action == MainGameAction.PlayerTwoJump) {
       if (InputHandler.instance.gamepadPresent(1)) {
         return InputHandler.instance.gamepadButtonDown(1, InputGamepadButton.A) ? 1 : 0;
       } else {
         return InputHandler.instance.keyDown('W') ? 1 : 0;
       }
-    } else if (action == MainGameActions.PlayerTwoJumpStop) {
+    } else if (action == MainGameAction.PlayerTwoJumpStop) {
       if (InputHandler.instance.gamepadPresent(1)) {
         return InputHandler.instance.gamepadButtonUp(1, InputGamepadButton.A) ? 1 : 0;
       } else {
         return InputHandler.instance.keyUp('W') ? 1 : 0;
       }
-    } else if (action == MainGameActions.PlayerTwoSwap) {
+    } else if (action == MainGameAction.PlayerTwoSwap) {
       if (InputHandler.instance.gamepadPresent(1)) {
         return InputHandler.instance.gamepadButtonDown(1, InputGamepadButton.X) ? 1 : 0;
       } else {
         return InputHandler.instance.keyDown(InputKeyCode.Space) ? 1 : 0;
       }
-    } else if (action == MainGameActions.EndGameContinue) {
+    } else if (action == MainGameAction.EndGameContinue) {
       if (InputHandler.instance.gamepadPresent(0)) {
         return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.A) ? 1 : 0;
       } else {

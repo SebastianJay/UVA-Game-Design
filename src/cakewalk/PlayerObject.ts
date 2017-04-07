@@ -1,7 +1,6 @@
 "use strict";
 
 import { DisplayObject } from '../engine/display/DisplayObject';
-import { Sprite } from '../engine/display/Sprite';
 import { IRectCollider, RectColliderSpriteBase } from '../engine/display/ColliderSprite';
 import { IPhysicsSprite, PhysicsSpriteBase } from '../engine/display/PhysicsSprite';
 import { IAnimatedSprite, AnimatedSpriteBase } from '../engine/display/AnimatedSprite';
@@ -12,7 +11,10 @@ import { Vector } from '../engine/util/Vector';
 import { Physics } from '../engine/util/Physics';
 import { applyMixins } from '../engine/util/mixins';
 
-export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprite, IAnimatedSprite {
+import { MainGameColor } from './MainGameEnums';
+import { MainGameSprite } from './MainGameSprite';
+
+export class PlayerObject extends MainGameSprite implements IRectCollider, IPhysicsSprite, IAnimatedSprite {
   jumpTargetSpeed : number = 14; // m/s in y-axis that jump pulls player up to
   jumpMinSpeed : number = 8;  // m/s in y-axis that cancel jump pulls player to
 
@@ -24,24 +26,24 @@ export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprit
   rampDownFactor : number = 5; // how much to scale down velocity each frame when still (friction)
   rampDownAirFactor : number = 12; // how much to scale down velocity in midair when still (drag)
 
-  color : number; // which "color" the player is (0 or 1)
   grounded : boolean;  // whether the player is on the ground
   jumping : boolean;  // whether the player is in process of jumping
-  currentDirectionRight : boolean;
+  currentDirectionRight : boolean;  // temp var
+  private _respawnPoint : Vector;  // if player dies, where to respawn
 
-  constructor(id: string, filename: string, color : number) {
-    super(id, filename);
+  constructor(id: string, filename: string, color : MainGameColor) {
+    super(id, filename, color);
     this.initPhysics();
     this.initAnimation(filename);
-    this.collisionLayer = 1;
+    this.grounded = false;
+    this.jumping = false;
+    this._respawnPoint = Vector.zero;
+    this.currentDirectionRight = true;
+
+    this.collisionLayer = (this.color == MainGameColor.Red) ? 3 : 4;
     this.isTrigger = false;
     this.elasticity = 0.0;
     this.terminalSpeeds.x = this.topSpeed;
-
-    this.grounded = false;
-    this.jumping = false;
-    this.currentDirectionRight = true;
-    this.color = color;
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
   }
 
@@ -106,6 +108,13 @@ export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprit
       }
       this.jumping = false;
     }
+  }
+
+  get respawnPoint() : Vector { return this._respawnPoint; }
+  set respawnPoint(vec : Vector) { this._respawnPoint = vec }
+
+  respawn() : void {
+    this.position = this.respawnPoint;
   }
 
   private get collisionHandler() {

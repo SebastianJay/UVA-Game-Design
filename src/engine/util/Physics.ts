@@ -114,10 +114,12 @@ export class Physics implements IEventDispatcher {
 		for (var i = 0; i < pairs.length; i++) {
 			var layer1 = pairs[i][0];
 			var layer2 = pairs[i][1];
-			for (var j = 0; j < colliders[layer1].length; j++) {
-				for (var k = (layer1 == layer2 ? j+1 : 0); k < colliders[layer2].length; k++) {
-					var obj1 = colliders[layer1][j];
-					var obj2 = colliders[layer2][k];
+      var colliderLst1 = (layer1 in colliders) ? colliders[layer1] : [];
+      var colliderLst2 = (layer2 in colliders) ? colliders[layer2] : [];
+			for (var j = 0; j < colliderLst1.length; j++) {
+				for (var k = (layer1 == layer2 ? j+1 : 0); k < colliderLst2.length; k++) {
+					var obj1 = colliderLst1[j];
+					var obj2 = colliderLst2[k];
           if (TweenManager.instance.isTweening(obj1) || TweenManager.instance.isTweening(obj2)) {
             continue; // no collisions should occur between objects that are animating
           }

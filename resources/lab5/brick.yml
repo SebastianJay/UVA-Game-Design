@@ -1,0 +1,11 @@
+# Dummy animation spec
+
+idle:
+  startRowPixel: 0
+  height: 32
+  width: 32
+  numStates: 1
+  framesPerState: 5000
+  endBehavior:
+    name: loop
+default: idle
