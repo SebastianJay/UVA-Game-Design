@@ -25,7 +25,9 @@ export class Game extends DisplayObjectContainer {
 		this._canvas = canvas;
 		this._g = canvas.getContext('2d'); //the graphics object
 		this._canvas.width = width;
+		this._canvas.style.width = width + 'px';
 		this._canvas.height = height;
+		this._canvas.style.height = height + 'px';
 		this._playing = false;
 
 		Game._instance = this;

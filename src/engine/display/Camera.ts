@@ -9,6 +9,7 @@ export class Camera extends DisplayObjectContainer {
   private _focusIndex : number;  // index of the child that is focus of the camera
   private _focusThreshold : number; // width of area in middle that focus should occupy
   private _focusWidth : number; // total width spanned by camera
+  private _smoothFactor : number; // affects how smoothly camera catches up to player
 
   constructor(id : string){
     super(id, '');
@@ -16,11 +17,11 @@ export class Camera extends DisplayObjectContainer {
     this._focusIndex = -1;
     this._focusThreshold = 0;
     this._focusWidth = 0;
+    this._smoothFactor = 0.05;
   }
 
   get screenPosition() : Vector { return this._screenPosition; }
   set screenPosition(v : Vector) { this._screenPosition = v; }
-  // TODO make methods for smooth panning, zooming, etc.
 
   //This function scrolls over the screen position.
   //A positive value causes a right scroll and a negative a left scroll
@@ -39,10 +40,13 @@ export class Camera extends DisplayObjectContainer {
     super.update();
     if (this._focusIndex >= 0 && this._focusIndex < this.children.size()) {
       var child = this.children.get(this._focusIndex);
-      if (child.position.x + this.screenPosition.x < (this._focusWidth - this._focusThreshold) / 2) {
-        this.scroll(5);
-      } else if (child.position.x + this.screenPosition.x > (this._focusWidth + this._focusThreshold) / 2) {
-        this.scroll(-5);
+      var childScreenPos = child.position.x + this.screenPosition.x;
+      var leftBoundPos = (this._focusWidth - this._focusThreshold) / 2;
+      var rightBoundPos = (this._focusWidth + this._focusThreshold) / 2;
+      if (childScreenPos < leftBoundPos) {
+        this.scroll((leftBoundPos - childScreenPos) * this._smoothFactor);
+      } else if (childScreenPos > rightBoundPos) {
+        this.scroll((rightBoundPos - childScreenPos) * this._smoothFactor);
       }
     }
   }
