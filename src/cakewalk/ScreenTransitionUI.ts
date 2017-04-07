@@ -1,7 +1,9 @@
 "use strict";
 
 import { Sprite } from '../engine/display/Sprite';
+import { TextObject } from '../engine/display/TextObject';
 import { GameClock } from '../engine/util/GameClock';
+import { Vector } from '../engine/util/Vector';
 import { TweenManager } from '../engine/tween/TweenManager';
 import { Tween } from '../engine/tween/Tween';
 import { TweenParam, TweenAttributeType, TweenFunctionType } from '../engine/tween/TweenParam';
@@ -12,11 +14,16 @@ export class ScreenTransitionUI extends Sprite {
 
   private _callback : () => void;
   private _fadeHandler : EventCallback;
+  private _textObj : TextObject;
 
   constructor(id : string, filename : string) {
     super(id, filename);
     this.alpha = 0;
     this._fadeHandler = this.fadeFinishedHandler;
+    this._textObj = new TextObject(this.id + "_text");
+    this._textObj.color = new Vector(255, 255, 255);
+    this._textObj.text = 'Your cake was stolen!';
+    this.addChild(this._textObj);
   }
 
   /**
@@ -24,6 +31,8 @@ export class ScreenTransitionUI extends Sprite {
    */
   fadeIn(duration : number, callback : () => void) : void {
     this._callback = callback;
+    this._textObj.position = new Vector(0, 0);
+    this._textObj.localScale = new Vector(1 / this.localScale.x, 1 / this.localScale.y);
     this.alpha = 0;
     TweenManager.instance.add(
       new Tween(this).animate(new TweenParam(TweenAttributeType.Alpha, 0.0, 1.0, duration, TweenFunctionType.Linear))

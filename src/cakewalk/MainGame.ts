@@ -93,8 +93,9 @@ export class MainGame extends Game {
     b2a.localScale = new Vector (0.6, 0.6);
     this.timer.pivotPoint = new Vector(0.5, 0.5);
     this.timer.localScale = new Vector(0.4, 0.4);
-    this.screenTransition.position = new Vector(0, 0);
+    this.screenTransition.position = new Vector(this.width / 2, this.height / 2);
     this.screenTransition.dimensions = new Vector(this.width, this.height);
+    this.screenTransition.pivotPoint = new Vector(0.5, 0.5);
     Physics.SetCollisionMat(0, 1);  // check collisions between player and platforms
   }
 
