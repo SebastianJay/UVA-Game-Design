@@ -24,11 +24,12 @@ export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprit
   rampDownFactor : number = 5; // how much to scale down velocity each frame when still (friction)
   rampDownAirFactor : number = 12; // how much to scale down velocity in midair when still (drag)
 
+  color : number; // which "color" the player is (0 or 1)
   grounded : boolean;  // whether the player is on the ground
   jumping : boolean;  // whether the player is in process of jumping
   currentDirectionRight : boolean;
 
-  constructor(id: string, filename: string) {
+  constructor(id: string, filename: string, color : number) {
     super(id, filename);
     this.initPhysics();
     this.initAnimation(filename);
@@ -40,6 +41,7 @@ export class PlayerObject extends Sprite implements IRectCollider, IPhysicsSprit
     this.grounded = false;
     this.jumping = false;
     this.currentDirectionRight = true;
+    this.color = color;
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
   }
 

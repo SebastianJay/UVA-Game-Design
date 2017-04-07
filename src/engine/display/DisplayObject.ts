@@ -211,6 +211,10 @@ export class DisplayObject {
 			this._altDimensions.y = h;
 		}
 	}
+	set dimensions(dim : Vector) {
+		this.width = dim.x;
+		this.height = dim.y;
+	}
 
 	protected get pivotDistance() : Vector{
 		return new Vector(this.pivotPoint.x * this.unscaledWidth, this.pivotPoint.y * this.unscaledHeight);

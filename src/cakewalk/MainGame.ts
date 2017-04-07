@@ -13,12 +13,21 @@ import { Physics } from '../engine/util/Physics';
 import { PlayerObject } from './PlayerObject';
 import { Platform } from './Platform';
 import { MainGameActions } from './MainGameActions';
+import { MainGameStates } from './MainGameStates';
+import { TimerUI } from './TimerUI';
+import { ScreenTransitionUI } from './ScreenTransitionUI';
 
 export class MainGame extends Game {
+
   private world1 : Camera;
   private world2 : Camera;
   private player1 : PlayerObject;
   private player2 : PlayerObject;
+  private timer : TimerUI;
+  private screenTransition : ScreenTransitionUI
+
+  private gameState : MainGameStates = MainGameStates.InGame;
+  private gameDuration : number = 10;  // amount of time before game over
 
   constructor (canvas : HTMLCanvasElement) {
     super("Cakewalk Game", 1280, 720, canvas);
@@ -30,21 +39,24 @@ export class MainGame extends Game {
     //b1a and b2a are blocks to jump over
     var b1a, b2a;
     this.addChild(new DisplayObjectContainer('root', '')
-      .addChild(new DisplayObjectContainer('root_UI', ''))
       .addChild(new DisplayObjectContainer('root_env', '')
         .addChild(this.world1 = new Camera('world1')
-          .addChild(this.player1 = new PlayerObject('player1', 'animations/mario_moving.png'))
+          .addChild(this.player1 = new PlayerObject('player1', 'animations/mario_moving.png', 0))
           .addChild(b1start = new Platform('brick1start', 'lab5/brick.png'))
           .addChild(b1end = new Platform('brick1end', 'lab5/brick.png'))
           .addChild(b1a = new Platform('brick1a', 'CakeWalk/YellowCake.png'))
           .addChild(p1 = new Platform('platform1', 'CakeWalk/tableCombined.png')) as Camera)
         .addChild(this.world2 = new Camera('world2')
-          .addChild(this.player2 = new PlayerObject('player2', 'animations/mario_moving_funky.png'))
+          .addChild(this.player2 = new PlayerObject('player2', 'animations/mario_moving_funky.png', 1))
           .addChild(b2start = new Platform('brick2end', 'lab5/brick.png'))
           .addChild(b2end = new Platform('brick2end', 'lab5/brick.png'))
           .addChild(b2a = new Platform('brick2a', 'CakeWalk/cake2.png'))
           .addChild(p2 = new Platform('platform2', 'CakeWalk/tableCombined.png')) as Camera)
         )
+      .addChild(new DisplayObjectContainer('root_UI', ''))
+        .addChild(this.timer = new TimerUI('timerui', 'CakeWalk/cake2.png', this.gameDuration,
+          new Vector(50, this.height / 2), new Vector(this.width - 50, this.height / 2)))
+        .addChild(this.screenTransition = new ScreenTransitionUI('transitionui', 'CakeWalk/black_square.png'))
       );
 
     this.world1.position = new Vector(0, 0);
@@ -77,51 +89,78 @@ export class MainGame extends Game {
     b2end.visible = false;
     b1a.position = new Vector(1500,120);
     b2a.position = new Vector(500,120);
-    b1a.localScale = new Vector (0.3, 0.3)
-    b2a.localScale = new Vector (0.6, 0.6)
+    b1a.localScale = new Vector (0.3, 0.3);
+    b2a.localScale = new Vector (0.6, 0.6);
+    this.timer.pivotPoint = new Vector(0.5, 0.5);
+    this.timer.localScale = new Vector(0.4, 0.4);
+    this.screenTransition.position = new Vector(0, 0);
+    this.screenTransition.dimensions = new Vector(this.width, this.height);
     Physics.SetCollisionMat(0, 1);  // check collisions between player and platforms
   }
 
   update() {
     super.update();
 
-    // handle input
-    this.player1.run(this.getActionInput(MainGameActions.PlayerOneRun));
-    if (this.getActionInput(MainGameActions.PlayerOneJump) > 0) {
-      this.player1.jump();
-    } else if (this.getActionInput(MainGameActions.PlayerOneJumpStop) > 0) {
-      this.player1.cancelJump();
-    }
-
-    this.player2.run(this.getActionInput(MainGameActions.PlayerTwoRun));
-    if (this.getActionInput(MainGameActions.PlayerTwoJump) > 0) {
-      this.player2.jump();
-    } else if (this.getActionInput(MainGameActions.PlayerTwoJumpStop) > 0) {
-      this.player2.cancelJump();
-    }
-
-    if (this.getActionInput(MainGameActions.PlayerOneSwap) > 0 || this.getActionInput(MainGameActions.PlayerTwoSwap)) {
-      // swap player attributes
-      var tmp = this.player1.position;
-      this.player1.position = this.player2.position;
-      this.player2.position = tmp;
-      tmp = this.player1.velocity;
-      this.player1.velocity = this.player2.velocity;
-      this.player2.velocity = tmp;
-
-      // switch two players in display tree
-      if (this.world1.getChild(0) == this.player1) {
-        this.world2.setChild(this.player1, 0);
-        this.world1.setChild(this.player2, 0);
-      } else {
-        this.world1.setChild(this.player1, 0);
-        this.world2.setChild(this.player2, 0);
+    if (this.gameState == MainGameStates.EndGameLoss) {
+      if (this.getActionInput(MainGameActions.EndGameContinue) > 0) {
+        if (!this.screenTransition.isFading) {
+          var self = this;
+          this.screenTransition.fadeOut(1.0, () => {
+            self.gameState = MainGameStates.InGame;
+            self.timer.reset();
+          });
+        }
       }
-    }
+    } else if (this.gameState == MainGameStates.InGame) {
+      // handle input
+      this.player1.run(this.getActionInput(MainGameActions.PlayerOneRun));
+      if (this.getActionInput(MainGameActions.PlayerOneJump) > 0) {
+        this.player1.jump();
+      } else if (this.getActionInput(MainGameActions.PlayerOneJumpStop) > 0) {
+        this.player1.cancelJump();
+      }
 
-    // apply global physics
-    this.player1.addForce(Physics.Gravity.multiply(this.player1.mass));
-    this.player2.addForce(Physics.Gravity.multiply(this.player2.mass));
+      this.player2.run(this.getActionInput(MainGameActions.PlayerTwoRun));
+      if (this.getActionInput(MainGameActions.PlayerTwoJump) > 0) {
+        this.player2.jump();
+      } else if (this.getActionInput(MainGameActions.PlayerTwoJumpStop) > 0) {
+        this.player2.cancelJump();
+      }
+
+      if (this.getActionInput(MainGameActions.PlayerOneSwap) > 0 || this.getActionInput(MainGameActions.PlayerTwoSwap)) {
+        // swap player attributes
+        var tmp = this.player1.position;
+        this.player1.position = this.player2.position;
+        this.player2.position = tmp;
+        tmp = this.player1.velocity;
+        this.player1.velocity = this.player2.velocity;
+        this.player2.velocity = tmp;
+
+        // switch two players in display tree
+        if (this.world1.getChild(0) == this.player1) {
+          this.world2.setChild(this.player1, 0);
+          this.world1.setChild(this.player2, 0);
+        } else {
+          this.world1.setChild(this.player1, 0);
+          this.world2.setChild(this.player2, 0);
+        }
+      }
+
+      // check for endgame state
+      //  screenTransition.isFading used as proxy for whether state is about to change
+      if (!this.screenTransition.isFading) {
+        if (this.timer.isFinished) {
+          var self = this;
+          this.screenTransition.fadeIn(2.0, () => {
+            self.gameState = MainGameStates.EndGameLoss
+          });
+        }
+      }
+
+      // apply global physics
+      this.player1.addForce(Physics.Gravity.multiply(this.player1.mass));
+      this.player2.addForce(Physics.Gravity.multiply(this.player2.mass));
+    }
   }
 
   /**
@@ -176,6 +215,12 @@ export class MainGame extends Game {
     } else if (action == MainGameActions.PlayerTwoSwap) {
       if (InputHandler.instance.gamepadPresent(1)) {
         return InputHandler.instance.gamepadButtonDown(1, InputGamepadButton.X) ? 1 : 0;
+      } else {
+        return InputHandler.instance.keyDown(InputKeyCode.Space) ? 1 : 0;
+      }
+    } else if (action == MainGameActions.EndGameContinue) {
+      if (InputHandler.instance.gamepadPresent(0)) {
+        return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.A) ? 1 : 0;
       } else {
         return InputHandler.instance.keyDown(InputKeyCode.Space) ? 1 : 0;
       }

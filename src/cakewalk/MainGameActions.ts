@@ -1,3 +1,4 @@
+"use strict";
 
 export const enum MainGameActions {
   // player specific actions
@@ -10,5 +11,7 @@ export const enum MainGameActions {
   PlayerTwoJumpStop,
   PlayerTwoSwap,
   // UI actions
-  Pause
+  Pause,
+  // game over options
+  EndGameContinue
 }
