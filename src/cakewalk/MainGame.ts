@@ -27,7 +27,7 @@ export class MainGame extends Game {
   private screenTransition : ScreenTransitionUI
 
   private gameState : MainGameState = MainGameState.InGame;
-  private gameDuration : number = 10;  // amount of time before game over
+  private gameDuration : number = 100;  // amount of time before game over
 
   constructor (canvas : HTMLCanvasElement) {
     super("Cakewalk Game", 1280, 720, canvas);
@@ -46,7 +46,7 @@ export class MainGame extends Game {
           .addChild(new DisplayObjectContainer('env1', '')
             .addChild(b1start = new Platform('brick1start', 'lab5/brick.png'))
             .addChild(b1end = new Platform('brick1end', 'lab5/brick.png'))
-            .addChild(b1a = new Platform('brick1a', 'CakeWalk/YellowCake.png', MainGameColor.Red))
+            .addChild(b1a = new Platform('brick1a', 'CakeWalk/RedCandle.png', MainGameColor.Red))
             .addChild(p1 = new Platform('platform1', 'CakeWalk/tableCombined.png'))
             .addChild(f1 = new Flame('flame1', 'animations/RedFlameSprite.png', MainGameColor.Red))
           ) as Camera)
@@ -55,7 +55,7 @@ export class MainGame extends Game {
           .addChild(new DisplayObjectContainer('env2', '')
             .addChild(b2start = new Platform('brick2end', 'lab5/brick.png'))
             .addChild(b2end = new Platform('brick2end', 'lab5/brick.png'))
-            .addChild(b2a = new Platform('brick2a', 'CakeWalk/cake2.png', MainGameColor.Blue))
+            .addChild(b2a = new Platform('brick2a', 'CakeWalk/BlueCandle.png', MainGameColor.Blue))
             .addChild(p2 = new Platform('platform2', 'CakeWalk/tableCombined.png'))
             .addChild(f2 = new Flame('flame2', 'animations/BlueFlameSprite.png', MainGameColor.Blue))
           ) as Camera)
@@ -96,8 +96,8 @@ export class MainGame extends Game {
     b2end.visible = false;
     b1a.position = new Vector(1500,120);
     b2a.position = new Vector(500,120);
-    b1a.localScale = new Vector (0.3, 0.3);
-    b2a.localScale = new Vector (0.6, 0.6);
+    // b1a.localScale = new Vector (0.3, 0.3);
+    // b2a.localScale = new Vector (0.6, 0.6);
     f1.position = new Vector(400, 120);
     f2.position = new Vector(700, 120);
     this.timer.pivotPoint = new Vector(0.5, 0.5);
