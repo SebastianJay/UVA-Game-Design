@@ -28,7 +28,7 @@ export class Rectangle {
   get topRightPoint() : Vector { return new Vector(this._right, this._top); }
   get bottomLeftPoint() : Vector { return new Vector(this._left, this._bottom); }
   get bottomRightPoint() : Vector { return new Vector(this._right, this._bottom); }
-  get centerPoint() : Vector { return new Vector(this._left + this.width / 2, this._top + this.height / 2); }
+  get center() : Vector { return new Vector(this._left + this.width / 2, this._top + this.height / 2); }
   get width() : number { return this._right - this._left; }
   get height() : number { return this._bottom - this._top; }
 

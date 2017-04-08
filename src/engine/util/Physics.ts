@@ -87,7 +87,7 @@ export class Physics implements IEventDispatcher {
       || pointInRect(b.center.add(new Vector(b.radius, 0)), a)
       || pointInRect(b.center.add(new Vector(0, -b.radius)), a)
       || pointInRect(b.center.add(new Vector(-b.radius, 0)), a)
-      || pointInCircle(a.centerPoint, b)
+      || pointInCircle(a.center, b)
       || pointInCircle(a.topRightPoint, b)
       || pointInCircle(a.topLeftPoint, b)
       || pointInCircle(a.bottomRightPoint, b)
@@ -192,23 +192,67 @@ export class Physics implements IEventDispatcher {
     var dty = projectVector(new Vector(0, dpos.y));
     if (!obj2.isTrigger) {
       obj1.position = obj1.previousPosition.add(new Vector(dpos.x * dtx, dpos.y * dty));
+
+      // if obj1 still collides (due to obj2 position changing externally), readjust so it's outside
+      if (obj1.collidesWith(obj2)) {
+        var objHitbox = obj1.getHitbox();
+        var rectHitbox = objHitbox instanceof Rectangle ? objHitbox :
+          Rectangle.fromBounds(objHitbox.center.x - objHitbox.radius,
+            objHitbox.center.x + objHitbox.radius,
+            objHitbox.center.y - objHitbox.radius,
+            objHitbox.center.y + objHitbox.radius);
+        var staticHitbox = obj2.getHitbox();
+        if (staticHitbox instanceof Rectangle) {
+          var moveUp = staticHitbox.top - rectHitbox.bottom;
+          var moveDown = staticHitbox.bottom - rectHitbox.top;
+          var moveLeft = staticHitbox.left - rectHitbox.right;
+          var moveRight = staticHitbox.right - rectHitbox.left;
+          var candidateMoves : number[] = [Math.abs(moveUp), Math.abs(moveDown),
+            Math.abs(moveLeft), Math.abs(moveRight)];
+          var minInd = 0;
+          for (var i = 1; i < candidateMoves.length; i++) {
+            if (candidateMoves[i] < candidateMoves[minInd]) {
+              minInd = i;
+            }
+          }
+          if (minInd == 0) {
+            obj1.position.y = staticHitbox.top - (obj1.height * (1 - obj1.pivotPoint.y) + Physics.Epsilon);
+          } else if (minInd == 1) {
+            obj1.position.y = staticHitbox.bottom + (obj1.height * (obj1.pivotPoint.y) + Physics.Epsilon);
+          } else if (minInd == 2) {
+            obj1.position.x = staticHitbox.left - (obj1.width * (1 - obj1.pivotPoint.x) + Physics.Epsilon);
+          } else if (minInd == 3) {
+            obj1.position.x = staticHitbox.right + (obj1.width * (obj1.pivotPoint.x) + Physics.Epsilon);
+          }
+        } else {
+          // find normal and push obj1 in that direction
+          // TODO test
+          var normal = objHitbox.center.subtract(staticHitbox.center).unit();
+          obj1.position = staticHitbox.center.add(normal.multiply(staticHitbox.radius));
+          if (normal.x > 0) {
+            obj1.position.x += obj1.width * (obj1.pivotPoint.x) + Physics.Epsilon;
+          } else {
+            obj1.position.x -= obj1.width * (1 - obj1.pivotPoint.x) + Physics.Epsilon;
+          }
+          if (normal.y > 0) {
+            obj1.position.y += obj1.height * (obj1.pivotPoint.y) + Physics.Epsilon;
+          } else {
+            obj1.position.y -= obj1.height * (1 - obj1.pivotPoint.y) + Physics.Epsilon;
+          }
+        }
+      }
     }
 
     // adjust obj1 velocity based on collision normal
     var normal = Vector.zero;
     var staticHitbox = obj2.getHitbox();
     if (staticHitbox instanceof Rectangle) {
-      var rectHitbox : Rectangle;
       var objHitbox = obj1.getHitbox();
-      if (objHitbox instanceof Rectangle) {
-        rectHitbox = objHitbox;
-      } else {
-        rectHitbox = Rectangle.fromBounds(objHitbox.center.x - objHitbox.radius,
+      var rectHitbox = objHitbox instanceof Rectangle ? objHitbox :
+        Rectangle.fromBounds(objHitbox.center.x - objHitbox.radius,
           objHitbox.center.x + objHitbox.radius,
           objHitbox.center.y - objHitbox.radius,
-          objHitbox.center.y + objHitbox.radius
-        );
-      }
+          objHitbox.center.y + objHitbox.radius);
       // TODO make better
       if (rectHitbox.right < staticHitbox.left) {
         normal.x = -1;
@@ -221,7 +265,7 @@ export class Physics implements IEventDispatcher {
         normal.y = 1;
       }
     } else {
-      normal = obj1.position.subtract(staticHitbox.center);
+      normal = obj1.getHitbox().center.subtract(staticHitbox.center);
     }
     normal = normal.unit();
     if (!obj2.isTrigger) {
