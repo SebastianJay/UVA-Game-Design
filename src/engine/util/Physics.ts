@@ -190,19 +190,21 @@ export class Physics implements IEventDispatcher {
     }
     var dtx = projectVector(new Vector(dpos.x, 0));
     var dty = projectVector(new Vector(0, dpos.y));
+    var normal = Vector.zero; // normal only gets calculated on non-trigger collisions
+
     if (!obj2.isTrigger) {
       obj1.position = obj1.previousPosition.add(new Vector(dpos.x * dtx, dpos.y * dty));
 
-      // if obj1 still collides (due to obj2 position changing externally), readjust so it's outside
-      if (obj1.collidesWith(obj2)) {
-        var objHitbox = obj1.getHitbox();
-        var rectHitbox = objHitbox instanceof Rectangle ? objHitbox :
-          Rectangle.fromBounds(objHitbox.center.x - objHitbox.radius,
-            objHitbox.center.x + objHitbox.radius,
-            objHitbox.center.y - objHitbox.radius,
-            objHitbox.center.y + objHitbox.radius);
-        var staticHitbox = obj2.getHitbox();
-        if (staticHitbox instanceof Rectangle) {
+      var objHitbox = obj1.getHitbox();
+      var rectHitbox = objHitbox instanceof Rectangle ? objHitbox :
+        Rectangle.fromBounds(objHitbox.center.x - objHitbox.radius,
+          objHitbox.center.x + objHitbox.radius,
+          objHitbox.center.y - objHitbox.radius,
+          objHitbox.center.y + objHitbox.radius);
+      var staticHitbox = obj2.getHitbox();
+      if (staticHitbox instanceof Rectangle) {
+        // if obj1 still collides (due to obj2 position changing externally), readjust so it's outside
+        if (obj1.collidesWith(obj2)) {
           var moveUp = staticHitbox.top - rectHitbox.bottom;
           var moveDown = staticHitbox.bottom - rectHitbox.top;
           var moveLeft = staticHitbox.left - rectHitbox.right;
@@ -224,10 +226,36 @@ export class Physics implements IEventDispatcher {
           } else if (minInd == 3) {
             obj1.position.x = staticHitbox.right + (obj1.width * (obj1.pivotPoint.x) + Physics.Epsilon);
           }
-        } else {
-          // find normal and push obj1 in that direction
-          // TODO test
-          var normal = objHitbox.center.subtract(staticHitbox.center).unit();
+
+          // recalculate hitboxes so proceeding normal calculations work
+          objHitbox = obj1.getHitbox();
+          rectHitbox = objHitbox instanceof Rectangle ? objHitbox :
+            Rectangle.fromBounds(objHitbox.center.x - objHitbox.radius,
+              objHitbox.center.x + objHitbox.radius,
+              objHitbox.center.y - objHitbox.radius,
+              objHitbox.center.y + objHitbox.radius);
+        }
+
+        // calculate normal TODO make better
+        if (rectHitbox.right < staticHitbox.left) {
+          normal.x = -1;
+        } else if (rectHitbox.left > staticHitbox.right) {
+          normal.x = 1;
+        }
+        if (rectHitbox.bottom < staticHitbox.top) {
+          normal.y = -1;
+        } else if (rectHitbox.top > staticHitbox.bottom) {
+          normal.y = 1;
+        }
+        normal = normal.unit();
+
+      } else {
+        // find normal first
+        normal = objHitbox.center.subtract(staticHitbox.center).unit();
+
+        // if obj1 still collides (due to obj2 position changing externally), readjust so it's outside
+        if (obj1.collidesWith(obj2)) {
+          // push object in direction of normal TODO test
           obj1.position = staticHitbox.center.add(normal.multiply(staticHitbox.radius));
           if (normal.x > 0) {
             obj1.position.x += obj1.width * (obj1.pivotPoint.x) + Physics.Epsilon;
@@ -241,34 +269,8 @@ export class Physics implements IEventDispatcher {
           }
         }
       }
-    }
 
-    // adjust obj1 velocity based on collision normal
-    var normal = Vector.zero;
-    var staticHitbox = obj2.getHitbox();
-    if (staticHitbox instanceof Rectangle) {
-      var objHitbox = obj1.getHitbox();
-      var rectHitbox = objHitbox instanceof Rectangle ? objHitbox :
-        Rectangle.fromBounds(objHitbox.center.x - objHitbox.radius,
-          objHitbox.center.x + objHitbox.radius,
-          objHitbox.center.y - objHitbox.radius,
-          objHitbox.center.y + objHitbox.radius);
-      // TODO make better
-      if (rectHitbox.right < staticHitbox.left) {
-        normal.x = -1;
-      } else if (rectHitbox.left > staticHitbox.right) {
-        normal.x = 1;
-      }
-      if (rectHitbox.bottom < staticHitbox.top) {
-        normal.y = -1;
-      } else if (rectHitbox.top > staticHitbox.bottom) {
-        normal.y = 1;
-      }
-    } else {
-      normal = obj1.getHitbox().center.subtract(staticHitbox.center);
-    }
-    normal = normal.unit();
-    if (!obj2.isTrigger) {
+      // adjust object velocity based on normal and elasticity
       if (obj1.elasticity == 0) {
         // inelastic collisions can retain velocity where possible TODO refactor
         obj1.velocity = new Vector(obj1.velocity.x * dtx, obj1.velocity.y * dty);

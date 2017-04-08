@@ -23,6 +23,9 @@ export class ArrayList<T> {
 	size() : number{
 		return this.contents.length;
 	}
+	get length() : number{
+		return this.contents.length;
+	}
 
 	/**
 	 * Two equivalent methods for getting an item at a specific index
