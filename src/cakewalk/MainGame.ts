@@ -29,7 +29,7 @@ export class MainGame extends Game {
   private screenTransition : ScreenTransitionUI
 
   private gameState : MainGameState = MainGameState.InGame;
-  private gameDuration : number = 60;  // amount of time (seconds) before game over
+  private gameDuration : number = 100;  // amount of time (seconds) before game over
 
   constructor (canvas : HTMLCanvasElement) {
     super("Cakewalk Game", 1280, 720, canvas);
@@ -50,20 +50,20 @@ export class MainGame extends Game {
           .addChild(new DisplayObjectContainer('env1', '')
             .addChild(b1start = new Platform('brick1start', 'lab5/brick.png'))
             .addChild(b1end = new Platform('brick1end', 'lab5/brick.png'))
-            .addChild(b1a = new Platform('brick1a', 'CakeWalk/YellowCake.png', MainGameColor.Red))
+            .addChild(b1a = new Platform('brick1a', 'CakeWalk/RedCandle.png', MainGameColor.Red))
             .addChild(g1 = new Gate('gate1', 'CakeWalk/cake2.png'))
             .addChild(p1 = new Platform('platform1', 'CakeWalk/tableCombined.png'))
-            .addChild(f1 = new Flame('flame1', 'lab5/brick.png', MainGameColor.Red))
+            .addChild(f1 = new Flame('flame1', 'animations/RedFlameSprite.png', MainGameColor.Red))
           ) as Camera)
         .addChild(this.world2 = new Camera('world2')
           .addChild(this.player2 = new PlayerObject('player2', 'animations/mario_moving_funky.png', MainGameColor.Blue))
           .addChild(new DisplayObjectContainer('env2', '')
             .addChild(b2start = new Platform('brick2end', 'lab5/brick.png'))
             .addChild(b2end = new Platform('brick2end', 'lab5/brick.png'))
-            .addChild(b2a = new Platform('brick2a', 'CakeWalk/cake2.png', MainGameColor.Blue))
+            .addChild(b2a = new Platform('brick2a', 'CakeWalk/BlueCandle.png', MainGameColor.Blue))
             .addChild(s1 = new Switch('switch1', 'lab4/coin.png'))
             .addChild(p2 = new Platform('platform2', 'CakeWalk/tableCombined.png'))
-            .addChild(f2 = new Flame('flame2', 'lab5/brick.png', MainGameColor.Blue))
+            .addChild(f2 = new Flame('flame2', 'animations/BlueFlameSprite.png', MainGameColor.Blue))
           ) as Camera)
         )
       .addChild(new DisplayObjectContainer('root_UI', ''))
@@ -107,8 +107,8 @@ export class MainGame extends Game {
     g1.syncSwitch(s1);
     b1a.position = new Vector(1500,120);
     b2a.position = new Vector(500,120);
-    b1a.localScale = new Vector (0.3, 0.3);
-    b2a.localScale = new Vector (0.6, 0.6);
+    // b1a.localScale = new Vector (0.3, 0.3);
+    // b2a.localScale = new Vector (0.6, 0.6);
     f1.position = new Vector(400, 120);
     f2.position = new Vector(1200, 120);
     this.timer.pivotPoint = new Vector(0.5, 0.5);
