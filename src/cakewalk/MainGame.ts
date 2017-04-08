@@ -51,7 +51,7 @@ export class MainGame extends Game {
             .addChild(b1start = new Platform('brick1start', 'lab5/brick.png'))
             .addChild(b1end = new Platform('brick1end', 'lab5/brick.png'))
             .addChild(b1a = new Platform('brick1a', 'CakeWalk/RedCandle.png', MainGameColor.Red))
-            .addChild(g1 = new Gate('gate1', 'CakeWalk/cake2.png'))
+            .addChild(g1 = new Gate('gate1', 'CakeWalk/YellowCandle.png'))
             .addChild(p1 = new Platform('platform1', 'CakeWalk/tableCombined.png'))
             .addChild(f1 = new Flame('flame1', 'animations/RedFlameSprite.png', MainGameColor.Red))
           ) as Camera)
@@ -61,7 +61,7 @@ export class MainGame extends Game {
             .addChild(b2start = new Platform('brick2end', 'lab5/brick.png'))
             .addChild(b2end = new Platform('brick2end', 'lab5/brick.png'))
             .addChild(b2a = new Platform('brick2a', 'CakeWalk/BlueCandle.png', MainGameColor.Blue))
-            .addChild(s1 = new Switch('switch1', 'lab4/coin.png'))
+            .addChild(s1 = new Switch('switch1', 'CakeWalk/BlueButton.png', MainGameColor.Blue))
             .addChild(p2 = new Platform('platform2', 'CakeWalk/tableCombined.png'))
             .addChild(f2 = new Flame('flame2', 'animations/BlueFlameSprite.png', MainGameColor.Blue))
           ) as Camera)
@@ -100,9 +100,9 @@ export class MainGame extends Game {
     b2end.position = new Vector(2400,0);
     b2end.localScale = new Vector(1.0, 100.0);
     b2end.visible = false;
-    g1.restPosition = g1.position = new Vector(900, 120);
-    g1.targetPosition = g1.position.add(new Vector(0, -200));
-    s1.position = new Vector(700, 120);
+    g1.restPosition = g1.position = new Vector(900, 80);
+    g1.targetPosition = g1.position.add(new Vector(0, -150));
+    s1.position = new Vector(700, 170);
     s1.localScale = new Vector(0.3, 0.3);
     g1.syncSwitch(s1);
     b1a.position = new Vector(1500,120);
