@@ -14,7 +14,7 @@ import { MainGameColor } from './MainGameEnums';
 
 /**
  * A flame object in the environment which can be "stomped out" on contact
- * by the same colored player, but contact with the other player causes death
+ * by the same colored player, but kills other players on contact
  */
 export class Flame extends MainGameSprite implements IRectCollider, IAnimatedSprite {
   private reflameDuration : number;
@@ -41,20 +41,20 @@ export class Flame extends MainGameSprite implements IRectCollider, IAnimatedSpr
         && (args.obj1 instanceof PlayerObject || args.obj2 instanceof PlayerObject)) {
         var player = ((args.obj1 instanceof PlayerObject) ? args.obj1 : args.obj2) as PlayerObject;
         if (player.color == self.color) {
-          // player puts out flame
+          // same color -> player puts out flame
           // TODO tween out of existence?
           var parent = self.parent as DisplayObjectContainer;
           if (parent) {
             self.removeSelf();
             if (self.reflameDuration > 0) {
-              // TODO rework setTimeout
+              // TODO rework setTimeout for flame respawning
               setTimeout(() => {
                 parent.addChild(self);
               }, this.reflameDuration);
             }
           }
         } else {
-          // flame puts out player
+          // different color -> flame puts out player
           player.respawn();
         }
       }

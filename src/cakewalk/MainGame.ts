@@ -12,6 +12,8 @@ import { Physics } from '../engine/util/Physics';
 
 import { PlayerObject } from './PlayerObject';
 import { Platform } from './Platform';
+import { Gate } from './Gate';
+import { Switch } from './Switch';
 import { Flame } from './Flame';
 import { MainGameAction, MainGameState, MainGameColor } from './MainGameEnums';
 import { TimerUI } from './TimerUI';
@@ -27,7 +29,7 @@ export class MainGame extends Game {
   private screenTransition : ScreenTransitionUI
 
   private gameState : MainGameState = MainGameState.InGame;
-  private gameDuration : number = 10;  // amount of time before game over
+  private gameDuration : number = 60;  // amount of time (seconds) before game over
 
   constructor (canvas : HTMLCanvasElement) {
     super("Cakewalk Game", 1280, 720, canvas);
@@ -39,6 +41,8 @@ export class MainGame extends Game {
     //b1a and b2a are blocks to jump over
     var b1a, b2a;
     var f1, f2;
+    var g1;
+    var s1;
     this.addChild(new DisplayObjectContainer('root', '')
       .addChild(new DisplayObjectContainer('root_env', '')
         .addChild(this.world1 = new Camera('world1')
@@ -47,6 +51,7 @@ export class MainGame extends Game {
             .addChild(b1start = new Platform('brick1start', 'lab5/brick.png'))
             .addChild(b1end = new Platform('brick1end', 'lab5/brick.png'))
             .addChild(b1a = new Platform('brick1a', 'CakeWalk/YellowCake.png', MainGameColor.Red))
+            .addChild(g1 = new Gate('gate1', 'CakeWalk/cake2.png'))
             .addChild(p1 = new Platform('platform1', 'CakeWalk/tableCombined.png'))
             .addChild(f1 = new Flame('flame1', 'lab5/brick.png', MainGameColor.Red))
           ) as Camera)
@@ -56,6 +61,7 @@ export class MainGame extends Game {
             .addChild(b2start = new Platform('brick2end', 'lab5/brick.png'))
             .addChild(b2end = new Platform('brick2end', 'lab5/brick.png'))
             .addChild(b2a = new Platform('brick2a', 'CakeWalk/cake2.png', MainGameColor.Blue))
+            .addChild(s1 = new Switch('switch1', 'lab4/coin.png'))
             .addChild(p2 = new Platform('platform2', 'CakeWalk/tableCombined.png'))
             .addChild(f2 = new Flame('flame2', 'lab5/brick.png', MainGameColor.Blue))
           ) as Camera)
@@ -94,12 +100,17 @@ export class MainGame extends Game {
     b2end.position = new Vector(2400,0);
     b2end.localScale = new Vector(1.0, 100.0);
     b2end.visible = false;
+    g1.restPosition = g1.position = new Vector(900, 120);
+    g1.targetPosition = g1.position.add(new Vector(0, -200));
+    s1.position = new Vector(700, 120);
+    s1.localScale = new Vector(0.3, 0.3);
+    g1.syncSwitch(s1);
     b1a.position = new Vector(1500,120);
     b2a.position = new Vector(500,120);
     b1a.localScale = new Vector (0.3, 0.3);
     b2a.localScale = new Vector (0.6, 0.6);
     f1.position = new Vector(400, 120);
-    f2.position = new Vector(700, 120);
+    f2.position = new Vector(1200, 120);
     this.timer.pivotPoint = new Vector(0.5, 0.5);
     this.timer.localScale = new Vector(0.4, 0.4);
     this.screenTransition.position = new Vector(this.width / 2, this.height / 2);
@@ -147,7 +158,7 @@ export class MainGame extends Game {
         this.player2.cancelJump();
       }
 
-      if (this.getActionInput(MainGameAction.PlayerOneSwap) > 0 || this.getActionInput(MainGameAction.PlayerTwoSwap)) {
+      if (this.getActionInput(MainGameAction.PlayerOneSwap) > 0 || this.getActionInput(MainGameAction.PlayerTwoSwap) > 0) {
         // swap player attributes
         var tmp = this.player1.position;
         this.player1.position = this.player2.position;
