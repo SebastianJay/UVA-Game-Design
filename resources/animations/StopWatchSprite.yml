@@ -1,0 +1,9 @@
+flicker:
+  startRowPixel: 0
+  height: 128
+  width: 128
+  numStates: 33
+  framesPerState: 3
+  endBehavior:
+    name: loop
+default: flicker

@@ -29,7 +29,7 @@ export class MainGame extends Game {
   private screenTransition : ScreenTransitionUI
 
   private gameState : MainGameState = MainGameState.InGame;
-  private gameDuration : number = 10000;  // amount of time (seconds) before game over
+  private gameDuration : number = 100;  // amount of time (seconds) before game over
 
   constructor (canvas : HTMLCanvasElement) {
     super("Cakewalk Game", 1280, 720, canvas);
@@ -51,6 +51,7 @@ export class MainGame extends Game {
     var s1a;
     var g2a;
     var s2a, s2b;
+    var timerPath;
     this.addChild(new DisplayObjectContainer('root', '')
       .addChild(new DisplayObjectContainer('root_env', '')
         .addChild(this.world1 = new Camera('world1')
@@ -64,11 +65,11 @@ export class MainGame extends Game {
             .addChild(c1d = new Platform('candle1d', 'CakeWalk/BlueCandle.png', MainGameColor.Blue))
             .addChild(c1e = new Platform('candle1e', 'CakeWalk/RedCandle.png', MainGameColor.Red))
             .addChild(c1f = new Platform('candle1f', 'CakeWalk/BlueCandle.png', MainGameColor.Blue))
-            .addChild(s1a = new Switch('switch1a', 'CakeWalk/BlueButton.png', MainGameColor.Red)) //TODO make this button red
+            .addChild(s1a = new Switch('switch1a', 'CakeWalk/RedButton.png', MainGameColor.Red)) //TODO make this button red
             .addChild(g1a = new Gate('gate1a', 'CakeWalk/YellowCandle.png'))
             .addChild(g1b = new Gate('gate1b', 'CakeWalk/YellowCandle.png'))
             .addChild(p1 = new Platform('platform1a', 'CakeWalk/tableCombined.png'))
-            .addChild(f1a = new Flame('flame1a', 'animations/BlueFlameSprite.png', MainGameColor.Blue)) // should be yellow
+            .addChild(f1a = new Flame('flame1a', 'animations/YellowFlameSprite.png')) // should be yellow
             .addChild(f1b = new Flame('flame1b', 'animations/BlueFlameSprite.png', MainGameColor.Blue))
             .addChild(f1c = new Flame('flame1c', 'animations/BlueFlameSprite.png', MainGameColor.Blue))
             .addChild(f1d = new Flame('flame1d', 'animations/BlueFlameSprite.png', MainGameColor.Blue))
@@ -100,7 +101,7 @@ export class MainGame extends Game {
             .addChild(s2a = new Switch('switch2a', 'CakeWalk/BlueButton.png', MainGameColor.Blue))
             .addChild(s2b = new Switch('switch2b', 'CakeWalk/BlueButton.png', MainGameColor.Blue))
             .addChild(p2 = new Platform('platform2', 'CakeWalk/tableCombined.png'))
-            .addChild(f2a = new Flame('flame2a', 'animations/RedFlameSprite.png', MainGameColor.Red)) // should be yellow
+            .addChild(f2a = new Flame('flame2a', 'animations/YellowFlameSprite.png')) // should be yellow
             .addChild(f2b = new Flame('flame2b', 'animations/RedFlameSprite.png', MainGameColor.Red))
             .addChild(f2c = new Flame('flame2c', 'animations/RedFlameSprite.png', MainGameColor.Red))
             .addChild(f2d = new Flame('flame2d', 'animations/RedFlameSprite.png', MainGameColor.Red))
@@ -121,8 +122,10 @@ export class MainGame extends Game {
           ) as Camera)
         )
       .addChild(new DisplayObjectContainer('root_UI', ''))
-        .addChild(this.timer = new TimerUI('timerui', 'CakeWalk/cake2.png', this.gameDuration,
-          new Vector(50, this.height / 2), new Vector(this.width - 50, this.height / 2)))
+        .addChild(timerPath = new TimerUI('timerUIPath', 'animations/TimerPath.png', this.gameDuration,
+          new Vector(50, this.height / 2.5), new Vector(50, this.height / 2.5)))
+        .addChild(this.timer = new TimerUI('timerui', 'animations/StopWatchSprite.png', this.gameDuration,
+          new Vector(50, this.height / 2.3), new Vector(this.width - 50, this.height / 2.3)))
         .addChild(this.screenTransition = new ScreenTransitionUI('transitionui', 'CakeWalk/black_square.png'))
       );
 
@@ -225,7 +228,8 @@ export class MainGame extends Game {
     // c2b.localScale = new Vector (0.6, 0.6);
 
     this.timer.pivotPoint = new Vector(0.5, 0.5);
-    this.timer.localScale = new Vector(0.4, 0.4);
+    this.timer.localScale = new Vector(0.5, 0.5);
+    timerPath.width = this.width - 50;
     this.screenTransition.position = new Vector(this.width / 2, this.height / 2);
     this.screenTransition.dimensions = new Vector(this.width, this.height);
     this.screenTransition.pivotPoint = new Vector(0.5, 0.5);
