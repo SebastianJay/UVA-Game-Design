@@ -37,6 +37,7 @@ export class Game extends DisplayObjectContainer {
 	update() : void {
 		super.update();
 		Physics.CollisionUpdate(this);
+		DisplayObjectContainer.DrainRemoveQueue();
 		TweenManager.instance.update();
 	}
 

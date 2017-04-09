@@ -76,9 +76,6 @@ export class Gate extends Platform {
         } else if (args.type == CollisionType.Exit && this._playersOnGate.contains(player)) {
           this._playersOnGate.remove(player);
         }
-        if (args.type != CollisionType.Stay) {
-          console.log(args);
-        }
       }
     }
   }

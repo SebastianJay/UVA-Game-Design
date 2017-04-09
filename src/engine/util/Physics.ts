@@ -205,12 +205,10 @@ export class Physics implements IEventDispatcher {
       if (staticHitbox instanceof Rectangle) {
         // if obj1 still collides (due to obj2 position changing externally), readjust so it's outside
         if (obj1.collidesWith(obj2)) {
-          var moveUp = staticHitbox.top - rectHitbox.bottom;
-          var moveDown = staticHitbox.bottom - rectHitbox.top;
-          var moveLeft = staticHitbox.left - rectHitbox.right;
-          var moveRight = staticHitbox.right - rectHitbox.left;
-          var candidateMoves : number[] = [Math.abs(moveUp), Math.abs(moveDown),
-            Math.abs(moveLeft), Math.abs(moveRight)];
+          var candidateMoves : number[] = [Math.abs(staticHitbox.top - rectHitbox.bottom),
+            Math.abs(staticHitbox.bottom - rectHitbox.top),
+            Math.abs(staticHitbox.left - rectHitbox.right),
+            Math.abs(staticHitbox.right - rectHitbox.left)];
           var minInd = 0;
           for (var i = 1; i < candidateMoves.length; i++) {
             if (candidateMoves[i] < candidateMoves[minInd]) {

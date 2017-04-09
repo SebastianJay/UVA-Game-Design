@@ -50,7 +50,7 @@ export class Flame extends MainGameSprite implements IRectCollider, IAnimatedSpr
               // TODO rework setTimeout for flame respawning
               setTimeout(() => {
                 parent.addChild(self);
-              }, this.reflameDuration);
+              }, self.reflameDuration);
             }
           }
         } else {

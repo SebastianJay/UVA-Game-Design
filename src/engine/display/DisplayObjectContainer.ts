@@ -6,6 +6,7 @@ import { ArrayList } from '../util/ArrayList';
 
 export class DisplayObjectContainer extends DisplayObject {
   private _children : ArrayList<DisplayObject>;
+  private static _removeQueue : DisplayObject[] = [];
 
   constructor(id : string, filename : string) {
     super(id, filename);
@@ -86,27 +87,42 @@ export class DisplayObjectContainer extends DisplayObject {
     return this.children.contains(child);
   }
 
+  // NOTE for the remove methods, these actions are enqueued and do not actually happen
+  //  until DisplayObjectContainer.DrainRemoveQueue() is called (from the main game loop).
+  //  The reason for this is that Physics calculations may end up having stale/faulty
+  //  data about colliders that are no longer in the tree.
   removeChild(child : DisplayObject) : DisplayObjectContainer {
-    child.parent = null;
-    this.children.remove(child);
+    if (this.containsChild(child)) {
+      DisplayObjectContainer._removeQueue.push(child);
+    }
     return this;
   }
 
   removeAtIndex(index : number) : DisplayObjectContainer {
-    this.children.get(index).parent = null;
-    this.children.removeAt(index);
+    if (index > 0 && index < this.children.length) {
+      DisplayObjectContainer._removeQueue.push(this.children.get(index));
+    }
     return this;
   }
 
   removeSelf() : void {
     if (this.parent != null && this.parent instanceof DisplayObjectContainer) {
-      (this.parent as DisplayObjectContainer).removeChild(this);
+      DisplayObjectContainer._removeQueue.push(this);
     }
   }
 
   clearChildren() : DisplayObjectContainer {
     this._children = new ArrayList<DisplayObject>();
     return this;
+  }
+
+  static DrainRemoveQueue() {
+    for (var i = 0; i < DisplayObjectContainer._removeQueue.length; i++) {
+      var child = DisplayObjectContainer._removeQueue[i];
+      (child.parent as DisplayObjectContainer).children.remove(child);
+      child.parent = null;
+    }
+    DisplayObjectContainer._removeQueue = [];
   }
 
   get children() : ArrayList<DisplayObject> { return this._children; }
