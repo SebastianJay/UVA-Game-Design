@@ -280,6 +280,9 @@ export class MainGame extends Game {
         var tmp = this.player1.position;
         this.player1.position = this.player2.position;
         this.player2.position = tmp;
+        tmp = this.player1.previousPosition;
+        this.player1.previousPosition = this.player2.previousPosition;
+        this.player2.previousPosition = tmp;
         tmp = this.player1.velocity;
         this.player1.velocity = this.player2.velocity;
         this.player2.velocity = tmp;

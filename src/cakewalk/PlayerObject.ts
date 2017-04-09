@@ -30,6 +30,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   jumping : boolean;  // whether the player is in process of jumping
   currentDirectionRight : boolean;  // temp var
   private _respawnPoint : Vector;  // if player dies, where to respawn
+  private _eventQueue : CollisionEventArgs[]; // for processing multiple collisions in the update loop
 
   constructor(id: string, filename: string, color : MainGameColor) {
     super(id, filename, color);
@@ -38,6 +39,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     this.grounded = false;
     this.jumping = false;
     this._respawnPoint = Vector.zero;
+    this._eventQueue = [];
     this.currentDirectionRight = true;
 
     this.collisionLayer = (this.color == MainGameColor.Red) ? 3 : 4;
@@ -51,6 +53,28 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     super.update();
     this.updatePhysics();
     this.updateAnimation();
+    // process multiple collisions for player getting "squished" and dying
+    var normalDirs = [false, false, false, false];  // whether player has a normal in N, E, S, W directions
+    for (var i = 0; i < this._eventQueue.length; i++) {
+      if (this._eventQueue[i].type == CollisionType.Enter || this._eventQueue[i].type == CollisionType.Stay) {
+        if (this._eventQueue[i].normal.y < 0) {
+          normalDirs[0] = true;
+        }
+        if (this._eventQueue[i].normal.x > 0) {
+          normalDirs[1] = true;
+        }
+        if (this._eventQueue[i].normal.y > 0) {
+          normalDirs[2] = true;
+        }
+        if (this._eventQueue[i].normal.x < 0) {
+          normalDirs[3] = true;
+        }
+      }
+    }
+    this._eventQueue = [];
+    if ((normalDirs[0] && normalDirs[2]) || (normalDirs[1] && normalDirs[3])) {
+      this.respawn();
+    }
   }
 
   /**
@@ -127,6 +151,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
         else if (args.type == CollisionType.Exit) {
           this.grounded = false;
         }
+        this._eventQueue.push(args);
       }
     }
   }
