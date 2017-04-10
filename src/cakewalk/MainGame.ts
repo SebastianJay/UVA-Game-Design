@@ -39,14 +39,14 @@ export class MainGame extends Game {
     super("Cakewalk Game", 1280, 720, canvas);
 
     // set up display tree
+    // p1 and p2 are ground for each stage
     var p1, p2;
-    //b1start b1end etc are invisible walls at the begining and end of level
+    // b1start b1end etc are invisible walls at the begining and end of level
     var b1start, b2start, b1end, b2end;
-    //c1b and c2b are candles to jump over
-    //naming convention: object, world, order
-    //object: c = candle, f = flame, g = gate, s = switch
-    //world: 1 = world 1, 2 = world 2
-    //order: from leftmost to right most type of that object a,b,c, etc.  after z it will go aa, ab, ac
+    // naming convention: object, world, order
+    // object: c = candle, f = flame, g = gate, s = switch
+    // world: 1 = world 1, 2 = world 2
+    // order: from leftmost to right most type of that object a,b,c, etc.  after z it will go aa, ab, ac
     var c1a, c1b, c1c, c1d, c1e, c1f, c1g;
     var c2a, c2b, c2c, c2d, c2e, c2f, c2g;
     var f1a, f1b, f1c, f1d, f1e, f1f, f1g, f1h, f1i, f1j, f1k, f1l, f1m, f1n, f1o, f1p;
@@ -58,7 +58,7 @@ export class MainGame extends Game {
     var timerPath;
     this.addChild(new DisplayObjectContainer('root', '')
       .addChild(new DisplayObjectContainer('root_env', '')
-        .addChild(this.world1 = new Camera('world1')
+        .addChild(this.world1 = <Camera> new Camera('world1')
           .addChild(this.player1 = new PlayerObject('player1', 'animations/mario_moving.png', MainGameColor.Red))
           .addChild(new DisplayObjectContainer('env1', '')
             .addChild(b1start = new Platform('brick1start', 'lab5/brick.png'))
@@ -69,11 +69,11 @@ export class MainGame extends Game {
             .addChild(c1d = new Platform('candle1d', 'CakeWalk/BlueCandle.png', MainGameColor.Blue))
             .addChild(c1e = new Platform('candle1e', 'CakeWalk/RedCandle.png', MainGameColor.Red))
             .addChild(c1f = new Platform('candle1f', 'CakeWalk/BlueCandle.png', MainGameColor.Blue))
-            .addChild(s1a = new Switch('switch1a', 'CakeWalk/RedButton.png', MainGameColor.Red)) //TODO make this button red
+            .addChild(s1a = new Switch('switch1a', 'CakeWalk/RedButton.png', MainGameColor.Red))
             .addChild(g1a = new Gate('gate1a', 'CakeWalk/YellowCandle.png'))
             .addChild(g1b = new Gate('gate1b', 'CakeWalk/YellowCandle.png'))
             .addChild(p1 = new Platform('platform1a', 'CakeWalk/tableCombined.png'))
-            .addChild(f1a = new Flame('flame1a', 'animations/YellowFlameSprite.png')) // should be yellow
+            .addChild(f1a = new Flame('flame1a', 'animations/YellowFlameSprite.png'))
             .addChild(f1b = new Flame('flame1b', 'animations/BlueFlameSprite.png', MainGameColor.Blue))
             .addChild(f1c = new Flame('flame1c', 'animations/BlueFlameSprite.png', MainGameColor.Blue))
             .addChild(f1d = new Flame('flame1d', 'animations/BlueFlameSprite.png', MainGameColor.Blue))
@@ -89,9 +89,11 @@ export class MainGame extends Game {
             .addChild(f1n = new Flame('flame1n', 'animations/RedFlameSprite.png', MainGameColor.Red))
             .addChild(f1o = new Flame('flame1o', 'animations/BlueFlameSprite.png', MainGameColor.Blue))
             .addChild(f1p = new Flame('flame1p', 'animations/RedFlameSprite.png', MainGameColor.Red))
-            .addChild(this.end1 = new TriggerZone('end1'))
-          ) as Camera)
-        .addChild(this.world2 = new Camera('world2')
+            .addChild(this.end1 = <TriggerZone> new TriggerZone('end1')
+              .addChild(new Sprite('end1_post', 'CakeWalk/goalpost.png'))
+            )
+          )
+        ).addChild(this.world2 = <Camera> new Camera('world2')
           .addChild(this.player2 = new PlayerObject('player2', 'animations/mario_moving_funky.png', MainGameColor.Blue))
           .addChild(new DisplayObjectContainer('env2', '')
             .addChild(b2start = new Platform('brick2end', 'lab5/brick.png'))
@@ -106,7 +108,7 @@ export class MainGame extends Game {
             .addChild(s2a = new Switch('switch2a', 'CakeWalk/BlueButton.png', MainGameColor.Blue))
             .addChild(s2b = new Switch('switch2b', 'CakeWalk/BlueButton.png', MainGameColor.Blue))
             .addChild(p2 = new Platform('platform2', 'CakeWalk/tableCombined.png'))
-            .addChild(f2a = new Flame('flame2a', 'animations/YellowFlameSprite.png')) // should be yellow
+            .addChild(f2a = new Flame('flame2a', 'animations/YellowFlameSprite.png'))
             .addChild(f2b = new Flame('flame2b', 'animations/RedFlameSprite.png', MainGameColor.Red))
             .addChild(f2c = new Flame('flame2c', 'animations/RedFlameSprite.png', MainGameColor.Red))
             .addChild(f2d = new Flame('flame2d', 'animations/RedFlameSprite.png', MainGameColor.Red))
@@ -122,33 +124,40 @@ export class MainGame extends Game {
             .addChild(f2n = new Flame('flame2n', 'animations/BlueFlameSprite.png', MainGameColor.Blue))
             .addChild(f2o = new Flame('flame2o', 'animations/RedFlameSprite.png', MainGameColor.Red))
             .addChild(f2p = new Flame('flame2p', 'animations/BlueFlameSprite.png', MainGameColor.Blue))
-            .addChild(this.end2 = new TriggerZone('end2'))
-          ) as Camera)
+            .addChild(this.end2 = <TriggerZone> new TriggerZone('end2')
+              .addChild(new Sprite('end2_post', 'CakeWalk/goalpost.png'))
+            )
+          )
         )
-      .addChild(new DisplayObjectContainer('root_UI', ''))
-        .addChild(timerPath = new TimerUI('timerUIPath', 'animations/TimerPath.png', this.gameDuration,
-          new Vector(50, this.height / 2.5), new Vector(50, this.height / 2.5)))
-        .addChild(this.timer = new TimerUI('timerui', 'animations/StopWatchSprite.png', this.gameDuration,
-          new Vector(50, this.height / 2.3), new Vector(this.width - 50, this.height / 2.3)))
-        .addChild(this.screenTransition = new ScreenTransitionUI('transitionui', 'CakeWalk/black_square.png'))
+      ).addChild(new DisplayObjectContainer('root_UI', ''))
+        .addChild(timerPath = new Sprite('timerUIPath', 'CakeWalk/TimerPath.png')
+          .addChild(this.timer = new TimerUI('timerUI', 'animations/StopWatchSprite.png', this.gameDuration,
+            new Vector(-10, 0), new Vector(961.5, 0))) // x-values found through trial and error
+        )
+        .addChild(this.screenTransition = new ScreenTransitionUI('transitionUI', 'CakeWalk/black_square.png'))
       );
 
+    // cameras
     this.world1.position = new Vector(0, 0);
     this.world2.position = new Vector(1e6, 1e6); // arbitrarily far away, so 2 worlds do not collide
     this.world1.screenPosition = new Vector(0, 0);
     this.world2.screenPosition = new Vector(0, this.height / 2);
     this.world1.setFocus(0, this.width / 2, this.width);
     this.world2.setFocus(0, this.width / 2, this.width);
+    // players
     this.player1.position = this.player1.respawnPoint = new Vector(50, 50);
     this.player2.position = this.player2.respawnPoint = new Vector(50, 50);
-    p1.position = new Vector(0, 200);
-    p1.width = this.width * 2.5;
-    p2.position = new Vector(0, 200);
-    p2.width = this.width * 2.5;
     this.player1.localScale = new Vector(2.0, 2.0);
     this.player2.localScale = new Vector(2.0, 2.0);
-    p1.localScale = new Vector(3.0, 0.3);
-    p2.localScale = new Vector(3.0, 0.3);
+    // ground
+    // TODO increase all y by 80
+    p1.position = new Vector(0, 280);
+    p1.width = 4000;
+    p1.height = 80;
+    p2.position = new Vector(0, 280);
+    p2.width = 4000;
+    p2.height = 80;
+    // invisible walls
     b1start.position = new Vector(-50,0);
     b1start.localScale = new Vector(1.0, 100.0);
     b1start.visible = false;
@@ -162,81 +171,86 @@ export class MainGame extends Game {
     b2end.localScale = new Vector(1.0, 100.0);
     b2end.visible = false;
     //first obstacle
-    c1a.position = new Vector(250,140);
-    c2a.position = new Vector(250,140);
+    c1a.position = new Vector(250,220);
+    c2a.position = new Vector(250,220);
     //second obstacle
-    f1a.position = new Vector(600, 140);
-    f2a.position = new Vector(600, 140);
+    f1a.position = new Vector(600, 220);
+    f2a.position = new Vector(600, 220);
     //third obstacle
-    c1b.position = new Vector(900,100);
-    c2b.position = new Vector(900,100);
+    c1b.position = new Vector(900,180);
+    c2b.position = new Vector(900,180);
     //fourth obstacle
-    c1c.position = new Vector(1100,100);
-    c2c.position = new Vector(1100,100);
+    c1c.position = new Vector(1100,180);
+    c2c.position = new Vector(1100,180);
     //fifth obstacle
-    f1b.position = new Vector(1300, 140);
-    f1c.position = new Vector(1350, 140);
-    f1d.position = new Vector(1400, 140);
-    f1e.position = new Vector(1450, 140);
-    f1f.position = new Vector(1500, 140);
-    f1g.position = new Vector(1550, 140);
-    f2b.position = new Vector(1300, 140);
-    f2c.position = new Vector(1350, 140);
-    f2d.position = new Vector(1400, 140);
-    f2e.position = new Vector(1450, 140);
-    f2f.position = new Vector(1500, 140);
-    f2g.position = new Vector(1550, 140);
+    f1b.position = new Vector(1300, 220);
+    f1c.position = new Vector(1350, 220);
+    f1d.position = new Vector(1400, 220);
+    f1e.position = new Vector(1450, 220);
+    f1f.position = new Vector(1500, 220);
+    f1g.position = new Vector(1550, 220);
+    f2b.position = new Vector(1300, 220);
+    f2c.position = new Vector(1350, 220);
+    f2d.position = new Vector(1400, 220);
+    f2e.position = new Vector(1450, 220);
+    f2f.position = new Vector(1500, 220);
+    f2g.position = new Vector(1550, 220);
     //sixth obstacle
-    f1h.position = new Vector(1700, 140);
-    f1i.position = new Vector(1750, 140);
-    f1j.position = new Vector(1800, 140);
-    f1k.position = new Vector(1850, 140);
-    f1l.position = new Vector(1900, 140);
-    f1m.position = new Vector(1950, 140);
-    f2h.position = new Vector(1700, 140);
-    f2i.position = new Vector(1750, 140);
-    f2j.position = new Vector(1800, 140);
-    f2k.position = new Vector(1850, 140);
-    f2l.position = new Vector(1900, 140);
-    f2m.position = new Vector(1950, 140);
+    f1h.position = new Vector(1700, 220);
+    f1i.position = new Vector(1750, 220);
+    f1j.position = new Vector(1800, 220);
+    f1k.position = new Vector(1850, 220);
+    f1l.position = new Vector(1900, 220);
+    f1m.position = new Vector(1950, 220);
+    f2h.position = new Vector(1700, 220);
+    f2i.position = new Vector(1750, 220);
+    f2j.position = new Vector(1800, 220);
+    f2k.position = new Vector(1850, 220);
+    f2l.position = new Vector(1900, 220);
+    f2m.position = new Vector(1950, 220);
     //seventh obstacle
-    g1a.restPosition = g1a.position = new Vector(2200, 80);
+    g1a.restPosition = g1a.position = new Vector(2200, 160);
     g1a.targetPosition = g1a.position.add(new Vector(0, -150));
-    s2a.position = new Vector(2200, 170);
+    s2a.position = new Vector(2200, 250);
     s2a.localScale = new Vector(0.3, 0.3);
     g1a.syncSwitch(s2a);
     //eighth obstacle
-    c1d.position = new Vector(2400,150);
-    c1e.position = new Vector(2450,100);
-    c1f.position = new Vector(2500,50);
-    c2d.position = new Vector(2400,150);
-    c2e.position = new Vector(2450,100);
-    c2f.position = new Vector(2500,70);
-    f1n.position = new Vector(2400,160);
-    f1o.position = new Vector(2450,110);
-    f1p.position = new Vector(2500,60);
-    f2n.position = new Vector(2400,160);
-    f2o.position = new Vector(2450,110);
-    f2p.position = new Vector(2500,60);
-    g1b.restPosition = g1b.position = new Vector(2550, -20);
-    g1b.targetPosition = g1b.position.add(new Vector(0, -550));
-    s2b.position = new Vector(2500, 50);
+    c1d.position = new Vector(2400,230);
+    c1e.position = new Vector(2450,180);
+    c1f.position = new Vector(2500,130);
+    c2d.position = new Vector(2400,230);
+    c2e.position = new Vector(2450,180);
+    c2f.position = new Vector(2500,150);
+    f1n.position = new Vector(2400,240);
+    f1o.position = new Vector(2450,190);
+    f1p.position = new Vector(2500,140);
+    f2n.position = new Vector(2400,240);
+    f2o.position = new Vector(2450,190);
+    f2p.position = new Vector(2500,140);
+    g1b.restPosition = g1b.position = new Vector(2550, 40);
+    g1b.targetPosition = g1b.position.add(new Vector(0, -150));
+    s2b.position = new Vector(2500, 130);
     s2b.localScale = new Vector(0.3, 0.3);
     g1b.syncSwitch(s2b);
-    g2a.restPosition = g2a.position = new Vector(2550, -20);
-    g2a.targetPosition = g2a.position.add(new Vector(0, 550));
-    s1a.position = new Vector(2700, 170);
+    g2a.restPosition = g2a.position = new Vector(2550, 40);
+    g2a.targetPosition = g2a.position.add(new Vector(0, 150));
+    s1a.position = new Vector(2700, 250);
     s1a.localScale = new Vector(0.3, 0.3);
     g2a.syncSwitch(s1a);
     // last obstacle (trigger zones)
     this.end1.position = new Vector(2850, 0);
     this.end1.dimensions = new Vector(200, 300);
+    this.end1.getChild(0).pivotPoint = new Vector(1.0, 0.0);
     this.end2.position = new Vector(2850, 0);
     this.end2.dimensions = new Vector(200, 300);
+    this.end2.getChild(0).pivotPoint = new Vector(1.0, 0.0);
 
-    this.timer.pivotPoint = new Vector(0.5, 0.5);
+    // UI
+    timerPath.position = new Vector(50, this.height / 2);
+    timerPath.width = this.width - 100;
+    timerPath.pivotPoint = new Vector(0.0, 0.5);
     this.timer.localScale = new Vector(0.5, 0.5);
-    timerPath.width = this.width - 50;
+    this.timer.pivotPoint = new Vector(0.0, 0.5);
     this.screenTransition.position = new Vector(this.width / 2, this.height / 2);
     this.screenTransition.dimensions = new Vector(this.width, this.height);
     this.screenTransition.pivotPoint = new Vector(0.5, 0.5);
