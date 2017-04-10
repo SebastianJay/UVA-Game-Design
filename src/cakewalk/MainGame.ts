@@ -15,6 +15,7 @@ import { Platform } from './Platform';
 import { Gate } from './Gate';
 import { Switch } from './Switch';
 import { Flame } from './Flame';
+import { TriggerZone } from './TriggerZone';
 import { MainGameAction, MainGameState, MainGameColor } from './MainGameEnums';
 import { TimerUI } from './TimerUI';
 import { ScreenTransitionUI } from './ScreenTransitionUI';
@@ -26,6 +27,9 @@ export class MainGame extends Game {
   private player1 : PlayerObject;
   private player2 : PlayerObject;
   private timer : TimerUI;
+  // end1 and end2 are trigger zones that indicate player has reached end of level
+  private end1 : TriggerZone;
+  private end2 : TriggerZone;
   private screenTransition : ScreenTransitionUI
 
   private gameState : MainGameState = MainGameState.InGame;
@@ -85,6 +89,7 @@ export class MainGame extends Game {
             .addChild(f1n = new Flame('flame1n', 'animations/RedFlameSprite.png', MainGameColor.Red))
             .addChild(f1o = new Flame('flame1o', 'animations/BlueFlameSprite.png', MainGameColor.Blue))
             .addChild(f1p = new Flame('flame1p', 'animations/RedFlameSprite.png', MainGameColor.Red))
+            .addChild(this.end1 = new TriggerZone('end1'))
           ) as Camera)
         .addChild(this.world2 = new Camera('world2')
           .addChild(this.player2 = new PlayerObject('player2', 'animations/mario_moving_funky.png', MainGameColor.Blue))
@@ -117,8 +122,7 @@ export class MainGame extends Game {
             .addChild(f2n = new Flame('flame2n', 'animations/BlueFlameSprite.png', MainGameColor.Blue))
             .addChild(f2o = new Flame('flame2o', 'animations/RedFlameSprite.png', MainGameColor.Red))
             .addChild(f2p = new Flame('flame2p', 'animations/BlueFlameSprite.png', MainGameColor.Blue))
-
-
+            .addChild(this.end2 = new TriggerZone('end2'))
           ) as Camera)
         )
       .addChild(new DisplayObjectContainer('root_UI', ''))
@@ -224,8 +228,11 @@ export class MainGame extends Game {
     s1a.position = new Vector(2700, 170);
     s1a.localScale = new Vector(0.3, 0.3);
     g2a.syncSwitch(s1a);
-    // c1b.localScale = new Vector (0.3, 0.3);
-    // c2b.localScale = new Vector (0.6, 0.6);
+    // last obstacle (trigger zones)
+    this.end1.position = new Vector(2850, 0);
+    this.end1.dimensions = new Vector(200, 300);
+    this.end2.position = new Vector(2850, 0);
+    this.end2.dimensions = new Vector(200, 300);
 
     this.timer.pivotPoint = new Vector(0.5, 0.5);
     this.timer.localScale = new Vector(0.5, 0.5);
@@ -253,10 +260,10 @@ export class MainGame extends Game {
       if (this.getActionInput(MainGameAction.EndGameContinue) > 0) {
         if (!this.screenTransition.isFading) {
           var self = this;
-          this.screenTransition.fadeOut(1.0, () => {
+          this.screenTransition.fadeOut(() => {
             self.gameState = MainGameState.InGame;
             self.timer.reset();
-          });
+          }, 1.0);
         }
       }
     } else if (this.gameState == MainGameState.InGame) {
@@ -305,9 +312,15 @@ export class MainGame extends Game {
       if (!this.screenTransition.isFading) {
         if (this.timer.isFinished) {
           var self = this;
-          this.screenTransition.fadeIn(2.0, () => {
+          this.screenTransition.fadeIn(() => {
             self.gameState = MainGameState.EndGameLoss
-          });
+          }, 2.0, 'Your cake was stolen!');
+        }
+        if (this.end1.isPlayerInZone && this.end2.isPlayerInZone) {
+          var self = this;
+          this.screenTransition.fadeIn(() => {
+            self.gameState = MainGameState.EndGameWin
+          }, 2.0, 'You finished the level!');
         }
       }
 

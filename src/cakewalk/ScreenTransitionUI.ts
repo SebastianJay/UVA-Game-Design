@@ -22,17 +22,17 @@ export class ScreenTransitionUI extends Sprite {
     this._fadeHandler = this.fadeFinishedHandler;
     this._textObj = new TextObject(this.id + "_text");
     this._textObj.color = new Vector(255, 255, 255);
-    this._textObj.text = 'Your cake was stolen!';
     this.addChild(this._textObj);
   }
 
   /**
    * Begins fading in with display text, then executes callback
    */
-  fadeIn(duration : number, callback : () => void) : void {
+  fadeIn(callback : () => void, duration : number, text : string = '') : void {
     this._callback = callback;
     this._textObj.position = new Vector(0, 0);
     this._textObj.localScale = new Vector(1 / this.localScale.x, 1 / this.localScale.y);
+    this._textObj.text = text;
     this.alpha = 0;
     TweenManager.instance.add(
       new Tween(this).animate(new TweenParam(TweenAttributeType.Alpha, 0.0, 1.0, duration, TweenFunctionType.Linear))
@@ -43,7 +43,7 @@ export class ScreenTransitionUI extends Sprite {
   /**
    * Fades out the screen UI, then executes callback
    */
-  fadeOut(duration : number, callback : () => void) : void {
+  fadeOut(callback : () => void, duration : number) : void {
     this._callback = callback;
     this.alpha = 1;
     TweenManager.instance.add(

@@ -18,6 +18,7 @@ export const enum MainGameAction {
 
 export const enum MainGameState {
   InGame,
+  EndGameWin,
   EndGameLoss,
 }
 
