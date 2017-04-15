@@ -85,24 +85,43 @@ export class DisplayObject {
 	 * Used for checking if mouse clicks hit the object -- inter-object collision is handled with collidesWith()
 	 */
 	isInRect(point: Vector) : boolean {
-		// apply inverse forward transform to point
-		var test = point.subtract(this.position).divide(this.localScale)
-			.rotate(Math.PI * -this.rotation / 180.0).add(this.pivotDistance);
+		var test = this.getLocalPosition(point);
 		return test.x > 0 && test.x < this.unscaledWidth && test.y > 0 && test.y < this.unscaledHeight;
 	}
 
 	/**
-	 * Translates local coordinates into global coordinates of top-left corner of object
+	 * Translates local coordinates into global coordinates (if no arg given, top-left corner of object)
 	 */
-	getGlobalPosition() : Vector {
-		var retPos = Vector.zero;
+	getGlobalPosition(v : Vector = Vector.zero) : Vector {
+		var retPos = v;
 		var obj : DisplayObject = this;
+		// repeatedly apply inverse reverse transform up the display tree hierarchy
 		while (obj != null) {
 			retPos = retPos.subtract(obj.pivotDistance)
 				.rotate(Math.PI * obj.rotation / 180.0)
 				.multiply(obj.localScale)
 				.add(obj.position);
 			obj = obj.parent;
+		}
+		return retPos;
+	}
+
+	/**
+	 * Translates given global coordinates into those of this object's coordinate system
+	 */
+	getLocalPosition(v : Vector) : Vector {
+		var retPos = v;
+		var lst : DisplayObject[] = [];
+		for (var ptr : DisplayObject = this; ptr != null; ptr = ptr.parent) {
+			lst.push(ptr);
+		}
+		// repeatedly apply inverse forward transform down the display tree hierarchy
+		for (var i = lst.length - 1; i >= 0; i--) {
+			var obj = lst[i];
+			retPos = retPos.subtract(obj.position)
+				.divide(obj.localScale)
+				.rotate(Math.PI * -obj.rotation / 180.0)
+				.add(obj.pivotDistance);
 		}
 		return retPos;
 	}
@@ -155,7 +174,9 @@ export class DisplayObject {
 		}
 		g.translate(this.pivotDistance.x, this.pivotDistance.y);
 		g.rotate(Math.PI * -this.rotation / 180.0);
-		g.scale(1 / this.localScale.x, 1 / this.localScale.y);
+		if (this.localScale.x != 0 && this.localScale.y != 0) {
+			g.scale(1 / this.localScale.x, 1 / this.localScale.y);
+		}
 		g.translate(-this.position.x, -this.position.y);
 		if (this.parent) {
 			g.translate(-this.parent.pivotDistance.x, -this.parent.pivotDistance.y);

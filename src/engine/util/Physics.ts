@@ -215,15 +215,17 @@ export class Physics implements IEventDispatcher {
               minInd = i;
             }
           }
+          var adjustedGlobal : Vector = obj1.getGlobalPosition();
           if (minInd == 0) {
-            obj1.position.y = staticHitbox.top - (obj1.height * (1 - obj1.pivotPoint.y) + Physics.Epsilon);
+            adjustedGlobal.y = staticHitbox.top - (obj1.height * (1 - obj1.pivotPoint.y) + Physics.Epsilon);
           } else if (minInd == 1) {
-            obj1.position.y = staticHitbox.bottom + (obj1.height * (obj1.pivotPoint.y) + Physics.Epsilon);
+            adjustedGlobal.y = staticHitbox.bottom + (obj1.height * (obj1.pivotPoint.y) + Physics.Epsilon);
           } else if (minInd == 2) {
-            obj1.position.x = staticHitbox.left - (obj1.width * (1 - obj1.pivotPoint.x) + Physics.Epsilon);
+            adjustedGlobal.x = staticHitbox.left - (obj1.width * (1 - obj1.pivotPoint.x) + Physics.Epsilon);
           } else if (minInd == 3) {
-            obj1.position.x = staticHitbox.right + (obj1.width * (obj1.pivotPoint.x) + Physics.Epsilon);
+            adjustedGlobal.x = staticHitbox.right + (obj1.width * (obj1.pivotPoint.x) + Physics.Epsilon);
           }
+          obj1.position = (obj1.parent != null ? obj1.parent : obj1).getLocalPosition(adjustedGlobal);
 
           // recalculate hitboxes so proceeding normal calculations work
           objHitbox = obj1.getHitbox();
@@ -254,17 +256,18 @@ export class Physics implements IEventDispatcher {
         // if obj1 still collides (due to obj2 position changing externally), readjust so it's outside
         if (obj1.collidesWith(obj2)) {
           // push object in direction of normal TODO test
-          obj1.position = staticHitbox.center.add(normal.multiply(staticHitbox.radius));
+          var adjustedGlobal = staticHitbox.center.add(normal.multiply(staticHitbox.radius));
           if (normal.x > 0) {
-            obj1.position.x += obj1.width * (obj1.pivotPoint.x) + Physics.Epsilon;
+            adjustedGlobal.x += obj1.width * (obj1.pivotPoint.x) + Physics.Epsilon;
           } else {
-            obj1.position.x -= obj1.width * (1 - obj1.pivotPoint.x) + Physics.Epsilon;
+            adjustedGlobal.x -= obj1.width * (1 - obj1.pivotPoint.x) + Physics.Epsilon;
           }
           if (normal.y > 0) {
-            obj1.position.y += obj1.height * (obj1.pivotPoint.y) + Physics.Epsilon;
+            adjustedGlobal.y += obj1.height * (obj1.pivotPoint.y) + Physics.Epsilon;
           } else {
-            obj1.position.y -= obj1.height * (1 - obj1.pivotPoint.y) + Physics.Epsilon;
+            adjustedGlobal.y -= obj1.height * (1 - obj1.pivotPoint.y) + Physics.Epsilon;
           }
+          obj1.position = (obj1.parent != null ? obj1.parent : obj1).getLocalPosition(adjustedGlobal);
         }
       }
 
