@@ -129,13 +129,13 @@ export class MainGame extends Game {
             )
           )
         )
-      ).addChild(new DisplayObjectContainer('root_UI', ''))
+      ).addChild(new DisplayObjectContainer('root_UI', '')
         .addChild(timerPath = new Sprite('timerUIPath', 'CakeWalk/TimerPath.png')
           .addChild(this.timer = new TimerUI('timerUI', 'animations/StopWatchSprite.png', this.gameDuration,
             new Vector(-10, 0), new Vector(961.5, 0))) // x-values found through trial and error
-        )
-        .addChild(this.screenTransition = new ScreenTransitionUI('transitionUI', 'CakeWalk/black_square.png'))
-      );
+        ).addChild(this.screenTransition = new ScreenTransitionUI('transitionUI', 'CakeWalk/black_square.png'))
+      )
+    );
 
     // cameras
     this.world1.position = new Vector(0, 0);
@@ -150,7 +150,6 @@ export class MainGame extends Game {
     this.player1.localScale = new Vector(2.0, 2.0);
     this.player2.localScale = new Vector(2.0, 2.0);
     // ground
-    // TODO increase all y by 80
     p1.position = new Vector(0, 280);
     p1.width = 4000;
     p1.height = 80;

@@ -158,7 +158,7 @@ export class DisplayObject {
 		g.scale(this.localScale.x, this.localScale.y);
 		g.rotate(Math.PI * this.rotation / 180.0);
 		g.translate(-this.pivotDistance.x, -this.pivotDistance.y);
-		g.globalAlpha *= this.alpha;
+		g.globalAlpha = Math.min(1.0, Math.max(0.0, g.globalAlpha * this.alpha));;
 	}
 
 	/**
@@ -166,7 +166,7 @@ export class DisplayObject {
 	 * */
 	protected reverseTransformations(g : CanvasRenderingContext2D) : void {
 		if (this.alpha != 0) {
-			g.globalAlpha /= this.alpha;
+			g.globalAlpha = Math.min(1.0, Math.max(0.0, g.globalAlpha / this.alpha));;
 		} else if (this.parent) {
 			g.globalAlpha = this.parent.alpha;
 		} else {
