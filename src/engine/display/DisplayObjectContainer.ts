@@ -58,11 +58,11 @@ export class DisplayObjectContainer extends DisplayObject {
 
   // Children getters and setters
   // Note that the getters are not recursive
-  addChild(child : DisplayObject) : DisplayObjectContainer {
+  addChild(child : DisplayObject) : this {
     return this.setChild(child, this.children.size());
   }
 
-  setChild(child : DisplayObject, index : number) : DisplayObjectContainer {
+  setChild(child : DisplayObject, index : number) : this {
     if (index >= 0 && index <= this.children.size()) {
       this.children.set(index, child);
       child.parent = this;
@@ -91,14 +91,14 @@ export class DisplayObjectContainer extends DisplayObject {
   //  until DisplayObjectContainer.DrainRemoveQueue() is called (from the main game loop).
   //  The reason for this is that Physics calculations may end up having stale/faulty
   //  data about colliders that are no longer in the tree.
-  removeChild(child : DisplayObject) : DisplayObjectContainer {
+  removeChild(child : DisplayObject) : this {
     if (this.containsChild(child)) {
       DisplayObjectContainer._removeQueue.push(child);
     }
     return this;
   }
 
-  removeAtIndex(index : number) : DisplayObjectContainer {
+  removeAtIndex(index : number) : this {
     if (index > 0 && index < this.children.length) {
       DisplayObjectContainer._removeQueue.push(this.children.get(index));
     }
@@ -111,7 +111,7 @@ export class DisplayObjectContainer extends DisplayObject {
     }
   }
 
-  clearChildren() : DisplayObjectContainer {
+  clearChildren() : this {
     this._children = new ArrayList<DisplayObject>();
     return this;
   }

@@ -21,7 +21,7 @@ export class Tween implements IEventDispatcher {
   }
 
   /** Begin animations with the given configuration on the next update. Returns self to allow chaining. */
-  animate(param : TweenParam) : Tween {
+  animate(param : TweenParam) : this {
     this._paramList.add([param, 0.0]);
     return this;
   }
