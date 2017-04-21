@@ -9,6 +9,7 @@ import { Gate } from './Gate';
 import { Switch } from './Switch';
 import { Flame } from './Flame';
 import { TriggerZone } from './TriggerZone';
+import { Checkpoint } from './Checkpoint';
 import { MainGameAction, MainGameState, MainGameColor } from './MainGameEnums';
 
 /**
@@ -90,9 +91,19 @@ export class LevelFactory {
   }
 
   private static MakeEndZone() : TriggerZone {
-    var z = new TriggerZone('end' + LevelFactory.Counter).addChild(new Sprite('end1_post', 'CakeWalk/goalpost.png'));
+    var z = new TriggerZone('end' + LevelFactory.Counter)
+    z.addChild(new Sprite(z.id+'_post', 'CakeWalk/goalpost.png'));
     z.getChild(0).pivotPoint = new Vector(1.0, 0.0);  // zone only appears after right edge of goal stripe
     return z;
+  }
+
+  private static MakeCheckpoint() : Checkpoint {
+    var c = new Checkpoint('checkpoint' + LevelFactory.Counter);
+    c.dimensions = new Vector(100, 720 / 2);
+    c.addChild(new Sprite(c.id+'_post', 'CakeWalk/cake2.png'));
+    c.getChild(0).position = new Vector(0, 0);
+    c.getChild(0).localScale = new Vector(0.3, 0.3);
+    return c;
   }
 
   /**
@@ -111,7 +122,7 @@ export class LevelFactory {
     // b1start b1end etc are invisible walls at the begining and end of level
     var b1start: Platform, b2start: Platform, b1end: Platform, b2end: Platform;
     // naming convention: object, world, order
-    // object: c = candle, f = flame, g = gate, s = switch
+    // object: c = candle, f = flame, g = gate, s = switch, q = checkpoint
     // world: 1 = world 1, 2 = world 2
     // order: from leftmost to right most type of that object a,b,c, etc.  after z it will go aa, ab, ac
     var c1a: Platform, c1b: Platform, c1c: Platform, c1d: Platform, c1e: Platform, c1f: Platform, c1g: Platform;
@@ -124,6 +135,8 @@ export class LevelFactory {
     var s1a: Switch;
     var g2a: Gate;
     var s2a: Switch, s2b: Switch;
+    var q1a: Checkpoint, q1b: Checkpoint;
+    var q2a: Checkpoint, q2b: Checkpoint;
     // trigger zones for end of level
     var end1: TriggerZone, end2: TriggerZone;
 
@@ -139,6 +152,8 @@ export class LevelFactory {
       .addChild(s1a = LevelFactory.MakeSwitch(MainGameColor.Red))
       .addChild(g1a = LevelFactory.MakeGate(MainGameColor.Neutral))
       .addChild(g1b = LevelFactory.MakeGate(MainGameColor.Neutral))
+      .addChild(q1a = LevelFactory.MakeCheckpoint())
+      .addChild(q1b = LevelFactory.MakeCheckpoint())
       .addChild(p1 = LevelFactory.MakeGround())
       .addChild(f1a = LevelFactory.MakeFlame(MainGameColor.Neutral))
       .addChild(f1b = LevelFactory.MakeFlame(MainGameColor.Blue))
@@ -156,8 +171,7 @@ export class LevelFactory {
       .addChild(f1n = LevelFactory.MakeFlame(MainGameColor.Red))
       .addChild(f1o = LevelFactory.MakeFlame(MainGameColor.Blue))
       .addChild(f1p = LevelFactory.MakeFlame(MainGameColor.Red))
-      .addChild(end1 = LevelFactory.MakeEndZone()
-    );
+      .addChild(end1 = LevelFactory.MakeEndZone());
 
     var env2 = new DisplayObjectContainer('level0_bottom', '')
       .addChild(b2start = LevelFactory.MakeWall(0))
@@ -171,6 +185,8 @@ export class LevelFactory {
       .addChild(g2a = LevelFactory.MakeGate(MainGameColor.Neutral))
       .addChild(s2a = LevelFactory.MakeSwitch(MainGameColor.Blue))
       .addChild(s2b = LevelFactory.MakeSwitch(MainGameColor.Blue))
+      .addChild(q2a = LevelFactory.MakeCheckpoint())
+      .addChild(q2b = LevelFactory.MakeCheckpoint())
       .addChild(p2 = LevelFactory.MakeGround())
       .addChild(f2a = LevelFactory.MakeFlame(MainGameColor.Neutral))
       .addChild(f2b = LevelFactory.MakeFlame(MainGameColor.Red))
@@ -188,8 +204,7 @@ export class LevelFactory {
       .addChild(f2n = LevelFactory.MakeFlame(MainGameColor.Blue))
       .addChild(f2o = LevelFactory.MakeFlame(MainGameColor.Red))
       .addChild(f2p = LevelFactory.MakeFlame(MainGameColor.Blue))
-      .addChild(end2 = LevelFactory.MakeEndZone()
-    );
+      .addChild(end2 = LevelFactory.MakeEndZone());
 
     // ground
     p1.position = new Vector(0, 280);
@@ -215,6 +230,11 @@ export class LevelFactory {
     //fourth obstacle
     c1c.position = new Vector(1100,180);
     c2c.position = new Vector(1100,180);
+    // checkpoint 1
+    q1a.position = new Vector(1200, 0);
+    q1a.spawnPoint = new Vector(1200, 200);
+    q2a.position = new Vector(1200, 0);
+    q2a.spawnPoint = new Vector(1200, 200);
     //fifth obstacle
     f1b.position = new Vector(1300, 220);
     f1c.position = new Vector(1350, 220);
@@ -247,6 +267,11 @@ export class LevelFactory {
     s2a.position = new Vector(2200, 250);
     s2a.localScale = new Vector(0.3, 0.3);
     g1a.syncSwitch(s2a);
+    // 2nd checkpoint
+    q1b.position = new Vector(2300, 0);
+    q1b.spawnPoint = new Vector(2300, 220);
+    q2b.position = new Vector(2300, 0);
+    q2b.spawnPoint = new Vector(2300, 220);
     //eighth obstacle
     c1d.position = new Vector(2400,230);
     c1e.position = new Vector(2450,180);
