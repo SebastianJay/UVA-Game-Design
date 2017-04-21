@@ -4,6 +4,7 @@ import { ICircleCollider, CircleColliderSpriteBase } from '../engine/display/Col
 import { IAnimatedSprite, AnimatedSpriteBase } from '../engine/display/AnimatedSprite';
 import { CollisionEventArgs, CollisionType } from '../engine/events/EventTypes';
 import { EventDispatcher } from '../engine/events/EventDispatcher';
+import { CallbackManager } from '../engine/events/CallbackManager';
 import { DisplayObjectContainer } from '../engine/display/DisplayObjectContainer';
 import { Sprite } from '../engine/display/Sprite';
 import { Circle } from '../engine/util/Circle';
@@ -57,8 +58,8 @@ export class Flame extends MainGameSprite implements ICircleCollider, IAnimatedS
           if (parent) {
             self.removeSelf();
             if (self.reflameDuration > 0) {
-              // TODO rework setTimeout for flame respawning
-              setTimeout(() => {
+              CallbackManager.instance.addCallback(() => {
+                // tween into existence?
                 parent.addChild(self);
               }, self.reflameDuration);
             }
