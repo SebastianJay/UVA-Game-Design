@@ -2,7 +2,6 @@
 
 import { Sprite } from '../engine/display/Sprite';
 import { TextObject } from '../engine/display/TextObject';
-import { GameClock } from '../engine/util/GameClock';
 import { Vector } from '../engine/util/Vector';
 import { TweenManager } from '../engine/tween/TweenManager';
 import { Tween } from '../engine/tween/Tween';

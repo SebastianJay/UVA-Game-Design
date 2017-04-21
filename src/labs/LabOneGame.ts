@@ -33,8 +33,8 @@ export class LabOneGame extends Game{
 		this.gameState = 0;
 	}
 
-	update(){
-		super.update();
+	update(dt : number = 0) : void{
+		super.update(dt);
 		if (InputHandler.instance.keyHeld(InputKeyCode.Left)) {
 			this.marioX = Math.max(this.marioX - 10, 0);
 		}
@@ -55,7 +55,7 @@ export class LabOneGame extends Game{
 			this.marioHealth -= 1;
 		}
 
-		this.mario.update();
+		this.mario.update(dt);
 		if (this.gameState == 0) {
 			var time = this.clock.getElapsedTime();
 			this.marioTime -= time / 1000;

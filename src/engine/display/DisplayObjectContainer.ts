@@ -13,10 +13,10 @@ export class DisplayObjectContainer extends DisplayObject {
     this._children = new ArrayList<DisplayObject>();
   }
 
-  update() : void {
-    super.update();
+  update(dt : number = 0) : void{
+    super.update(dt);
     for (var i = 0; i < this.children.size(); i++) {
-      this.children.get(i).update();
+      this.children.get(i).update(dt);
     }
   }
 

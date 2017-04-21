@@ -3,7 +3,6 @@
 import { Tween } from './Tween';
 import { DisplayObject } from '../display/DisplayObject';
 import { ArrayList } from '../util/ArrayList';
-import { GameClock } from '../util/GameClock';
 
 /**
  * A singleton class that handles attribute-based animations on DisplayObjects (as
@@ -23,14 +22,10 @@ export class TweenManager {
   // fields
   private _tweenList : ArrayList<Tween>;
   private _tweenSet : {[id : string] : number}; // a hash set mirroring tweenList, the val is meaningless
-  private _clock : GameClock;
-  private _lastTimestamp : number;
 
   private constructor () {
     this._tweenList = new ArrayList<Tween>();
     this._tweenSet = {};
-    this._clock = new GameClock();
-    this._lastTimestamp = this._clock.getElapsedTime();
   }
 
   /** Adds a new Tween to the mix. It will be removed internally when it finishes. */
@@ -38,13 +33,8 @@ export class TweenManager {
     this._tweenList.add(tween);
   }
 
-  /** Called by main loop whenever Tweens should animate further */
-  update () : void {
-    // clock management
-    var t = this._clock.getElapsedTime();
-    var dt = t - this._lastTimestamp;
-    this._lastTimestamp = t;
-
+  /** Called by main loop whenever Tweens should animate further. Given dt in seconds from time elapsed. */
+  update (dt : number) : void {
     // call update on all contained tweens
     for (var i = 0; i < this._tweenList.size(); i++) {
       this._tweenList.get(i).update(dt / 1000);

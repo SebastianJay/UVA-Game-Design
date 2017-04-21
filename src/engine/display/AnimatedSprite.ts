@@ -115,7 +115,7 @@ export abstract class AnimatedSpriteBase extends Sprite {
     }
   }
 
-  // helper getter
+  // helper getter NOTE we don't use get currentConfig so mixin application works properly
   private getCurrentConfig() : AnimationConfig { return this._configDict[this._currentAnimId]; }
 
   // override dimensions to only be the part of the image being drawn
@@ -147,8 +147,8 @@ export class AnimatedSprite extends Sprite implements IAnimatedSprite {
     this.initAnimation(filename);
   }
 
-  update() : void {
-    super.update();
+  update(dt : number = 0) : void{
+    super.update(dt);
     this.updateAnimation();
   }
 

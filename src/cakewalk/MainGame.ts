@@ -105,8 +105,8 @@ export class MainGame extends Game {
     Physics.SetCollisionMat(2, 3);
   }
 
-  update() {
-    super.update();
+  update(dt : number = 0) : void{
+    super.update(dt);
 
     if (this.gameState == MainGameState.MenuOpen) {
       if (this.getActionInput(MainGameAction.MenuConfirm) > 0) {

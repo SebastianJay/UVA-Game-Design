@@ -9,8 +9,6 @@ import { ArrayList } from '../engine/util/ArrayList';
 import { applyMixins } from '../engine/util/mixins';
 
 import { PlayerObject } from './PlayerObject';
-import { MainGameSprite } from './MainGameSprite';
-import { MainGameColor } from './MainGameEnums';
 
 export class TriggerZone extends DisplayObjectContainer implements IRectCollider {
   private _playersInZone : ArrayList<PlayerObject>;

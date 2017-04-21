@@ -64,9 +64,9 @@ export class DisplayObject {
 	}
 
 	/**
-	 * Invoked every frame, manually for now, but later automatically if this DO is in DisplayTree
+	 * Invoked every frame with a dt (in seconds) from amount of time elapsed since last call
 	 */
-	update() : void{
+	update(dt : number = 0) : void{
 	}
 
 	/**

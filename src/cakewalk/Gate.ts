@@ -34,8 +34,8 @@ export class Gate extends Platform {
   get targetPosition() : Vector { return this._targetPosition; }
   set targetPosition(v : Vector) { this._targetPosition = v; }
 
-  update() : void {
-    super.update();
+  update(dt : number = 0) : void{
+    super.update(dt);
     var deltaPos = Vector.zero;
     var destPos = this._moveMode == 0 ? this.restPosition : this.targetPosition;
     if (!this.position.equals(destPos)) {

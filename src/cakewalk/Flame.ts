@@ -1,11 +1,12 @@
 "use strict";
 
-import { IRectCollider, RectColliderSpriteBase } from '../engine/display/ColliderSprite';
+import { ICircleCollider, CircleColliderSpriteBase } from '../engine/display/ColliderSprite';
 import { IAnimatedSprite, AnimatedSpriteBase } from '../engine/display/AnimatedSprite';
 import { CollisionEventArgs, CollisionType } from '../engine/events/EventTypes';
 import { EventDispatcher } from '../engine/events/EventDispatcher';
 import { DisplayObjectContainer } from '../engine/display/DisplayObjectContainer';
-import { Rectangle } from '../engine/util/Rectangle';
+import { Sprite } from '../engine/display/Sprite';
+import { Circle } from '../engine/util/Circle';
 import { applyMixins } from '../engine/util/mixins';
 
 import { PlayerObject } from './PlayerObject';
@@ -16,7 +17,7 @@ import { MainGameColor } from './MainGameEnums';
  * A flame object in the environment which can be "stomped out" on contact
  * by the same colored player, but kills other players on contact
  */
-export class Flame extends MainGameSprite implements IRectCollider, IAnimatedSprite {
+export class Flame extends MainGameSprite implements ICircleCollider, IAnimatedSprite {
   private reflameDuration : number;
 
   constructor(id : string, filename : string, color : MainGameColor = MainGameColor.Neutral, reflameDuration : number = -1) {
@@ -25,11 +26,20 @@ export class Flame extends MainGameSprite implements IRectCollider, IAnimatedSpr
     this.reflameDuration = reflameDuration;
     this.collisionLayer = 0;  //always collides, regardless of color
     this.isTrigger = true;
+    /*
+    var box = new Sprite(id+'_box', 'lab3/black_circle.png');
+    box.alpha = 0.5;
+    box.localScale.x = 0.45;
+    box.localScale.y = 0.45;
+    box.position.x = 10;
+    box.position.y = 18;
+    this.addChild(box);
+    */
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
   }
 
-  update() : void {
-    super.update();
+  update(dt : number = 0) : void{
+    super.update(dt);
     this.updateAnimation();
   }
 
@@ -63,7 +73,7 @@ export class Flame extends MainGameSprite implements IRectCollider, IAnimatedSpr
 
   collisionLayer : number;
   isTrigger : boolean;
-  getHitbox : () => Rectangle;
+  getHitbox : () => Circle;
 
   animate : (animId: string) => void;
   isPaused : () => boolean;
@@ -73,4 +83,4 @@ export class Flame extends MainGameSprite implements IRectCollider, IAnimatedSpr
   protected initAnimation : (filename : string) => void;
   protected updateAnimation : () => void;
 }
-applyMixins(Flame, [RectColliderSpriteBase, AnimatedSpriteBase]);
+applyMixins(Flame, [CircleColliderSpriteBase, AnimatedSpriteBase]);

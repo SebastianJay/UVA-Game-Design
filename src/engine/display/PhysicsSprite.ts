@@ -84,8 +84,8 @@ export class PhysicsSprite extends Sprite implements IPhysicsSprite {
     this.initPhysics();
   }
 
-  update() : void {
-    super.update();
+  update(dt : number = 0) : void{
+    super.update(dt);
     this.updatePhysics();
   }
 

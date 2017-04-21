@@ -24,8 +24,8 @@ export class LabFiveMario extends Sprite implements IRectCollider, IPhysicsSprit
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
   }
 
-  update() : void {
-    super.update();
+  update(dt : number = 0) : void{
+    super.update(dt);
     this.updatePhysics();
     this.updateAnimation();
   }

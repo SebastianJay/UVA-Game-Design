@@ -4,6 +4,7 @@ import { InputHandler } from '../input/InputHandler';
 import { TweenManager } from '../tween/TweenManager';
 import { DisplayObjectContainer } from '../display/DisplayObjectContainer';
 import { Physics } from '../util/Physics';
+import { GameClock } from '../util/GameClock';
 
 /**
  * Main class. Instantiate or extend Game to create a new game of your own
@@ -16,6 +17,8 @@ export class Game extends DisplayObjectContainer {
 	private _canvas : HTMLCanvasElement;
 	private _g : CanvasRenderingContext2D;
 	private _playing : boolean;
+	private _lastTimestamp : number;
+	private _clock : GameClock;
 
 	constructor(gameId : string, width : number, height : number, canvas : HTMLCanvasElement){
 		super(gameId, '');
@@ -29,16 +32,24 @@ export class Game extends DisplayObjectContainer {
 		this._canvas.height = height;
 		this._canvas.style.height = height + 'px';
 		this._playing = false;
+		this._clock = new GameClock();
+		this._lastTimestamp = this._clock.getElapsedTime();
 
 		Game._instance = this;
 		InputHandler.instance.registerInputFocus(this._canvas);
 	}
 
-	update() : void {
-		super.update();
+	update(dt : number = 0) : void{
+		if (dt == 0) {
+			var t = this._clock.getElapsedTime();
+			dt = (t - this._lastTimestamp) / 1000;
+			this._lastTimestamp = t;
+		}
+		super.update(dt);
+
 		Physics.CollisionUpdate(this);
 		DisplayObjectContainer.DrainRemoveQueue();
-		TweenManager.instance.update();
+		TweenManager.instance.update(dt);
 	}
 
 	draw(g : CanvasRenderingContext2D){

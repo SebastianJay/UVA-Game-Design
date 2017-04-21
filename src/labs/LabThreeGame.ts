@@ -77,8 +77,8 @@ export class LabThreeGame extends Game {
     ];
   }
 
-  update() {
-    super.update();
+  update(dt : number = 0) : void{
+    super.update(dt);
     // Adjust elliptical path of each body
     var time = this.clock.getElapsedTime();
     for (var i = 0; i < this.bodyPaths.length; i++) {

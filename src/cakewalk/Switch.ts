@@ -30,7 +30,8 @@ export class Switch extends MainGameSprite implements IRectCollider {
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
   }
 
-  update() : void {
+  update(dt : number = 0) : void{
+    super.update(dt);
     // only process collisions if one event was thrown last frame
     // NOTE this logic may not be valid if multiple players can touch the same switch
     if (this._eventQueue.length == 1) {

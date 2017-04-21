@@ -28,7 +28,8 @@ export class LabTwoGame extends Game{
 		this.gameState = 0;
 	}
 
-	update(){
+	update(dt : number = 0) : void{
+		super.update(dt);
     // handle key presses
 		if (InputHandler.instance.keyHeld(InputKeyCode.Left)) {
 			this.mario.position.x -= 10;
@@ -97,7 +98,7 @@ export class LabTwoGame extends Game{
 			this.height - this.mario.height + this.mario.pivotPoint.y * this.mario.height);
 
 		// check for endgame state
-		this.mario.update();
+		this.mario.update(dt);
 		if (this.gameState == 0) {
 			var time = this.clock.getElapsedTime();
 			this.marioTime -= time / 1000;

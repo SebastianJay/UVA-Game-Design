@@ -36,8 +36,8 @@ export class Camera extends DisplayObjectContainer {
     this._focusWidth = totalWidth;
   }
 
-  update() : void {
-    super.update();
+  update(dt : number = 0) : void{
+    super.update(dt);
     if (this._focusIndex >= 0 && this._focusIndex < this.children.size()) {
       var child = this.children.get(this._focusIndex);
       var childScreenPos = child.position.x + this.screenPosition.x;

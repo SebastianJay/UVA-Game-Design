@@ -53,8 +53,8 @@ export class LabFiveGame extends Game {
     Physics.SetCollisionMat(0, 1);  // check collisions between Mario and platforms
   }
 
-  update() {
-    super.update();
+  update(dt : number = 0) : void{
+    super.update(dt);
     // handle input
     if (InputHandler.instance.keyHeld(InputKeyCode.Left)) {
       this.mario.addForce(this.moveForce.multiply(-1));

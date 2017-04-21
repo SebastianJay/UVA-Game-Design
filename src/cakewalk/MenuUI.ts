@@ -60,7 +60,8 @@ export class MenuUI extends Sprite {
     this.getChild(2).visible = false;
   }
 
-  update() : void {
+  update(dt : number = 0) : void{
+    super.update(dt);
     this._cursor.position = this.optionFocus.position.subtract(new Vector(50, 0));
   }
 

@@ -26,8 +26,8 @@ export class LabFourGame extends Game {
     this.ui.position = new Vector(this.width - 200, 20);
   }
 
-  update() {
-    super.update();
+  update(dt : number = 0) : void{
+    super.update(dt);
     // handle input
     if (InputHandler.instance.keyHeld(InputKeyCode.Left)) {
       this.mario.x -= 4;

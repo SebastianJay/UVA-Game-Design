@@ -60,8 +60,8 @@ export class LabSixGame extends Game {
     Physics.SetCollisionMat(0, 1);  // check collisions between Mario and platforms
   }
 
-  update() {
-    super.update();
+  update(dt : number = 0) : void{
+    super.update(dt);
     if (TweenManager.instance.isTweening(this.mario)) {
       return; // do nothing to Mario if he is animating
     }

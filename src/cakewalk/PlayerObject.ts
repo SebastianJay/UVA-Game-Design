@@ -49,8 +49,8 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
   }
 
-  update() : void {
-    super.update();
+  update(dt : number = 0) : void{
+    super.update(dt);
     this.updatePhysics();
     this.updateAnimation();
     // process multiple collisions for player getting "squished" and dying
