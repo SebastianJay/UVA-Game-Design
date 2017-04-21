@@ -10,13 +10,18 @@ export const enum MainGameAction {
   PlayerTwoJump,
   PlayerTwoJumpStop,
   PlayerTwoSwap,
-  // UI actions
+  // general player actions
   Pause,
+  // menu actions
+  MenuConfirm,
+  MenuUp,
+  MenuDown,
   // game over options
   EndGameContinue
 }
 
 export const enum MainGameState {
+  MenuOpen,
   InGame,
   EndGameWin,
   EndGameLoss,

@@ -16,6 +16,7 @@ import { TriggerZone } from './TriggerZone';
 import { MainGameAction, MainGameState, MainGameColor } from './MainGameEnums';
 import { TimerUI } from './TimerUI';
 import { ScreenTransitionUI } from './ScreenTransitionUI';
+import { MenuUI } from './MenuUI';
 
 export class MainGame extends Game {
 
@@ -23,13 +24,14 @@ export class MainGame extends Game {
   private world2 : Camera;
   private player1 : PlayerObject;
   private player2 : PlayerObject;
-  private timer : TimerUI;
   // end1 and end2 are trigger zones that indicate player has reached end of level
   private end1 : TriggerZone;
   private end2 : TriggerZone;
+  private timer : TimerUI;
   private screenTransition : ScreenTransitionUI
+  private menu : MenuUI;
 
-  private gameState : MainGameState = MainGameState.InGame;
+  private gameState : MainGameState = MainGameState.MenuOpen;
   private gameLevelNumber : number = 0; // which level players are on
   private gameDuration : number = 100;  // amount of time (seconds) before game over
 
@@ -51,7 +53,8 @@ export class MainGame extends Game {
         .addChild(timerPath = new Sprite('timerUIPath', 'CakeWalk/TimerPath.png')
           .addChild(this.timer = new TimerUI('timerUI', 'animations/StopWatchSprite.png', this.gameDuration,
             new Vector(-10, 0), new Vector(961.5, 0))) // x-values found through trial and error
-        ).addChild(this.screenTransition = new ScreenTransitionUI('transitionUI', 'CakeWalk/black_square.png'))
+        ).addChild(this.menu = new MenuUI('menuUI', 'CakeWalk/title.png'))
+        .addChild(this.screenTransition = new ScreenTransitionUI('transitionUI', 'CakeWalk/black_square.png'))
       )
     );
 
@@ -84,6 +87,12 @@ export class MainGame extends Game {
     this.screenTransition.dimensions = new Vector(this.width, this.height);
     this.screenTransition.pivotPoint = new Vector(0.5, 0.5);
 
+    var self = this;
+    this.menu.registerGameStartCallback(() => {
+      self.menu.visible = false;
+      self.gameState = MainGameState.InGame;
+    });
+
     // create collision matrix
     // 0 - neutral objects that collide both players
     // 1 - red objects that pass through player red
@@ -99,7 +108,15 @@ export class MainGame extends Game {
   update() {
     super.update();
 
-    if (this.gameState == MainGameState.EndGameLoss) {
+    if (this.gameState == MainGameState.MenuOpen) {
+      if (this.getActionInput(MainGameAction.MenuConfirm) > 0) {
+        this.menu.menuAction();
+      } else if (this.getActionInput(MainGameAction.MenuUp) > 0) {
+        this.menu.menuScroll(false);
+      } else if (this.getActionInput(MainGameAction.MenuDown) > 0) {
+        this.menu.menuScroll(true);
+      }
+    } else if (this.gameState == MainGameState.EndGameLoss) {
       if (this.getActionInput(MainGameAction.EndGameContinue) > 0) {
         if (!this.screenTransition.isFading) {
           var self = this;
@@ -233,6 +250,26 @@ export class MainGame extends Game {
         return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.A) ? 1 : 0;
       } else {
         return InputHandler.instance.keyDown(InputKeyCode.Space) ? 1 : 0;
+      }
+    } else if (action == MainGameAction.MenuConfirm) {
+      if (InputHandler.instance.gamepadPresent(0)) {
+        return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.A) ? 1 : 0;
+      } else {
+        return InputHandler.instance.keyDown(InputKeyCode.Return) ? 1 : 0;
+      }
+    } else if (action == MainGameAction.MenuUp) {
+      if (InputHandler.instance.gamepadPresent(0)) {
+        return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.DpadUp)
+          || InputHandler.instance.gamepadAxis(0, InputGamepadAxis.LeftVertical) < -0.5 ? 1 : 0;
+      } else {
+        return InputHandler.instance.keyDown(InputKeyCode.Up) ? 1 : 0;
+      }
+    } else if (action == MainGameAction.MenuDown) {
+      if (InputHandler.instance.gamepadPresent(0)) {
+        return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.DpadDown)
+          || InputHandler.instance.gamepadAxis(0, InputGamepadAxis.LeftVertical) > 0.5 ? 1 : 0;
+      } else {
+        return InputHandler.instance.keyDown(InputKeyCode.Down) ? 1 : 0;
       }
     }
     return 0;
