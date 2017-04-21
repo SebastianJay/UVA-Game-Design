@@ -20,13 +20,18 @@ import { MenuUI } from './MenuUI';
 
 export class MainGame extends Game {
 
+  private rootEnv : DisplayObjectContainer;
+  // cameras that contain the two stages and players
   private world1 : Camera;
   private world2 : Camera;
+  // player objects
   private player1 : PlayerObject;
   private player2 : PlayerObject;
   // end1 and end2 are trigger zones that indicate player has reached end of level
   private end1 : TriggerZone;
   private end2 : TriggerZone;
+
+  // UI elements
   private timer : TimerUI;
   private screenTransition : ScreenTransitionUI
   private menu : MenuUI;
@@ -39,9 +44,9 @@ export class MainGame extends Game {
     super("Cakewalk Game", 1280, 720, canvas);
 
     // set up display tree
-    var timerPath;
+    var timerPath : Sprite;
     this.addChild(new DisplayObjectContainer('root', '')
-      .addChild(new DisplayObjectContainer('root_env', '')
+      .addChild(this.rootEnv = new DisplayObjectContainer('root_env', '')
         .addChild(this.world1 = new Camera('world1')
           .addChild(this.player1 = new PlayerObject('player1', 'animations/mario_moving.png', MainGameColor.Red))
           // level environments are inserted here
@@ -58,6 +63,8 @@ export class MainGame extends Game {
       )
     );
 
+    // root env
+    this.rootEnv.active = false;  // do not update, as menu will be present first
     // cameras
     this.world1.position = new Vector(0, 0);
     this.world2.position = new Vector(1e6, 1e6); // arbitrarily far away, so 2 worlds do not collide
@@ -83,6 +90,7 @@ export class MainGame extends Game {
     timerPath.pivotPoint = new Vector(0.0, 0.5);
     this.timer.localScale = new Vector(0.5, 0.5);
     this.timer.pivotPoint = new Vector(0.0, 0.5);
+    this.timer.active = false;
     this.screenTransition.position = new Vector(this.width / 2, this.height / 2);
     this.screenTransition.dimensions = new Vector(this.width, this.height);
     this.screenTransition.pivotPoint = new Vector(0.5, 0.5);
@@ -90,6 +98,8 @@ export class MainGame extends Game {
     var self = this;
     this.menu.registerGameStartCallback(() => {
       self.menu.visible = false;
+      self.rootEnv.active = true;
+      self.timer.active = true;
       self.gameState = MainGameState.InGame;
     });
 

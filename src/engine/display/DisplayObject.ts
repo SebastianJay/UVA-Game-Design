@@ -16,6 +16,7 @@ export class DisplayObject {
 	private _loaded : boolean;		// whether the file has been loaded from disk
 	private _displayImage : HTMLImageElement;	// the HTML element corresponding to the image
 	private _visible : boolean;	// whether the DisplayObject should be drawn
+	private _active : boolean;	// whether the DisplayObject should be updated (decides which children of DOC are updated)
 	private _position : Vector;	// 2D position
 	private _altDimensions : Vector;	// if displayImage is not initialized, a width and height representing size
 	private _pivotPoint : Vector;	// origin of the object relative to top-left corner. Ranges from (0, 0) to (1, 1)
@@ -31,6 +32,7 @@ export class DisplayObject {
 		this.loadImage(filename);
 
 		this.visible = true;
+		this.active = true;
 		this.position = Vector.zero;
 		this.pivotPoint = Vector.zero;
 		this.localScale = Vector.one;
@@ -188,6 +190,9 @@ export class DisplayObject {
 
 	set visible(mVisible: boolean){this._visible = mVisible;}
 	get visible() : boolean{return this._visible;}
+
+	set active(mActive : boolean){ this._active = mActive; }
+	get active() : boolean { return this._active; }
 
 	set position(mPosition: Vector){this._position = mPosition;}
 	get position() : Vector{return this._position;}

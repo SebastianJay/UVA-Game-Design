@@ -16,7 +16,9 @@ export class DisplayObjectContainer extends DisplayObject {
   update(dt : number = 0) : void{
     super.update(dt);
     for (var i = 0; i < this.children.size(); i++) {
-      this.children.get(i).update(dt);
+      if (this.children.get(i).active) {
+        this.children.get(i).update(dt);
+      }
     }
   }
 
