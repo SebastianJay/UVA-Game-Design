@@ -4,6 +4,7 @@ import { Vector } from '../util/Vector';
 import { Rectangle } from '../util/Rectangle';
 import { Circle } from '../util/Circle';
 import { Sprite } from './Sprite';
+import { applyMixins } from '../util/mixins';
 
 /** interface for publicly visible members of a collider */
 export interface ICollider {
@@ -55,3 +56,20 @@ export abstract class CircleColliderSpriteBase extends Sprite implements ICircle
     return new Circle(myPos, this.width / 2);
   }
 }
+
+/**
+ * Concrete implementations of the classes
+ */
+export class CircleColliderSprite extends Sprite implements ICircleCollider {
+  collisionLayer : number;
+  isTrigger : boolean;
+  getHitbox : () => Circle;
+}
+applyMixins(CircleColliderSprite, [CircleColliderSpriteBase]);
+
+export class RectColliderSprite extends Sprite implements IRectCollider {
+  collisionLayer : number;
+  isTrigger : boolean;
+  getHitbox : () => Rectangle;
+}
+applyMixins(RectColliderSprite, [RectColliderSpriteBase]);

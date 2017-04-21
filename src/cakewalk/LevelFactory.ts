@@ -285,12 +285,12 @@ export class LevelFactory {
     f2n.position = new Vector(2400,240);
     f2o.position = new Vector(2450,190);
     f2p.position = new Vector(2500,140);
-    g1b.restPosition = g1b.position = new Vector(2550, 40);
+    g1b.restPosition = g1b.position = new Vector(2550, 25);
     g1b.targetPosition = g1b.position.add(new Vector(0, -150));
     s2b.position = new Vector(2500, 130);
     s2b.localScale = new Vector(0.3, 0.3);
     g1b.syncSwitch(s2b);
-    g2a.restPosition = g2a.position = new Vector(2550, 40);
+    g2a.restPosition = g2a.position = new Vector(2550, 25);
     g2a.targetPosition = g2a.position.add(new Vector(0, 150));
     s1a.position = new Vector(2700, 250);
     s1a.localScale = new Vector(0.3, 0.3);
