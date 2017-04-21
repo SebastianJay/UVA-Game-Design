@@ -37,7 +37,7 @@ export class TweenManager {
   update (dt : number) : void {
     // call update on all contained tweens
     for (var i = 0; i < this._tweenList.size(); i++) {
-      this._tweenList.get(i).update(dt / 1000);
+      this._tweenList.get(i).update(dt);
     }
 
     // remove any tweens which are complete
