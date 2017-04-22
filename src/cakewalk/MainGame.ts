@@ -6,6 +6,11 @@ import { DisplayObjectContainer } from '../engine/display/DisplayObjectContainer
 import { Camera } from '../engine/display/Camera';
 import { InputHandler } from '../engine/input/InputHandler';
 import { InputKeyCode, InputGamepadButton, InputGamepadAxis } from '../engine/input/InputPrimitives';
+import { CallbackManager } from '../engine/events/CallbackManager';
+import { TweenManager } from '../engine/tween/TweenManager';
+import { Tween } from '../engine/tween/Tween';
+import { TweenParam, TweenAttributeType, TweenFunctionType } from '../engine/tween/TweenParam';
+import { TweenEventArgs } from '../engine/events/EventTypes';
 import { Sprite } from '../engine/display/Sprite';
 import { Vector } from '../engine/util/Vector';
 import { Physics } from '../engine/util/Physics';
@@ -33,8 +38,10 @@ export class MainGame extends Game {
 
   // UI elements
   private timer : TimerUI;
-  private screenTransition : ScreenTransitionUI
+  private transitionWin : ScreenTransitionUI;
+  private transitionLose : ScreenTransitionUI;
   private menu : MenuUI;
+  private menuLock : boolean;
 
   private gameState : MainGameState = MainGameState.MenuOpen;
   private gameLevelNumber : number = 0; // which level players are on
@@ -45,6 +52,7 @@ export class MainGame extends Game {
 
     // set up display tree
     var timerPath : Sprite;
+    var plotScreen : ScreenTransitionUI;
     this.addChild(new DisplayObjectContainer('root', '')
       .addChild(this.rootEnv = new DisplayObjectContainer('root_env', '')
         .addChild(this.world1 = new Camera('world1')
@@ -59,12 +67,15 @@ export class MainGame extends Game {
           .addChild(this.timer = new TimerUI('timerUI', 'animations/StopWatchSprite.png', this.gameDuration,
             new Vector(-10, 0), new Vector(961.5, 0))) // x-values found through trial and error
         ).addChild(this.menu = new MenuUI('menuUI', 'CakeWalk/title.png'))
-        .addChild(this.screenTransition = new ScreenTransitionUI('transitionUI', 'CakeWalk/black_square.png'))
+        .addChild(this.transitionWin = new ScreenTransitionUI('winTransitionUI', 'CakeWalk/win_screen.png'))
+        .addChild(this.transitionLose = new ScreenTransitionUI('loseTransitionUI', 'CakeWalk/lose_screen.png'))
+        .addChild(plotScreen = new ScreenTransitionUI('plotScreen', 'CakeWalk/plot_screen.png'))
       )
     );
 
-    // root env
-    this.rootEnv.active = false;  // do not update, as menu will be present first
+    // root env - hide on start (as menu will show)
+    this.rootEnv.visible = false;
+    this.rootEnv.active = false;
     // cameras
     this.world1.position = new Vector(0, 0);
     this.world2.position = new Vector(1e6, 1e6); // arbitrarily far away, so 2 worlds do not collide
@@ -73,16 +84,8 @@ export class MainGame extends Game {
     this.world1.setFocus(0, this.width / 2, this.width);
     this.world2.setFocus(0, this.width / 2, this.width);
     // players
-    this.player1.position = this.player1.respawnPoint = new Vector(50, 50);
-    this.player2.position = this.player2.respawnPoint = new Vector(50, 50);
     this.player1.localScale = new Vector(2.0, 2.0);
     this.player2.localScale = new Vector(2.0, 2.0);
-
-    var levelParams = LevelFactory.GetLevel(0);
-    this.world1.setChild(levelParams.topLevel, 1);
-    this.world2.setChild(levelParams.bottomLevel, 1);
-    this.end1 = levelParams.topEndZone;
-    this.end2 = levelParams.bottomEndZone;
 
     // UI
     timerPath.position = new Vector(50, this.height / 2);
@@ -90,18 +93,36 @@ export class MainGame extends Game {
     timerPath.pivotPoint = new Vector(0.0, 0.5);
     this.timer.localScale = new Vector(0.5, 0.5);
     this.timer.pivotPoint = new Vector(0.0, 0.5);
-    this.timer.active = false;
-    this.screenTransition.position = new Vector(this.width / 2, this.height / 2);
-    this.screenTransition.dimensions = new Vector(this.width, this.height);
-    this.screenTransition.pivotPoint = new Vector(0.5, 0.5);
+    timerPath.visible = this.timer.visible = false;
+    this.timer.active = false;  // do not show/update timer until level start
 
     var self = this;
     this.menu.registerGameStartCallback(() => {
-      self.menu.visible = false;
-      self.rootEnv.active = true;
-      self.timer.active = true;
-      self.gameState = MainGameState.InGame;
+      // produce a series of events by chaining callbacks
+      //  fade out menu, fade in plot screen, wait, fade out plot screen, then start game
+      self.menuLock = true;
+      var tw : Tween;
+      TweenManager.instance.add(tw = new Tween(self.menu)
+        .animate(new TweenParam(TweenAttributeType.Alpha, 1.0, 0.0, 1, TweenFunctionType.Linear)));
+      tw.addEventListener(TweenEventArgs.ClassName, (args : TweenEventArgs) => {
+        if ((args.src as Tween).isComplete) {
+          plotScreen.fadeIn(() => {
+            CallbackManager.instance.addCallback(() => {
+              plotScreen.fadeOut(() => {
+                self.menu.visible = false;
+                self.menu.alpha = 1.0;  // reset alpha so toggling menu back is simple
+                self.rootEnv.active = self.rootEnv.visible = true;
+                self.timer.active = timerPath.visible = self.timer.visible = true;
+                self.gameState = MainGameState.InGame;
+                self.menuLock = false;
+                self.loadLevel();
+              }, 1);
+            }, 5);
+          }, 1);
+        }
+      });
     });
+    this.menuLock = false;
 
     // create collision matrix
     // 0 - neutral objects that collide both players
@@ -119,18 +140,20 @@ export class MainGame extends Game {
     super.update(dt);
 
     if (this.gameState == MainGameState.MenuOpen) {
-      if (this.getActionInput(MainGameAction.MenuConfirm) > 0) {
-        this.menu.menuAction();
-      } else if (this.getActionInput(MainGameAction.MenuUp) > 0) {
-        this.menu.menuScroll(false);
-      } else if (this.getActionInput(MainGameAction.MenuDown) > 0) {
-        this.menu.menuScroll(true);
+      if (!this.menuLock) {
+        if (this.getActionInput(MainGameAction.MenuConfirm) > 0) {
+          this.menu.menuAction();
+        } else if (this.getActionInput(MainGameAction.MenuUp) > 0) {
+          this.menu.menuScroll(false);
+        } else if (this.getActionInput(MainGameAction.MenuDown) > 0) {
+          this.menu.menuScroll(true);
+        }
       }
     } else if (this.gameState == MainGameState.EndGameLoss) {
       if (this.getActionInput(MainGameAction.EndGameContinue) > 0) {
-        if (!this.screenTransition.isFading) {
+        if (!this.transitionLose.isFading) {
           var self = this;
-          this.screenTransition.fadeOut(() => {
+          this.transitionLose.fadeOut(() => {
             self.gameState = MainGameState.InGame;
             self.timer.reset();
           }, 1.0);
@@ -179,18 +202,18 @@ export class MainGame extends Game {
 
       // check for endgame state
       //  screenTransition.isFading used as proxy for whether state is about to change
-      if (!this.screenTransition.isFading) {
+      if (!(this.transitionWin.isFading || this.transitionLose.isFading)) {
         if (this.timer.isFinished) {
           var self = this;
-          this.screenTransition.fadeIn(() => {
+          this.transitionLose.fadeIn(() => {
             self.gameState = MainGameState.EndGameLoss
-          }, 2.0, 'Your cake was stolen!');
+          }, 2.0);
         }
         if (this.end1.isPlayerInZone && this.end2.isPlayerInZone) {
           var self = this;
-          this.screenTransition.fadeIn(() => {
+          this.transitionWin.fadeIn(() => {
             self.gameState = MainGameState.EndGameWin
-          }, 2.0, 'You finished the level!');
+          }, 2.0);
         }
       }
 
@@ -198,6 +221,23 @@ export class MainGame extends Game {
       this.player1.addForce(Physics.Gravity.multiply(this.player1.mass));
       this.player2.addForce(Physics.Gravity.multiply(this.player2.mass));
     }
+  }
+
+  private loadLevel() {
+    // insert new environment into display tree
+    var levelParams = LevelFactory.GetLevel(this.gameLevelNumber);
+    this.world1.setChild(levelParams.topLevel, 1);
+    this.world2.setChild(levelParams.bottomLevel, 1);
+    this.end1 = levelParams.topEndZone;
+    this.end2 = levelParams.bottomEndZone;
+
+    // set player and camera positions
+    this.player1.position = this.player1.respawnPoint = levelParams.topStartPoint;
+    this.player2.position = this.player2.respawnPoint = levelParams.bottomStartPoint;
+    this.world1.screenPosition.x = -(this.player1.position.x - this.width / 2);
+    this.world2.screenPosition.x = -(this.player2.position.x - this.width / 2);
+    this.world1.setXBounds(levelParams.topXBounds[0], levelParams.topXBounds[1]);
+    this.world2.setXBounds(levelParams.bottomXBounds[0], levelParams.bottomXBounds[1]);
   }
 
   /**

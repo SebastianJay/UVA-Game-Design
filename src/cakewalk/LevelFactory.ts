@@ -51,16 +51,10 @@ export class LevelFactory {
   }
 
   // these are for invisible walls at the bounds of the stage
-  // side = 0 -> left wall, side = 1 -> right wall
-  private static MakeWall(side : number) : Platform {
+  private static MakeWall() : Platform {
     var w = new Platform('wall' + LevelFactory.Counter, '');
     w.width = 50;
     w.height = 2000;
-    if (side == 0) {
-      w.pivotPoint = new Vector(1.0, 0.0);
-    } else if (side == 0) {
-      w.pivotPoint = new Vector(0.0, 0.0);
-    }
     w.visible = false;
     return w;
   }
@@ -141,8 +135,8 @@ export class LevelFactory {
     var end1: TriggerZone, end2: TriggerZone;
 
     var env1 = new DisplayObjectContainer('level0_top', '')
-      .addChild(b1start = LevelFactory.MakeWall(0))
-      .addChild(b1end = LevelFactory.MakeWall(1))
+      .addChild(b1start = LevelFactory.MakeWall())
+      .addChild(b1end = LevelFactory.MakeWall())
       .addChild(c1a = LevelFactory.MakeCandle(MainGameColor.Neutral))
       .addChild(c1b = LevelFactory.MakeCandle(MainGameColor.Red))
       .addChild(c1c = LevelFactory.MakeCandle(MainGameColor.Blue))
@@ -174,8 +168,8 @@ export class LevelFactory {
       .addChild(end1 = LevelFactory.MakeEndZone());
 
     var env2 = new DisplayObjectContainer('level0_bottom', '')
-      .addChild(b2start = LevelFactory.MakeWall(0))
-      .addChild(b2end = LevelFactory.MakeWall(1))
+      .addChild(b2start = LevelFactory.MakeWall())
+      .addChild(b2end = LevelFactory.MakeWall())
       .addChild(c2a = LevelFactory.MakeCandle(MainGameColor.Neutral))
       .addChild(c2b = LevelFactory.MakeCandle(MainGameColor.Blue))
       .addChild(c2c = LevelFactory.MakeCandle(MainGameColor.Red))
@@ -207,10 +201,10 @@ export class LevelFactory {
       .addChild(end2 = LevelFactory.MakeEndZone());
 
     // ground
-    p1.position = new Vector(0, 280);
+    p1.position = new Vector(-200, 280);
     p1.width = 4000;
     p1.height = 80;
-    p2.position = new Vector(0, 280);
+    p2.position = new Vector(-200, 280);
     p2.width = 4000;
     p2.height = 80;
     // invisible walls

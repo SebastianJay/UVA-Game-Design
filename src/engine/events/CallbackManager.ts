@@ -1,5 +1,9 @@
 'use strict';
 
+/**
+ * CallbackManager is a singleton class that is a simple implementation of the
+ * JS function setTimeout() -- however, it works within the main game update loop()
+ */
 type Action = () => void;
 export class CallbackManager {
   // singleton pattern

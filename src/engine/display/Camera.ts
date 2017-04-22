@@ -10,6 +10,7 @@ export class Camera extends DisplayObjectContainer {
   private _focusThreshold : number; // width of area in middle that focus should occupy
   private _focusWidth : number; // total width spanned by camera
   private _smoothFactor : number; // affects how smoothly camera catches up to player
+  private _xBounds : [number, number];  // min and max x values to keep camera in
 
   constructor(id : string){
     super(id, '');
@@ -17,6 +18,7 @@ export class Camera extends DisplayObjectContainer {
     this._focusIndex = -1;
     this._focusThreshold = 0;
     this._focusWidth = 0;
+    this._xBounds = [-1e6, 1e6];
     this._smoothFactor = 0.05;
   }
 
@@ -36,7 +38,14 @@ export class Camera extends DisplayObjectContainer {
     this._focusWidth = totalWidth;
   }
 
-  update(dt : number = 0) : void{
+  // establishes the min and max x coordinates that the camera range cannot go beyond
+  setXBounds(minX : number, maxX: number) {
+    this._xBounds[0] = minX;
+    this._xBounds[1] = maxX;
+    this.boundPosition();
+  }
+
+  update(dt : number = 0) : void {
     super.update(dt);
     if (this._focusIndex >= 0 && this._focusIndex < this.children.size()) {
       var child = this.children.get(this._focusIndex);
@@ -49,6 +58,13 @@ export class Camera extends DisplayObjectContainer {
         this.scroll((rightBoundPos - childScreenPos) * this._smoothFactor);
       }
     }
+    this.boundPosition();
+  }
+
+  // adjust the position now to the correct spot
+  private boundPosition() : void {
+    this.screenPosition.x = Math.max(this.screenPosition.x, -(this._xBounds[1] - this._focusWidth));
+    this.screenPosition.x = Math.min(this.screenPosition.x, -this._xBounds[0]);
   }
 
   // copied from DisplayObject, but uses screenPosition instead of real position
