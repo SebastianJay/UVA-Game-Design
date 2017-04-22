@@ -183,12 +183,25 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
       TweenManager.instance.add(tw = new Tween(this)
         .animate(new TweenParam(TweenAttributeType.Alpha, 1.0, 0.0, this.respawnTime - 0.5, TweenFunctionType.Linear)));
     }
+    var self = this;
     CallbackManager.instance.addCallback(() => {
-      this.position = this.respawnPoint;
-      this.velocity = Vector.zero;
-      this._inDeathState = false;
-      this.alpha = 1.0;
+      self.position = self.respawnPoint;
+      self.velocity = Vector.zero;
+      self._inDeathState = false;
+      self.alpha = 1.0;
     }, this.respawnTime);
+  }
+
+  /** Resets internal state to be what it would be when a level starts */
+  // NOTE be careful of ongoing timeout callbacks that may execute afterward
+  reset() : void {
+    this.velocity = Vector.zero;
+    this._currentDirectionRight = true;
+    this._inDeathState = false;
+    this._canSwap = true;
+    this.grounded = false;
+    this.jumping = false;
+    this.animate('idle');
   }
 
   get isAlive() : boolean { return !this._inDeathState; }

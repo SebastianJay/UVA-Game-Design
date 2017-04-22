@@ -114,9 +114,8 @@ export class MainGame extends Game {
               plotScreen.fadeOut(() => {
                 self.menuLock = false;
                 self.menu.visible = false;
-                self.menu.alpha = 1.0;  // reset alpha so toggling menu back is simple
-                self.rootEnv.active = self.rootEnv.visible = true;
-                self.timerParent.active = self.timerParent.visible = true;
+                self.menu.alpha = 1.0;  // reset alpha and set invisible instead so toggling is easy
+                self.menu.setGameStarted();
                 self.gameState = MainGameState.InGame;
                 self.gameLevelNumber = 0;
                 self.loadLevel();
@@ -125,6 +124,10 @@ export class MainGame extends Game {
           }, 1);
         }
       });
+    });
+
+    this.menu.registerGameResumeCallback(() => {
+      self.closeMenu();
     });
 
     // lock vars
@@ -148,6 +151,10 @@ export class MainGame extends Game {
     super.update(dt);
 
     if (this.gameState == MainGameState.MenuOpen && !this.menuLock) {
+      // if pause is pressed in game it closes the menu (second check is a proxy for "environment is loaded")
+      if (this.getActionInput(MainGameAction.Pause) > 0 && this.world1.children.length > 1) {
+        this.closeMenu();
+      }
       if (this.getActionInput(MainGameAction.MenuConfirm) > 0) {
         this.menu.menuAction();
       } else if (this.getActionInput(MainGameAction.MenuUp) > 0) {
@@ -178,6 +185,8 @@ export class MainGame extends Game {
       }
     } else if (this.gameState == MainGameState.InGame) {
       // handle input
+
+      // player 1 running and jumping
       this.player1.run(this.getActionInput(MainGameAction.PlayerOneRun));
       if (this.getActionInput(MainGameAction.PlayerOneJump) > 0) {
         this.player1.jump();
@@ -185,6 +194,7 @@ export class MainGame extends Game {
         this.player1.cancelJump();
       }
 
+      // player 2 running and jumping
       this.player2.run(this.getActionInput(MainGameAction.PlayerTwoRun));
       if (this.getActionInput(MainGameAction.PlayerTwoJump) > 0) {
         this.player2.jump();
@@ -192,7 +202,8 @@ export class MainGame extends Game {
         this.player2.cancelJump();
       }
 
-      if (this.player1.isAlive && this.player2.isAlive) {
+      // player swapping
+      if (!this.gameOverLock && this.player1.isAlive && this.player2.isAlive) {
         var doSwap = false;
         if (this.getActionInput(MainGameAction.PlayerOneSwap) > 0 && this.player1.canSwap) {
           this.player1.didSwap();
@@ -227,19 +238,31 @@ export class MainGame extends Game {
         }
       }
 
+      // opening pause menu
+      if (!this.gameOverLock && this.getActionInput(MainGameAction.Pause) > 0) {
+        this.openMenu();
+      }
+
       // check for endgame state
       if (!this.gameOverLock) {
+        // if timer is finished, players lose
+        // if both players are alive and in end zone, they win
         if (this.timer.isFinished) {
           this.gameOverLock = true;
           var self = this;
           this.transitionLose.fadeIn(() => {
+            self.rootEnv.active = false;
+            self.timerParent.active = false;
             self.gameState = MainGameState.EndGameLoss
             self.gameOverLock = false;
           }, 2.0);
-        } else if (this.end1.isPlayerInZone && this.end2.isPlayerInZone) {
+        } else if (this.end1.isPlayerInZone && this.end2.isPlayerInZone
+            && this.player1.isAlive && this.player2.isAlive) {
           this.gameOverLock = true;
           var self = this;
           this.transitionWin.fadeIn(() => {
+            self.rootEnv.active = false;
+            self.timerParent.active = false;
             self.gameState = MainGameState.EndGameWin
             self.gameOverLock = false;
           }, 2.0);
@@ -261,6 +284,8 @@ export class MainGame extends Game {
     this.end2 = levelParams.bottomEndZone;
 
     // set player and camera positions
+    this.world1.setChild(this.player1, 0);
+    this.world2.setChild(this.player2, 0);
     this.player1.position = this.player1.respawnPoint = levelParams.topStartPoint;
     this.player2.position = this.player2.respawnPoint = levelParams.bottomStartPoint;
     this.world1.screenPosition.x = -(this.player1.position.x - this.width / 2);
@@ -270,6 +295,27 @@ export class MainGame extends Game {
 
     // reset elements
     this.timer.reset();
+    this.player1.reset();
+    this.player2.reset();
+    this.rootEnv.active = this.rootEnv.visible = true;
+    this.timerParent.active = this.timerParent.visible = true;
+  }
+
+  openMenu() : void {
+    this.menu.visible = true;
+    this.rootEnv.active = false;
+    this.timerParent.active = false;
+    this.pauseGlobalUpdates();
+    this.gameState = MainGameState.MenuOpen;
+  }
+
+  closeMenu() : void {
+    this.menu.reset();
+    this.menu.visible = false;
+    this.rootEnv.active = true;
+    this.timerParent.active = true;
+    this.resumeGlobalUpdates();
+    this.gameState = MainGameState.InGame;
   }
 
   /**
@@ -327,29 +373,38 @@ export class MainGame extends Game {
       } else {
         return InputHandler.instance.keyDown(InputKeyCode.Space) ? 1 : 0;
       }
+    } else if (action == MainGameAction.Pause) {
+        return (InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.Start)
+          || InputHandler.instance.gamepadButtonDown(1, InputGamepadButton.Start)
+          || InputHandler.instance.keyDown(InputKeyCode.Escape)) ? 1 : 0;
     } else if (action == MainGameAction.EndGameContinue) {
-      if (InputHandler.instance.gamepadPresent(0)) {
-        return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.A) ? 1 : 0;
-      } else {
-        return InputHandler.instance.keyDown(InputKeyCode.Space) ? 1 : 0;
-      }
+        return (InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.A)
+          || InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.X)
+          || InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.Start)
+          || InputHandler.instance.gamepadButtonDown(1, InputGamepadButton.A)
+          || InputHandler.instance.gamepadButtonDown(1, InputGamepadButton.X)
+          || InputHandler.instance.gamepadButtonDown(1, InputGamepadButton.Start)
+          || InputHandler.instance.keyDown(InputKeyCode.Return)
+          || InputHandler.instance.keyDown(InputKeyCode.Space)) ? 1 : 0;
     } else if (action == MainGameAction.MenuConfirm) {
-      if (InputHandler.instance.gamepadPresent(0)) {
-        return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.A) ? 1 : 0;
+      if (InputHandler.instance.gamepadPresent(0) || InputHandler.instance.gamepadPresent(1)) {
+        return (InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.A)
+          || InputHandler.instance.gamepadButtonDown(1, InputGamepadButton.A)) ? 1 : 0;
       } else {
-        return InputHandler.instance.keyDown(InputKeyCode.Return) ? 1 : 0;
+        return (InputHandler.instance.keyDown(InputKeyCode.Return)
+          || InputHandler.instance.keyDown(InputKeyCode.Space))? 1 : 0;
       }
     } else if (action == MainGameAction.MenuUp) {
-      if (InputHandler.instance.gamepadPresent(0)) {
-        return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.DpadUp)
-          || InputHandler.instance.gamepadAxis(0, InputGamepadAxis.LeftVertical) < -0.5 ? 1 : 0;
+      if (InputHandler.instance.gamepadPresent(0) || InputHandler.instance.gamepadPresent(1)) {
+        return (InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.DpadUp)
+          || InputHandler.instance.gamepadButtonDown(1, InputGamepadButton.DpadUp)) ? 1 : 0;
       } else {
         return InputHandler.instance.keyDown(InputKeyCode.Up) ? 1 : 0;
       }
     } else if (action == MainGameAction.MenuDown) {
-      if (InputHandler.instance.gamepadPresent(0)) {
-        return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.DpadDown)
-          || InputHandler.instance.gamepadAxis(0, InputGamepadAxis.LeftVertical) > 0.5 ? 1 : 0;
+      if (InputHandler.instance.gamepadPresent(0) || InputHandler.instance.gamepadPresent(1)) {
+        return (InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.DpadDown)
+          || InputHandler.instance.gamepadButtonDown(1, InputGamepadButton.DpadDown)) ? 1 : 0;
       } else {
         return InputHandler.instance.keyDown(InputKeyCode.Down) ? 1 : 0;
       }

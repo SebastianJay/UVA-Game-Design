@@ -12,6 +12,9 @@ export class MenuUI extends Sprite {
   private _optionIndex : number;
   private _menuIndex : number;
   private _gameStartCallback : () => void;
+  private _gameResumeCallback : () => void;
+  private _gameStarted : boolean;
+  private _t0 : TextObject; // reference to a menu option that changes value
 
   constructor(id : string, filename : string) {
     super(id, filename);
@@ -22,7 +25,7 @@ export class MenuUI extends Sprite {
     this.addChild(this._cursor = new Sprite(id+'_cursor', 'CakeWalk/cake2.png'))
     .addChild(new DisplayObjectContainer(id+'_mainmenu', '')
       .addChild(new DisplayObjectContainer(id+'mainmenu_options', '')
-        .addChild(t0 = new TextObject(id+'_t0'))
+        .addChild(this._t0 = t0 = new TextObject(id+'_t0'))
         .addChild(t1 = new TextObject(id+'_t1'))
       )
     ).addChild(new DisplayObjectContainer(id+'_credits', '')
@@ -54,6 +57,7 @@ export class MenuUI extends Sprite {
     this._cursor.pivotPoint = new Vector(0.5, 0.8);
     this._cursor.localScale = new Vector(0.3, 0.3);
 
+    this._gameStarted = false;
     this._optionIndex = 0;
     this._menuIndex = 0;
     // hide all menus but first one
@@ -84,8 +88,14 @@ export class MenuUI extends Sprite {
     if (this._menuIndex == 0) {
       // main menu
       if (this._optionIndex == 0) {
-        if (this._gameStartCallback != null) {
-          this._gameStartCallback();
+        if (!this._gameStarted) {
+          if (this._gameStartCallback != null) {
+            this._gameStartCallback();
+          }
+        } else {
+          if (this._gameResumeCallback != null) {
+            this._gameResumeCallback();
+          }
         }
       } else if (this._optionIndex == 1) {
         this.menuChange(1);
@@ -96,8 +106,26 @@ export class MenuUI extends Sprite {
     }
   }
 
-  registerGameStartCallback(callback : () => void) {
+  registerGameStartCallback(callback : () => void) : void{
     this._gameStartCallback = callback;
+  }
+
+  registerGameResumeCallback(callback: () => void) : void {
+    this._gameResumeCallback = callback;
+  }
+
+  setGameStarted() : void {
+    this._gameStarted = true;
+    this._t0.text = "Resume Game";
+  }
+
+  reset() : void {
+    this._optionIndex = 0;
+    this._menuIndex = 0;
+    this.getChild(1).visible = true;
+    for(var i = 2; i < this.children.length; i++) {
+      this.getChild(i).visible = false;
+    }
   }
 
   private menuChange(newInd : number) {

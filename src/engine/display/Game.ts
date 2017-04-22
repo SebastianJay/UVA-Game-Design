@@ -18,6 +18,7 @@ export class Game extends DisplayObjectContainer {
 	private _canvas : HTMLCanvasElement;
 	private _g : CanvasRenderingContext2D;
 	private _playing : boolean;
+	private _doGlobalUpdates : boolean;
 	private _lastTimestamp : number;
 	private _clock : GameClock;
 
@@ -33,6 +34,7 @@ export class Game extends DisplayObjectContainer {
 		this._canvas.height = height;
 		this._canvas.style.height = height + 'px';
 		this._playing = false;
+		this._doGlobalUpdates = true;
 		this._clock = new GameClock();
 		this._lastTimestamp = this._clock.getElapsedTime();
 
@@ -48,10 +50,12 @@ export class Game extends DisplayObjectContainer {
 		}
 		super.update(dt);
 
-		Physics.CollisionUpdate(this);
+		if (this._doGlobalUpdates) {
+			Physics.CollisionUpdate(this);
+			TweenManager.instance.update(dt);
+			CallbackManager.instance.update(dt);
+		}
 		DisplayObjectContainer.DrainRemoveQueue();
-		TweenManager.instance.update(dt);
-		CallbackManager.instance.update(dt);
 	}
 
 	draw(g : CanvasRenderingContext2D){
@@ -69,6 +73,16 @@ export class Game extends DisplayObjectContainer {
 
 	pause(){
 		this._playing = false;
+	}
+
+	/** Halts updates to TweenManager, CallbackManager, and Physics, but still updates display tree */
+	pauseGlobalUpdates() {
+		this._doGlobalUpdates = false;
+	}
+
+	/** Resumes posting updates to TweenManager, CallbackManager, and Physics */
+	resumeGlobalUpdates() {
+		this._doGlobalUpdates = true;
 	}
 
 	get isPlaying(): boolean { return this._playing; }

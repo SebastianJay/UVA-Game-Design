@@ -15,6 +15,7 @@ export const enum InputKeyCode {
   Shift =16,
   Ctrl  =17,
   Alt   =18,
+  Escape=27,
   // function keys
   F1    =112,
   F2    =113,
