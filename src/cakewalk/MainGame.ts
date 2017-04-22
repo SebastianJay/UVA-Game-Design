@@ -37,11 +37,13 @@ export class MainGame extends Game {
   private end2 : TriggerZone;
 
   // UI elements
-  private timer : TimerUI;
+  private timerParent : Sprite;
   private transitionWin : ScreenTransitionUI;
   private transitionLose : ScreenTransitionUI;
   private menu : MenuUI;
   private menuLock : boolean;
+  private transitionLock : boolean;
+  private gameOverLock : boolean;
 
   private gameState : MainGameState = MainGameState.MenuOpen;
   private gameLevelNumber : number = 0; // which level players are on
@@ -51,7 +53,6 @@ export class MainGame extends Game {
     super("Cakewalk Game", 1280, 720, canvas);
 
     // set up display tree
-    var timerPath : Sprite;
     var plotScreen : ScreenTransitionUI;
     this.addChild(new DisplayObjectContainer('root', '')
       .addChild(this.rootEnv = new DisplayObjectContainer('root_env', '')
@@ -63,8 +64,8 @@ export class MainGame extends Game {
           // level environments are inserted here
         )
       ).addChild(new DisplayObjectContainer('root_UI', '')
-        .addChild(timerPath = new Sprite('timerUIPath', 'CakeWalk/TimerPath.png')
-          .addChild(this.timer = new TimerUI('timerUI', 'animations/StopWatchSprite.png', this.gameDuration,
+        .addChild(this.timerParent = new Sprite('timerUIPath', 'CakeWalk/TimerPath.png')
+          .addChild(new TimerUI('timerUI', 'animations/StopWatchSprite.png', this.gameDuration,
             new Vector(-10, 0), new Vector(961.5, 0))) // x-values found through trial and error
         ).addChild(this.menu = new MenuUI('menuUI', 'CakeWalk/title.png'))
         .addChild(this.transitionWin = new ScreenTransitionUI('winTransitionUI', 'CakeWalk/win_screen.png'))
@@ -88,13 +89,15 @@ export class MainGame extends Game {
     this.player2.localScale = new Vector(2.0, 2.0);
 
     // UI
-    timerPath.position = new Vector(50, this.height / 2);
-    timerPath.width = this.width - 100;
-    timerPath.pivotPoint = new Vector(0.0, 0.5);
+    this.timerParent.position = new Vector(50, this.height / 2);
+    this.timerParent.width = this.width - 100;
+    this.timerParent.pivotPoint = new Vector(0.0, 0.5);
+    this.timerParent.visible = false;
+    this.timerParent.active = false;  // do not show/update timer until level start
+    // NOTE references to this.timer are getting type casted first child of timerParent
     this.timer.localScale = new Vector(0.5, 0.5);
     this.timer.pivotPoint = new Vector(0.0, 0.5);
-    timerPath.visible = this.timer.visible = false;
-    this.timer.active = false;  // do not show/update timer until level start
+    this.timer.reset();
 
     var self = this;
     this.menu.registerGameStartCallback(() => {
@@ -109,12 +112,13 @@ export class MainGame extends Game {
           plotScreen.fadeIn(() => {
             CallbackManager.instance.addCallback(() => {
               plotScreen.fadeOut(() => {
+                self.menuLock = false;
                 self.menu.visible = false;
                 self.menu.alpha = 1.0;  // reset alpha so toggling menu back is simple
                 self.rootEnv.active = self.rootEnv.visible = true;
-                self.timer.active = timerPath.visible = self.timer.visible = true;
+                self.timerParent.active = self.timerParent.visible = true;
                 self.gameState = MainGameState.InGame;
-                self.menuLock = false;
+                self.gameLevelNumber = 0;
                 self.loadLevel();
               }, 1);
             }, 5);
@@ -122,7 +126,11 @@ export class MainGame extends Game {
         }
       });
     });
+
+    // lock vars
     this.menuLock = false;
+    this.transitionLock = false;
+    this.gameOverLock = false;
 
     // create collision matrix
     // 0 - neutral objects that collide both players
@@ -139,25 +147,34 @@ export class MainGame extends Game {
   update(dt : number = 0) : void{
     super.update(dt);
 
-    if (this.gameState == MainGameState.MenuOpen) {
-      if (!this.menuLock) {
-        if (this.getActionInput(MainGameAction.MenuConfirm) > 0) {
-          this.menu.menuAction();
-        } else if (this.getActionInput(MainGameAction.MenuUp) > 0) {
-          this.menu.menuScroll(false);
-        } else if (this.getActionInput(MainGameAction.MenuDown) > 0) {
-          this.menu.menuScroll(true);
-        }
+    if (this.gameState == MainGameState.MenuOpen && !this.menuLock) {
+      if (this.getActionInput(MainGameAction.MenuConfirm) > 0) {
+        this.menu.menuAction();
+      } else if (this.getActionInput(MainGameAction.MenuUp) > 0) {
+        this.menu.menuScroll(false);
+      } else if (this.getActionInput(MainGameAction.MenuDown) > 0) {
+        this.menu.menuScroll(true);
       }
-    } else if (this.gameState == MainGameState.EndGameLoss) {
+    } else if (this.gameState == MainGameState.EndGameLoss && !this.transitionLock) {
       if (this.getActionInput(MainGameAction.EndGameContinue) > 0) {
-        if (!this.transitionLose.isFading) {
-          var self = this;
-          this.transitionLose.fadeOut(() => {
-            self.gameState = MainGameState.InGame;
-            self.timer.reset();
-          }, 1.0);
-        }
+        this.transitionLock = true;
+        var self = this;
+        this.transitionLose.fadeOut(() => {
+          self.loadLevel(); // load same level
+          self.gameState = MainGameState.InGame;
+          self.transitionLock = false;
+        }, 1.0);
+      }
+    } else if (this.gameState == MainGameState.EndGameWin && !this.transitionLock) {
+      if (this.getActionInput(MainGameAction.EndGameContinue) > 0) {
+        this.transitionLock = true;
+        var self = this;
+        this.transitionWin.fadeOut(() => {
+          self.gameLevelNumber += 1;
+          self.loadLevel(); // load next level
+          self.gameState = MainGameState.InGame;
+          self.transitionLock = false;
+        }, 1.0);
       }
     } else if (this.gameState == MainGameState.InGame) {
       // handle input
@@ -201,18 +218,20 @@ export class MainGame extends Game {
       }
 
       // check for endgame state
-      //  screenTransition.isFading used as proxy for whether state is about to change
-      if (!(this.transitionWin.isFading || this.transitionLose.isFading)) {
+      if (!this.gameOverLock) {
         if (this.timer.isFinished) {
+          this.gameOverLock = true;
           var self = this;
           this.transitionLose.fadeIn(() => {
             self.gameState = MainGameState.EndGameLoss
+            self.gameOverLock = false;
           }, 2.0);
-        }
-        if (this.end1.isPlayerInZone && this.end2.isPlayerInZone) {
+        } else if (this.end1.isPlayerInZone && this.end2.isPlayerInZone) {
+          this.gameOverLock = true;
           var self = this;
           this.transitionWin.fadeIn(() => {
             self.gameState = MainGameState.EndGameWin
+            self.gameOverLock = false;
           }, 2.0);
         }
       }
@@ -238,6 +257,9 @@ export class MainGame extends Game {
     this.world2.screenPosition.x = -(this.player2.position.x - this.width / 2);
     this.world1.setXBounds(levelParams.topXBounds[0], levelParams.topXBounds[1]);
     this.world2.setXBounds(levelParams.bottomXBounds[0], levelParams.bottomXBounds[1]);
+
+    // reset elements
+    this.timer.reset();
   }
 
   /**
@@ -323,6 +345,10 @@ export class MainGame extends Game {
       }
     }
     return 0;
+  }
+
+  private get timer() : TimerUI {
+    return this.timerParent.getChild(0) as TimerUI;
   }
 }
 

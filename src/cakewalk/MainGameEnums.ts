@@ -16,7 +16,7 @@ export const enum MainGameAction {
   MenuConfirm,
   MenuUp,
   MenuDown,
-  // game over options
+  // game over (win/loss) options
   EndGameContinue
 }
 

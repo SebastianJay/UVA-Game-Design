@@ -5,7 +5,12 @@ import { IRectCollider, RectColliderSpriteBase } from '../engine/display/Collide
 import { IPhysicsSprite, PhysicsSpriteBase } from '../engine/display/PhysicsSprite';
 import { IAnimatedSprite, AnimatedSpriteBase } from '../engine/display/AnimatedSprite';
 import { CollisionEventArgs, CollisionType } from '../engine/events/EventTypes';
+import { CallbackManager } from '../engine/events/CallbackManager';
 import { EventDispatcher } from '../engine/events/EventDispatcher';
+import { TweenManager } from '../engine/tween/TweenManager';
+import { Tween } from '../engine/tween/Tween';
+import { TweenParam, TweenAttributeType, TweenFunctionType } from '../engine/tween/TweenParam';
+import { TweenEventArgs } from '../engine/events/EventTypes';
 import { Rectangle } from '../engine/util/Rectangle';
 import { Vector } from '../engine/util/Vector';
 import { Physics } from '../engine/util/Physics';
@@ -26,9 +31,12 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   rampDownFactor : number = 5; // how much to scale down velocity each frame when still (friction)
   rampDownAirFactor : number = 12; // how much to scale down velocity in midair when still (drag)
 
+  respawnTime : number = 3; // how much time elapses from death to respawn
+
   grounded : boolean;  // whether the player is on the ground
   jumping : boolean;  // whether the player is in process of jumping
   currentDirectionRight : boolean;  // temp var
+  private _inDeathState : boolean; // whether the character has died and is waiting to respawn
   private _respawnPoint : Vector;  // if player dies, where to respawn
   private _eventQueue : CollisionEventArgs[]; // for processing multiple collisions in the update loop
 
@@ -41,6 +49,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     this._respawnPoint = Vector.zero;
     this._eventQueue = [];
     this.currentDirectionRight = true;
+    this._inDeathState = false;
 
     this.collisionLayer = (this.color == MainGameColor.Red) ? 3 : 4;
     this.isTrigger = false;
@@ -54,27 +63,29 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     this.updatePhysics();
     this.updateAnimation();
     // process multiple collisions for player getting "squished" and dying
-    var normalDirs = [false, false, false, false];  // whether player has a normal in N, E, S, W directions
-    for (var i = 0; i < this._eventQueue.length; i++) {
-      if (this._eventQueue[i].type == CollisionType.Enter || this._eventQueue[i].type == CollisionType.Stay) {
-        if (this._eventQueue[i].normal.y < 0) {
-          normalDirs[0] = true;
+    if (!this._inDeathState) {
+      var normalDirs = [false, false, false, false];  // whether player has a normal in N, E, S, W directions
+      for (var i = 0; i < this._eventQueue.length; i++) {
+        if (this._eventQueue[i].type == CollisionType.Enter || this._eventQueue[i].type == CollisionType.Stay) {
+          if (this._eventQueue[i].normal.y < 0) {
+            normalDirs[0] = true;
+          }
+          if (this._eventQueue[i].normal.x > 0) {
+            normalDirs[1] = true;
+          }
+          if (this._eventQueue[i].normal.y > 0) {
+            normalDirs[2] = true;
+          }
+          if (this._eventQueue[i].normal.x < 0) {
+            normalDirs[3] = true;
+          }
         }
-        if (this._eventQueue[i].normal.x > 0) {
-          normalDirs[1] = true;
-        }
-        if (this._eventQueue[i].normal.y > 0) {
-          normalDirs[2] = true;
-        }
-        if (this._eventQueue[i].normal.x < 0) {
-          normalDirs[3] = true;
-        }
+      }
+      if ((normalDirs[0] && normalDirs[2]) || (normalDirs[1] && normalDirs[3])) {
+        this.respawn();
       }
     }
     this._eventQueue = [];
-    if ((normalDirs[0] && normalDirs[2]) || (normalDirs[1] && normalDirs[3])) {
-      this.respawn();
-    }
   }
 
   /**
@@ -82,12 +93,12 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
    * Direction is negative moving left, positive moving right, or zero if no input
    */
   run(direction : number) : void {
-    if (direction < -0.5) {
+    if (direction < -0.5 && !this._inDeathState) {
       this.addForce(this.moveForce.multiply(-1)
         .multiply(this.velocity.x > this.runningSpeed && this.grounded ? this.reverseFactor : 1));
       this.animate('walk_left');
       this.currentDirectionRight = false;
-    } else if (direction > 0.5) {
+    } else if (direction > 0.5 && !this._inDeathState) {
       this.addForce(this.moveForce
         .multiply(this.velocity.x < -this.runningSpeed && this.grounded ? this.reverseFactor : 1));
       this.animate('walk');
@@ -102,10 +113,12 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
           / Physics.DeltaTime * this.mass, 0));
       }
 
-      if (this.currentDirectionRight) {
-        this.animate('idle');
-      } else {
-        this.animate('idle_left');
+      if (!this._inDeathState) {
+        if (this.currentDirectionRight) {
+          this.animate('idle');
+        } else {
+          this.animate('idle_left');
+        }
       }
     }
   }
@@ -114,7 +127,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   * Called when the player wants the player to jump
   */
   jump() : void {
-    if (this.grounded) {
+    if (this.grounded && !this._inDeathState) {
       // add force that would equate player's y speed to jumpTargetSpeed
       this.addForce(new Vector(0, -this.jumpTargetSpeed / Physics.DeltaTime * this.mass)
         .add(Physics.Gravity.multiply(this.mass)));
@@ -124,7 +137,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
 
   /** Called when player releases jump button */
   cancelJump() : void {
-    if (this.jumping) {
+    if (this.jumping && !this._inDeathState) {
       if (this.velocity.y < -this.jumpMinSpeed) {
         // moves velocity to jumpMinSpeed
         this.addForce(new Vector(0, -(this.velocity.y + this.jumpMinSpeed) / Physics.DeltaTime * this.mass)
@@ -134,12 +147,32 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     }
   }
 
-  get respawnPoint() : Vector { return this._respawnPoint; }
-  set respawnPoint(vec : Vector) { this._respawnPoint = vec }
+  respawn(reason? : string) : void {
+    if (this._inDeathState) {
+      return; // already dead, cannot overlap deaths
+    }
 
-  respawn() : void {
-    this.position = this.respawnPoint;
+    this._inDeathState = true;
+    if (reason != null) {
+      // TODO death animation
+    } else {
+      // temporary fade-out death tween
+      var tw : Tween;
+      TweenManager.instance.add(tw = new Tween(this)
+        .animate(new TweenParam(TweenAttributeType.Alpha, 1.0, 0.0, this.respawnTime - 0.5, TweenFunctionType.Linear)));
+    }
+    CallbackManager.instance.addCallback(() => {
+      this.position = this.respawnPoint;
+      this.velocity = Vector.zero;
+      this._inDeathState = false;
+      this.alpha = 1.0;
+    }, this.respawnTime);
   }
+
+  get isAlive() : boolean { return !this._inDeathState; }
+
+  get respawnPoint() : Vector { return this._respawnPoint; }
+  set respawnPoint(vec : Vector) { this._respawnPoint = vec; }
 
   private get collisionHandler() {
     var self = this;
