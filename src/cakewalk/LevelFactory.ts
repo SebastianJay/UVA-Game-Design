@@ -1,6 +1,7 @@
 "use strict";
 
 import { DisplayObjectContainer } from '../engine/display/DisplayObjectContainer';
+import { TiledSpriteContainer } from '../engine/display/TiledSpriteContainer';
 import { Sprite } from '../engine/display/Sprite';
 import { Vector } from '../engine/util/Vector';
 
@@ -46,8 +47,13 @@ export class LevelFactory {
   }
 
   /** The following methods create commonly used components */
-  private static MakeGround() : Platform {
-    return new Platform('ground' + LevelFactory.Counter, 'CakeWalk/tableCombined.png');
+  /** The ground shall be tiled in the x direction to span the given width */
+  private static MakeGround(width : number, height : number) : TiledSpriteContainer {
+    return new TiledSpriteContainer('ground' + LevelFactory.Counter, 'CakeWalk/tableCombined.png', width, height,
+      (id: string, filename: string) => {
+        return new Platform(id, filename);
+      }
+    );
   }
 
   // these are for invisible walls at the bounds of the stage
@@ -112,7 +118,7 @@ export class LevelFactory {
   // first level - tutorial
   private static GetLevelZero() : LevelParams {
     // p1 and p2 are ground for each stage
-    var p1: Platform, p2: Platform;
+    var p1: TiledSpriteContainer, p2: TiledSpriteContainer;
     // b1start b1end etc are invisible walls at the begining and end of level
     var b1start: Platform, b2start: Platform, b1end: Platform, b2end: Platform;
     // naming convention: object, world, order
@@ -148,7 +154,7 @@ export class LevelFactory {
       .addChild(g1b = LevelFactory.MakeGate(MainGameColor.Neutral))
       .addChild(q1a = LevelFactory.MakeCheckpoint())
       .addChild(q1b = LevelFactory.MakeCheckpoint())
-      .addChild(p1 = LevelFactory.MakeGround())
+      .addChild(p1 = LevelFactory.MakeGround(4000, 80))
       .addChild(f1a = LevelFactory.MakeFlame(MainGameColor.Neutral))
       .addChild(f1b = LevelFactory.MakeFlame(MainGameColor.Blue))
       .addChild(f1c = LevelFactory.MakeFlame(MainGameColor.Blue))
@@ -181,7 +187,7 @@ export class LevelFactory {
       .addChild(s2b = LevelFactory.MakeSwitch(MainGameColor.Blue))
       .addChild(q2a = LevelFactory.MakeCheckpoint())
       .addChild(q2b = LevelFactory.MakeCheckpoint())
-      .addChild(p2 = LevelFactory.MakeGround())
+      .addChild(p2 = LevelFactory.MakeGround(4000, 80))
       .addChild(f2a = LevelFactory.MakeFlame(MainGameColor.Neutral))
       .addChild(f2b = LevelFactory.MakeFlame(MainGameColor.Red))
       .addChild(f2c = LevelFactory.MakeFlame(MainGameColor.Red))
@@ -202,11 +208,7 @@ export class LevelFactory {
 
     // ground
     p1.position = new Vector(-200, 280);
-    p1.width = 4000;
-    p1.height = 80;
     p2.position = new Vector(-200, 280);
-    p2.width = 4000;
-    p2.height = 80;
     // invisible walls
     b1start.position = new Vector(-50,-500);
     b1end.position = new Vector(3000,-500);

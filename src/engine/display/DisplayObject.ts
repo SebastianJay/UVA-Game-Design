@@ -51,15 +51,7 @@ export class DisplayObject {
 			var self = this;
 			this._displayImage = new Image();
 			this._displayImage.onload = () => {
-				self._loaded = true;
-				// if we tried to set dimensions before loading complete,
-				//  then altDimensions contains info to set the scale accordingly
-				if (self._altDimensions.x != 0) {
-					self.localScale.x = self._altDimensions.x / self.displayImage.width;
-				}
-				if (self._altDimensions.y != 0) {
-					self.localScale.y = self._altDimensions.y / self.displayImage.height;
-				}
+				self.onDisplayImageLoaded();
 			};
 			this._displayImage.src = 'resources/' + filename;
 		}
@@ -147,6 +139,19 @@ export class DisplayObject {
 	/** Helper intended to be overriden by display objects using spritesheets */
 	protected drawImage(g: CanvasRenderingContext2D) {
 		g.drawImage(this.displayImage,0,0);
+	}
+
+	/** Helper intended to be overriden by display objects needing image data */
+	protected onDisplayImageLoaded() {
+		this._loaded = true;
+		// if we tried to set dimensions before loading complete,
+		//  then altDimensions contains info to set the scale accordingly
+		if (this._altDimensions.x != 0) {
+			this.localScale.x = this._altDimensions.x / this.displayImage.width;
+		}
+		if (this._altDimensions.y != 0) {
+			this.localScale.y = this._altDimensions.y / this.displayImage.height;
+		}
 	}
 
 	/**
@@ -251,6 +256,8 @@ export class DisplayObject {
 	protected get pivotDistance() : Vector{
 		return new Vector(this.pivotPoint.x * this.unscaledWidth, this.pivotPoint.y * this.unscaledHeight);
 	}
+
+	protected get filename(): string { return this._filename; }
 
 	static getById(id : string) : DisplayObject {
 		return this._objectHash[id];
