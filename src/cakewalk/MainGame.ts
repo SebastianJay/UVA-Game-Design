@@ -192,28 +192,38 @@ export class MainGame extends Game {
         this.player2.cancelJump();
       }
 
-      if (this.getActionInput(MainGameAction.PlayerOneSwap) > 0 || this.getActionInput(MainGameAction.PlayerTwoSwap) > 0) {
-        // swap player attributes
-        var tmp = this.player1.position;
-        this.player1.position = this.player2.position;
-        this.player2.position = tmp;
-        tmp = this.player1.previousPosition;
-        this.player1.previousPosition = this.player2.previousPosition;
-        this.player2.previousPosition = tmp;
-        tmp = this.player1.velocity;
-        this.player1.velocity = this.player2.velocity;
-        this.player2.velocity = tmp;
-        tmp = this.player1.respawnPoint;
-        this.player1.respawnPoint = this.player2.respawnPoint;
-        this.player2.respawnPoint = tmp;
+      if (this.player1.isAlive && this.player2.isAlive) {
+        var doSwap = false;
+        if (this.getActionInput(MainGameAction.PlayerOneSwap) > 0 && this.player1.canSwap) {
+          this.player1.didSwap();
+          doSwap = true;
+        } else if (this.getActionInput(MainGameAction.PlayerTwoSwap) > 0 && this.player2.canSwap) {
+          this.player2.didSwap();
+          doSwap = true;
+        }
+        if (doSwap) {
+          // swap player attributes
+          var tmp = this.player1.position;
+          this.player1.position = this.player2.position;
+          this.player2.position = tmp;
+          tmp = this.player1.previousPosition;
+          this.player1.previousPosition = this.player2.previousPosition;
+          this.player2.previousPosition = tmp;
+          tmp = this.player1.velocity;
+          this.player1.velocity = this.player2.velocity;
+          this.player2.velocity = tmp;
+          tmp = this.player1.respawnPoint;
+          this.player1.respawnPoint = this.player2.respawnPoint;
+          this.player2.respawnPoint = tmp;
 
-        // switch two players in display tree
-        if (this.world1.getChild(0) == this.player1) {
-          this.world2.setChild(this.player1, 0);
-          this.world1.setChild(this.player2, 0);
-        } else {
-          this.world1.setChild(this.player1, 0);
-          this.world2.setChild(this.player2, 0);
+          // switch two players in display tree
+          if (this.world1.getChild(0) == this.player1) {
+            this.world2.setChild(this.player1, 0);
+            this.world1.setChild(this.player2, 0);
+          } else {
+            this.world1.setChild(this.player1, 0);
+            this.world2.setChild(this.player2, 0);
+          }
         }
       }
 

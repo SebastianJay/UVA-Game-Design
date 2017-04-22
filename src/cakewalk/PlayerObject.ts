@@ -32,11 +32,13 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   rampDownAirFactor : number = 12; // how much to scale down velocity in midair when still (drag)
 
   respawnTime : number = 3; // how much time elapses from death to respawn
+  swapCooldownTime : number = 3; // how much time elapses after player swaps before they can do it again
 
   grounded : boolean;  // whether the player is on the ground
   jumping : boolean;  // whether the player is in process of jumping
-  currentDirectionRight : boolean;  // temp var
+  private _currentDirectionRight : boolean;  // temp var
   private _inDeathState : boolean; // whether the character has died and is waiting to respawn
+  private _canSwap : boolean; // whether the character is able to swap
   private _respawnPoint : Vector;  // if player dies, where to respawn
   private _eventQueue : CollisionEventArgs[]; // for processing multiple collisions in the update loop
 
@@ -48,7 +50,8 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     this.jumping = false;
     this._respawnPoint = Vector.zero;
     this._eventQueue = [];
-    this.currentDirectionRight = true;
+    this._currentDirectionRight = true;
+    this._canSwap = true;
     this._inDeathState = false;
 
     this.collisionLayer = (this.color == MainGameColor.Red) ? 3 : 4;
@@ -97,12 +100,12 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
       this.addForce(this.moveForce.multiply(-1)
         .multiply(this.velocity.x > this.runningSpeed && this.grounded ? this.reverseFactor : 1));
       this.animate('walk_left');
-      this.currentDirectionRight = false;
+      this._currentDirectionRight = false;
     } else if (direction > 0.5 && !this._inDeathState) {
       this.addForce(this.moveForce
         .multiply(this.velocity.x < -this.runningSpeed && this.grounded ? this.reverseFactor : 1));
       this.animate('walk');
-      this.currentDirectionRight = true;
+      this._currentDirectionRight = true;
     } else {
       if (Math.abs(this.velocity.x) < this.stillSpeed) {
         // effectively moves velocity back to zero
@@ -114,7 +117,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
       }
 
       if (!this._inDeathState) {
-        if (this.currentDirectionRight) {
+        if (this._currentDirectionRight) {
           this.animate('idle');
         } else {
           this.animate('idle_left');
@@ -147,6 +150,25 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     }
   }
 
+  /** Called when this player executed a swap */
+  didSwap() : void {
+    this._canSwap = false;
+    CallbackManager.instance.addCallback(() => {
+      this._canSwap = true;
+    }, this.swapCooldownTime);
+    // TODO animation to show when you can swap again
+    // temp animation - black circle appears over head
+    var c : DisplayObject;
+    this.addChild(c = new DisplayObject(this.id+'_swap_circle', 'lab3/black_circle.png'));
+    c.localScale = new Vector(0.1, 0.1);
+    c.position = new Vector(5, -15);
+    var self = this;
+    CallbackManager.instance.addCallback(() => {
+      self.removeChild(c);
+    }, this.swapCooldownTime);
+  }
+
+  /** Called when the player meets a death condition. reason specifies which animation to play. */
   respawn(reason? : string) : void {
     if (this._inDeathState) {
       return; // already dead, cannot overlap deaths
@@ -170,6 +192,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   }
 
   get isAlive() : boolean { return !this._inDeathState; }
+  get canSwap() : boolean { return this._canSwap; }
 
   get respawnPoint() : Vector { return this._respawnPoint; }
   set respawnPoint(vec : Vector) { this._respawnPoint = vec; }
