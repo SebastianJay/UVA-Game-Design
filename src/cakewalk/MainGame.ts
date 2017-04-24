@@ -25,6 +25,8 @@ import { MenuUI } from './MenuUI';
 
 export class MainGame extends Game {
 
+  public static get IsDebug() : boolean { return true; }
+
   private rootEnv : DisplayObjectContainer;
   // cameras that contain the two stages and players
   private world1 : Camera;
@@ -145,6 +147,14 @@ export class MainGame extends Game {
     Physics.SetCollisionMat(0, 4);
     Physics.SetCollisionMat(1, 4);
     Physics.SetCollisionMat(2, 3);
+
+    if (MainGame.IsDebug) {
+      this.menu.visible = false;
+      this.menu.setGameStarted();
+      this.gameState = MainGameState.InGame;
+      this.gameLevelNumber = 0;
+      this.loadLevel();
+    }
   }
 
   update(dt : number = 0) : void{
@@ -295,6 +305,7 @@ export class MainGame extends Game {
 
     // reset elements
     this.timer.reset();
+    this.timer.gameDuration = levelParams.gameDuration;
     this.player1.reset();
     this.player2.reset();
     this.rootEnv.active = this.rootEnv.visible = true;
