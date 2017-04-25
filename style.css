@@ -1,0 +1,5 @@
+/* load custom font */
+@font-face {
+  font-family: 'Sanchez';
+  src: url('resources/CakeWalk/font/Sanchez-Regular.ttf'); 
+}

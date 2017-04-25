@@ -71,6 +71,8 @@ export class MenuUI extends Sprite {
 
     [t0, t1, t2, t3, t4, t5, t6, tn0, tn1, tn2].map((t : TextObject) => {
       t.color = new Vector(0, 0, 0);
+      t.fontSize = 48;
+      t.fontFamily = 'Sanchez';
     });
 
     this._cursor.position = new Vector(1280 / 2 - 150, 350);
