@@ -3,6 +3,7 @@
 import { InputHandler } from '../input/InputHandler';
 import { TweenManager } from '../tween/TweenManager';
 import { CallbackManager } from '../events/CallbackManager';
+import { SoundManager } from '../sound/SoundManager';
 import { DisplayObjectContainer } from '../display/DisplayObjectContainer';
 import { Physics } from '../util/Physics';
 import { GameClock } from '../util/GameClock';
@@ -54,6 +55,7 @@ export class Game extends DisplayObjectContainer {
 			Physics.CollisionUpdate(this);
 			TweenManager.instance.update(dt);
 			CallbackManager.instance.update(dt);
+			SoundManager.instance.update(dt);
 		}
 		DisplayObjectContainer.DrainRemoveQueue();
 	}

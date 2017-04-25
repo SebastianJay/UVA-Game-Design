@@ -10,13 +10,40 @@ type SoundConfig = {
 export class SoundManager {
   private static _instance : SoundManager;
   private soundHash : {[id: string]: SoundConfig };
+  // the following fields are used to transition from one song to another
+  private currentSongId : string;
+  private nextSongId : string;
+  private isFading : boolean;
+  private fadeTimeout : number;
+  private fadeTimer : number;
 
   private constructor() {
     this.soundHash = {};
+    this.currentSongId = '';
+    this.nextSongId = '';
+    this.isFading = false;
+    this.fadeTimer = 0;
+    this.fadeTimeout = 0;
   }
   public static get instance() : SoundManager
   {
     return this._instance || (this._instance = new this());
+  }
+
+  update(dt : number = 0) {
+    if (this.isFading && this.currentSongId in this.soundHash) {
+      this.fadeTimer += dt;
+      if (this.fadeTimer > this.fadeTimeout) {
+        this.soundHash[this.currentSongId].audio.pause();
+        this.soundHash[this.currentSongId].audio.volume = 1.0;
+        this.soundHash[this.nextSongId].audio.currentTime = 0.0;
+        this.playMusic(this.nextSongId);
+        this.currentSongId = this.nextSongId;
+        this.isFading = false;
+      } else {
+        this.soundHash[this.currentSongId].audio.volume = Math.min(1.0, Math.max(0.0, 1.0 - (this.fadeTimer / this.fadeTimeout)));
+      }
+    }
   }
 
   loadSound(id : string, filename : string) : void {
@@ -50,6 +77,14 @@ export class SoundManager {
 
   playMusic(id : string, loop: number = -1) : void {
     this.playSound(id, loop);
+    this.currentSongId = id;
+  }
+
+  fadeToNext(id : string, fadeTime : number) : void {
+    this.fadeTimeout = fadeTime;
+    this.fadeTimer = 0.0;
+    this.nextSongId = id;
+    this.isFading = true;
   }
 
   private playSound(id : string, loop : number) : void {

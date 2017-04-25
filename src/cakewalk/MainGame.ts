@@ -11,6 +11,7 @@ import { TweenManager } from '../engine/tween/TweenManager';
 import { Tween } from '../engine/tween/Tween';
 import { TweenParam, TweenAttributeType, TweenFunctionType } from '../engine/tween/TweenParam';
 import { TweenEventArgs } from '../engine/events/EventTypes';
+import { SoundManager } from '../engine/sound/SoundManager';
 import { Sprite } from '../engine/display/Sprite';
 import { Vector } from '../engine/util/Vector';
 import { Physics } from '../engine/util/Physics';
@@ -136,6 +137,11 @@ export class MainGame extends Game {
     this.menuLock = false;
     this.transitionLock = false;
     this.gameOverLock = false;
+
+    // load all sounds and music
+    SoundManager.instance.loadSound('jacket', 'CakeWalk/music/short_skirt_long_jacket.mp3');
+    SoundManager.instance.playMusic('jacket');
+    //SoundManager.instance.loadSound('distance', 'CakeWalk/music/the_distance.mp3');
 
     // create collision matrix
     // 0 - neutral objects that collide both players
