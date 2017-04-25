@@ -143,7 +143,7 @@ export class MainGame extends Game {
     // NOTE the bg music ids need to match gameSongs
     SoundManager.instance.loadSound('jacket', 'CakeWalk/music/short_skirt_long_jacket.mp3');
     SoundManager.instance.loadSound('atop', 'CakeWalk/music/atop_a_cake.mp3');
-    SoundManager.instance.loadSound('ocean', 'CakeWalk/music/cake_by_the_ocean.mp3');
+    SoundManager.instance.loadSound('ocean', 'CakeWalk/music/cake_by_the_ocean.ogg');
     SoundManager.instance.loadSound('distance', 'CakeWalk/music/the_distance.mp3');
     SoundManager.instance.loadSound('cake', 'CakeWalk/music/cake_martinez.mp3');
     SoundManager.instance.playMusic(this.gameSongs[0]);
