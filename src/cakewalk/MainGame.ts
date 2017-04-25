@@ -26,7 +26,7 @@ import { MenuUI } from './MenuUI';
 
 export class MainGame extends Game {
 
-  public static get IsDebug() : boolean { return true; }
+  public static get IsDebug() : boolean { return false; }
 
   private rootEnv : DisplayObjectContainer;
   // cameras that contain the two stages and players

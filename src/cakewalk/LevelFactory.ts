@@ -122,7 +122,13 @@ export class LevelFactory {
    * Ideally, levels starting from a certain number will be procedurally generated.
    */
   static GetLevel(num : number) {
-    return LevelFactory.GetLevelThree();
+    if (num == 0) {
+      return LevelFactory.GetLevelOne();
+    } else if (num == 1) {
+      return LevelFactory.GetLevelTwo();
+    } else {
+      return LevelFactory.GetLevelThree();
+    }
   }
 
   // first level - tutorial
