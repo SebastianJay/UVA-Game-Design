@@ -51,6 +51,7 @@ export class MainGame extends Game {
   private gameState : MainGameState = MainGameState.MenuOpen;
   private gameLevelNumber : number = 0; // which level players are on
   private gameDuration : number = 100;  // amount of time (seconds) before game over
+  private gameSongs : string[] = ['jacket', 'atop', 'ocean', 'distance', 'cake']; // order that songs are played
 
   constructor (canvas : HTMLCanvasElement) {
     super("Cakewalk Game", 1280, 720, canvas);
@@ -139,9 +140,13 @@ export class MainGame extends Game {
     this.gameOverLock = false;
 
     // load all sounds and music
+    // NOTE the bg music ids need to match gameSongs
     SoundManager.instance.loadSound('jacket', 'CakeWalk/music/short_skirt_long_jacket.mp3');
-    SoundManager.instance.playMusic('jacket');
-    //SoundManager.instance.loadSound('distance', 'CakeWalk/music/the_distance.mp3');
+    SoundManager.instance.loadSound('atop', 'CakeWalk/music/atop_a_cake.mp3');
+    SoundManager.instance.loadSound('ocean', 'CakeWalk/music/cake_by_the_ocean.mp3');
+    SoundManager.instance.loadSound('distance', 'CakeWalk/music/the_distance.mp3');
+    SoundManager.instance.loadSound('cake', 'CakeWalk/music/cake_martinez.mp3');
+    SoundManager.instance.playMusic(this.gameSongs[0]);
 
     // create collision matrix
     // 0 - neutral objects that collide both players
@@ -192,12 +197,13 @@ export class MainGame extends Game {
       if (this.getActionInput(MainGameAction.EndGameContinue) > 0) {
         this.transitionLock = true;
         var self = this;
+        self.gameLevelNumber += 1;
         this.transitionWin.fadeOut(() => {
-          self.gameLevelNumber += 1;
           self.loadLevel(); // load next level
           self.gameState = MainGameState.InGame;
           self.transitionLock = false;
         }, 1.0);
+        SoundManager.instance.fadeToNext(this.gameSongs[this.gameLevelNumber % this.gameSongs.length], 1.0);
       }
     } else if (this.gameState == MainGameState.InGame) {
       // handle input
