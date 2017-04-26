@@ -56,12 +56,12 @@ export class Gate extends Platform {
 
   syncSwitch(sw : Switch) : void {
     var self = this;
-    sw.onEnter = () => {
+    sw.addOnEnter(() => {
       self._moveMode = 1;
-    };
-    sw.onExit = () => {
+    });
+    sw.addOnExit(() => {
       self._moveMode = 0;
-    };
+    });
   }
 
   private get collisionHandler() {

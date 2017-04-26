@@ -16,8 +16,8 @@ import { MainGameSprite } from './MainGameSprite';
  */
 export class Switch extends MainGameSprite implements IRectCollider {
 
-  private _onEnter : () => void;
-  private _onExit : () => void;
+  private _onEnter : (() => void)[];
+  private _onExit : (() => void)[];
   private _isPressed : boolean;
   private _eventQueue : CollisionEventArgs[];
 
@@ -27,6 +27,8 @@ export class Switch extends MainGameSprite implements IRectCollider {
     this.isTrigger = false;
     this._isPressed = false;
     this._eventQueue = [];
+    this._onEnter = [];
+    this._onExit = [];
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
   }
 
@@ -37,13 +39,13 @@ export class Switch extends MainGameSprite implements IRectCollider {
     if (this._eventQueue.length == 1) {
       var args = this._eventQueue[0];
       if (!this._isPressed && args.type == CollisionType.Enter && args.normal.y < 0) {
-        if (this.onEnter != null) {
-          this.onEnter();
+        for (var i = 0; i < this._onEnter.length; i++) {
+          this._onEnter[i]();
         }
         this._isPressed = true;
       } else if (this._isPressed && args.type == CollisionType.Exit) {
-        if (this.onExit != null) {
-          this.onExit();
+        for (var i = 0; i < this._onExit.length; i++) {
+          this._onExit[i]();
         }
         this._isPressed = false;
       }
@@ -51,10 +53,10 @@ export class Switch extends MainGameSprite implements IRectCollider {
     this._eventQueue = [];  // reset queue every frame
   }
 
-  get onEnter() : () => void { return this._onEnter; }
-  set onEnter(f : () => void) { this._onEnter = f; }
-  get onExit() : () => void { return this._onExit; }
-  set onExit(f : () => void) { this._onExit = f; }
+  getOnEnter() : (() => void)[] { return this._onEnter; }
+  addOnEnter(f : () => void) { this._onEnter.push(f); }
+  getOnExit() : (() => void)[] { return this._onExit; }
+  addOnExit(f : () => void) { this._onExit.push(f); }
 
   private get collisionHandler() {
     var self = this;
