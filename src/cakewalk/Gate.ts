@@ -34,7 +34,7 @@ export class Gate extends Platform {
   get targetPosition() : Vector { return this._targetPosition; }
   set targetPosition(v : Vector) { this._targetPosition = v; }
 
-  update(dt : number = 0) : void{
+  update(dt : number = 0) : void {
     super.update(dt);
     var deltaPos = Vector.zero;
     var destPos = this._moveMode == 0 ? this.restPosition : this.targetPosition;
@@ -63,6 +63,9 @@ export class Gate extends Platform {
       self._moveMode = 0;
     });
   }
+
+  protected get moveMode() : number { return this._moveMode; }
+  protected set moveMode(m : number) { this._moveMode = m; }
 
   private get collisionHandler() {
     var self = this;

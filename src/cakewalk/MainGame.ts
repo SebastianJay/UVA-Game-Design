@@ -163,7 +163,7 @@ export class MainGame extends Game {
       this.menu.visible = false;
       this.menu.setGameStarted();
       this.gameState = MainGameState.InGame;
-      this.gameLevelNumber = 0;
+      this.gameLevelNumber = -1;
       this.loadLevel();
     }
   }

@@ -7,6 +7,7 @@ import { Vector } from '../engine/util/Vector';
 
 import { Platform } from './Platform';
 import { Gate } from './Gate';
+import { TimedGate } from './TimedGate';
 import { Switch } from './Switch';
 import { Flame } from './Flame';
 import { TriggerZone } from './TriggerZone';
@@ -86,6 +87,11 @@ export class LevelFactory {
       c == MainGameColor.Neutral ? 'CakeWalk/YellowCandleRotated.png'
       : (c == MainGameColor.Red ? 'CakeWalk/RedCandleRotated.png' : 'CakeWalk/BlueCandleRotated.png'), c);
   }
+  private static MakeTimedGate(c : MainGameColor = MainGameColor.Neutral, halfCycleTime : number) : TimedGate {
+    return new TimedGate('gate' + LevelFactory.Counter,
+      c == MainGameColor.Neutral ? 'CakeWalk/YellowCandle.png'
+      : (c == MainGameColor.Red ? 'CakeWalk/RedCandle.png' : 'CakeWalk/BlueCandle.png'), halfCycleTime, c);
+  }
 
   private static MakeFlame(c : MainGameColor = MainGameColor.Neutral) : Flame {
     return new Flame('flame' + LevelFactory.Counter,
@@ -122,7 +128,9 @@ export class LevelFactory {
    * Ideally, levels starting from a certain number will be procedurally generated.
    */
   static GetLevel(num : number) {
-    if (num == 0) {
+    if (num == -1) {
+      return LevelFactory.GetLevelTest();
+    } else if (num == 0) {
       return LevelFactory.GetLevelOne();
     } else if (num == 1) {
       return LevelFactory.GetLevelTwo();
@@ -971,6 +979,63 @@ private static GetLevelThree() : LevelParams {
     bottomXBounds: [0, 3000],
 
     gameDuration: 100,
+  };
+}
+
+private static GetLevelTest() : LevelParams {
+  var tg1a : TimedGate, tg1b : TimedGate, tg2a : TimedGate, tg2b : TimedGate;
+  var s2a : Switch;
+  var p1 : TiledSpriteContainer, p2 : TiledSpriteContainer;
+  var end1 : TriggerZone, end2 : TriggerZone;
+
+  var env1 = new DisplayObjectContainer('testlevel_top', '')
+    .addChild(tg1a = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 5))
+    .addChild(tg1b = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 2))
+    .addChild(p1 = LevelFactory.MakeGround(4000, 80))
+    .addChild(end1 = LevelFactory.MakeEndZone());
+
+  var env2 = new DisplayObjectContainer('testlevel_bottom', '')
+    .addChild(tg2a = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 5))
+    .addChild(tg2b = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 1.75))
+    .addChild(s2a = LevelFactory.MakeSwitch(MainGameColor.Blue))
+    .addChild(p2 = LevelFactory.MakeGround(4000, 80))
+    .addChild(end2 = LevelFactory.MakeEndZone());
+
+  // ground
+  p1.position = new Vector(-200, 280);
+  p2.position = new Vector(-200, 280);
+  // gates
+  // the following gates start moving automatically since they aren't sycned with switches
+  tg1a.position = tg1a.restPosition = new Vector(200, 70);
+  tg1a.targetPosition = tg1a.position.add(new Vector(0, 150));
+  tg2a.position = tg2a.restPosition = new Vector(200, 70);
+  tg2a.targetPosition = tg2a.position.add(new Vector(0, 150));
+  // these gates only start moving once the switch is pressed
+  tg1b.position = tg1b.restPosition = new Vector(400, 70);
+  tg1b.targetPosition = tg1b.position.add(new Vector(0, 150));
+  tg2b.position = tg2b.restPosition = new Vector(500, 220);
+  tg2b.targetPosition = tg2b.position.add(new Vector(0, -150));
+  s2a.position = new Vector(300, 240);
+  tg1b.syncSwitch(s2a);
+  tg2b.syncSwitch(s2a);
+  // end zones
+  end1.position = new Vector(1000, 0);
+  end1.dimensions = new Vector(200, 300);
+  end2.position = new Vector(1000, 0);
+  end2.dimensions = new Vector(200, 300);
+
+  return {
+    topLevel: env1,
+    topStartPoint: new Vector(50, 50),
+    topEndZone: end1,
+    topXBounds: [0, 3000],
+
+    bottomLevel :env2,
+    bottomStartPoint: new Vector(50, 50),
+    bottomEndZone: end2,
+    bottomXBounds: [0, 3000],
+
+    gameDuration: 10000,
   };
 }
 
