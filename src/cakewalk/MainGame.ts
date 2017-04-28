@@ -26,7 +26,7 @@ import { MenuUI } from './MenuUI';
 
 export class MainGame extends Game {
 
-  public static get IsDebug() : boolean { return false; }
+  public static get IsDebug() : boolean { return true; }
 
   private rootEnv : DisplayObjectContainer;
   // cameras that contain the two stages and players
@@ -61,7 +61,7 @@ export class MainGame extends Game {
     this.addChild(new DisplayObjectContainer('root', '')
       .addChild(this.rootEnv = new DisplayObjectContainer('root_env', '')
         .addChild(this.world2 = new Camera('world2')
-          .addChild(this.player2 = new PlayerObject('player2', 'animations/mario_moving_funky.png', MainGameColor.Blue))
+          .addChild(this.player2 = new PlayerObject('player2', 'animations/fullblueman.png', MainGameColor.Blue))
           // level environments are inserted here
         ).addChild(this.world1 = new Camera('world1')
           .addChild(this.player1 = new PlayerObject('player1', 'animations/fullredman.png', MainGameColor.Red))

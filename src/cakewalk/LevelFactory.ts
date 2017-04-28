@@ -116,7 +116,7 @@ export class LevelFactory {
   private static MakeCheckpoint() : Checkpoint {
     var c = new Checkpoint('checkpoint' + LevelFactory.Counter);
     c.dimensions = new Vector(100, 720 / 2);
-    c.addChild(new Sprite(c.id+'_post', 'CakeWalk/cake2.png'));
+    c.addChild(new Sprite(c.id+'_post', 'CakeWalk/checkpoint.png'));
     c.getChild(0).position = new Vector(0, 0);
     c.getChild(0).localScale = new Vector(0.3, 0.3);
     return c;
