@@ -195,6 +195,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   /** Resets internal state to be what it would be when a level starts */
   // NOTE be careful of ongoing timeout callbacks that may execute afterward
   reset() : void {
+    this.previousPosition = this.position;
     this.velocity = Vector.zero;
     this._currentDirectionRight = true;
     this._inDeathState = false;

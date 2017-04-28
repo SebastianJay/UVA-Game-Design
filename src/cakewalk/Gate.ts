@@ -17,7 +17,8 @@ export class Gate extends Platform {
   private _restPosition : Vector;
   private _targetPosition : Vector;
   private _moveMode : number;
-  private _playersOnGate : ArrayList<PlayerObject>;  // list of players that are on top of gate
+  private _playersOnGate : ArrayList<PlayerObject>; // list of players that are on top of gate
+  private _playersOnSide : ArrayList<PlayerObject>; // list of players getting pushed by gate
   private _smoothFactor : number = 0.05;
   private _closeDistance : number = 0.05;
 
@@ -26,6 +27,7 @@ export class Gate extends Platform {
     this._restPosition = this._targetPosition = this.position;
     this._moveMode = 0;
     this._playersOnGate = new ArrayList<PlayerObject>();
+    this._playersOnSide = new ArrayList<PlayerObject>();
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
   }
 
@@ -37,7 +39,7 @@ export class Gate extends Platform {
   update(dt : number = 0) : void {
     super.update(dt);
     var deltaPos = Vector.zero;
-    var destPos = this._moveMode == 0 ? this.restPosition : this.targetPosition;
+    var destPos = this.moveMode == 0 ? this.restPosition : this.targetPosition;
     if (!this.position.equals(destPos)) {
       // if gate is close enough to dest, go straight there, otherwise move by smooth interpolated amount
       var isCloseToDest = this.position.subtract(destPos).lengthSquared() <= this._closeDistance*this._closeDistance;
@@ -47,20 +49,34 @@ export class Gate extends Platform {
     // update gate position as well as any players standing on top of the gate
     this.position = this.position.add(deltaPos);
     for (var i = 0; i < this._playersOnGate.length; i++) {
+      var player = this._playersOnGate.get(i);
       // NOTE since we modify PhysicsObject position directly we also change previousPosition so physics updates work
       // this is hacky since we are overwriting history, but not doing this prevents player from running on moving gate
-      this._playersOnGate.get(i).position = this._playersOnGate.get(i).position.add(deltaPos);
-      this._playersOnGate.get(i).previousPosition = this._playersOnGate.get(i).previousPosition.add(deltaPos);
+      player.position = player.position.add(deltaPos);
+      player.previousPosition = player.previousPosition.add(deltaPos);
+    }
+    for (var i = 0; i < this._playersOnSide.length; i++) {
+      var player = this._playersOnSide.get(i);
+      var collides = false;
+      if (this.collidesWith(player)) {
+        player.position = player.position.add(deltaPos);
+        player.previousPosition = player.previousPosition.add(deltaPos);
+        collides = true;
+      }
+      if (!collides) {
+        this._playersOnSide.removeAt(i);
+        i--;  // length decreases, so we want to at same index for next element
+      }
     }
   }
 
   syncSwitch(sw : Switch) : void {
     var self = this;
     sw.addOnEnter(() => {
-      self._moveMode = 1;
+      self.moveMode = 1;
     });
     sw.addOnExit(() => {
-      self._moveMode = 0;
+      self.moveMode = 0;
     });
   }
 
@@ -74,12 +90,22 @@ export class Gate extends Platform {
       if ((args.obj1 === self || args.obj2 === self)
         && (args.obj1 instanceof PlayerObject || args.obj2 instanceof PlayerObject)) {
         var player = ((args.obj1 instanceof PlayerObject) ? args.obj1 : args.obj2) as PlayerObject;
-        if (args.type == CollisionType.Enter && args.normal.y < 0 && !this._playersOnGate.contains(player)) {
-          this._playersOnGate.add(player);
+        if (args.type == CollisionType.Enter) {
+          if (args.normal.y < 0 && !this._playersOnGate.contains(player)) {
+            this._playersOnGate.add(player);
+          } else if (this.isMovingInDir(args.normal) && !this._playersOnSide.contains(player)) {
+            this._playersOnSide.add(player);
+          }
         } else if (args.type == CollisionType.Exit && this._playersOnGate.contains(player)) {
           this._playersOnGate.remove(player);
         }
       }
     }
+  }
+
+  // tells whether the gate is moving in the direction given by the param
+  private isMovingInDir(dir : Vector) {
+    var dp = this.moveMode == 0 ? (this.restPosition.subtract(this.targetPosition)) : (this.targetPosition.subtract(this.restPosition));
+    return (dir.x == 0 || dir.x * dp.x > 0) && (dir.y == 0 || dir.y * dp.y > 0);
   }
 }

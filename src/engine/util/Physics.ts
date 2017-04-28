@@ -164,7 +164,7 @@ export class Physics implements IEventDispatcher {
     // adjust obj1 position to be close to collision point
     var dpos = obj1.position.subtract(obj1.previousPosition);
     var projectVector = (dp : Vector) : number => {
-      var t = 0;
+      var t = 0.0;
       var dt = 1.0;
       var reset = obj1.position;
       obj1.position = obj1.previousPosition;
@@ -182,11 +182,14 @@ export class Physics implements IEventDispatcher {
             t += dt;
           }
         }
+        if (t < 0) {
+          break;
+        }
         obj1.position = obj1.previousPosition.add(dp.multiply(t));
       }
       // reset position so no side effects occur within helper
       obj1.position = reset;
-      return t;
+      return Math.max(0.0, Math.min(1.0, t));
     }
     var dtx = projectVector(new Vector(dpos.x, 0));
     var dty = projectVector(new Vector(0, dpos.y));
