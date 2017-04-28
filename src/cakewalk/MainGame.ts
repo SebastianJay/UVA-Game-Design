@@ -60,11 +60,11 @@ export class MainGame extends Game {
     var plotScreen : ScreenTransitionUI;
     this.addChild(new DisplayObjectContainer('root', '')
       .addChild(this.rootEnv = new DisplayObjectContainer('root_env', '')
-        .addChild(this.world1 = new Camera('world1')
-          .addChild(this.player1 = new PlayerObject('player1', 'animations/mario_moving.png', MainGameColor.Red))
-          // level environments are inserted here
-        ).addChild(this.world2 = new Camera('world2')
+        .addChild(this.world2 = new Camera('world2')
           .addChild(this.player2 = new PlayerObject('player2', 'animations/mario_moving_funky.png', MainGameColor.Blue))
+          // level environments are inserted here
+        ).addChild(this.world1 = new Camera('world1')
+          .addChild(this.player1 = new PlayerObject('player1', 'animations/mario_moving.png', MainGameColor.Red))
           // level environments are inserted here
         )
       ).addChild(new DisplayObjectContainer('root_UI', '')
@@ -88,6 +88,8 @@ export class MainGame extends Game {
     this.world2.screenPosition = new Vector(0, this.height / 2);
     this.world1.setFocus(0, this.width / 2, this.width);
     this.world2.setFocus(0, this.width / 2, this.width);
+    this.world1.dimensions = new Vector(this.width, this.height / 2);
+    this.world2.dimensions = new Vector(this.width, this.height / 2);
     // players
     this.player1.localScale = new Vector(2.0, 2.0);
     this.player2.localScale = new Vector(2.0, 2.0);

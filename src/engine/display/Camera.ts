@@ -61,6 +61,12 @@ export class Camera extends DisplayObjectContainer {
     this.boundPosition();
   }
 
+  draw(g : CanvasRenderingContext2D) : void {
+    // clear rect spanned by camera
+    g.clearRect(0, 0, this.width, this.height);
+    super.draw(g);
+  }
+
   // adjust the position now to the correct spot
   private boundPosition() : void {
     this.screenPosition.x = Math.max(this.screenPosition.x, -(this._xBounds[1] - this._focusWidth));
