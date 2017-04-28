@@ -99,12 +99,12 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     if (direction < -0.5 && !this._inDeathState) {
       this.addForce(this.moveForce.multiply(-1)
         .multiply(this.velocity.x > this.runningSpeed && this.grounded ? this.reverseFactor : 1));
-      this.animate('walk_left');
+        this.animate('walk_left');
       this._currentDirectionRight = false;
     } else if (direction > 0.5 && !this._inDeathState) {
       this.addForce(this.moveForce
         .multiply(this.velocity.x < -this.runningSpeed && this.grounded ? this.reverseFactor : 1));
-      this.animate('walk');
+        this.animate('walk');
       this._currentDirectionRight = true;
     } else {
       if (Math.abs(this.velocity.x) < this.stillSpeed) {
@@ -118,9 +118,17 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
 
       if (!this._inDeathState) {
         if (this._currentDirectionRight) {
-          this.animate('idle');
+          if(this.jumping && !this.grounded){
+            this.animate('jump')
+          }else{
+            this.animate('idle');
+          }
         } else {
-          this.animate('idle_left');
+          if(this.jumping && !this.grounded){
+            this.animate('jump_left')
+          }else{
+            this.animate('idle_left');
+          }    
         }
       }
     }

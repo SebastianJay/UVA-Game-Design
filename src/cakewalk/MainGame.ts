@@ -64,7 +64,7 @@ export class MainGame extends Game {
           .addChild(this.player2 = new PlayerObject('player2', 'animations/mario_moving_funky.png', MainGameColor.Blue))
           // level environments are inserted here
         ).addChild(this.world1 = new Camera('world1')
-          .addChild(this.player1 = new PlayerObject('player1', 'animations/mario_moving.png', MainGameColor.Red))
+          .addChild(this.player1 = new PlayerObject('player1', 'animations/fullredman.png', MainGameColor.Red))
           // level environments are inserted here
         )
       ).addChild(new DisplayObjectContainer('root_UI', '')
@@ -91,8 +91,8 @@ export class MainGame extends Game {
     this.world1.dimensions = new Vector(this.width, this.height / 2);
     this.world2.dimensions = new Vector(this.width, this.height / 2);
     // players
-    this.player1.localScale = new Vector(2.0, 2.0);
-    this.player2.localScale = new Vector(2.0, 2.0);
+    this.player1.localScale = new Vector(1.0, 0.75);
+    this.player2.localScale = new Vector(1.0, 0.75);
 
     // UI
     this.timerParent.position = new Vector(50, this.height / 2);
