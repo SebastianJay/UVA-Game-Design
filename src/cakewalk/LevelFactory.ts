@@ -165,6 +165,8 @@ export class LevelFactory {
     // trigger zones for end of level
     var end1: TriggerZone, end2: TriggerZone;
 
+    var abutton1 : Sprite, abutton2 : Sprite, xbutton1 : Sprite, xbutton2 : Sprite;
+
     var env1 = new DisplayObjectContainer('level0_top', '')
       .addChild(b1start = LevelFactory.MakeWall())
       .addChild(b1end = LevelFactory.MakeWall())
@@ -196,7 +198,9 @@ export class LevelFactory {
       .addChild(f1n = LevelFactory.MakeFlame(MainGameColor.Red))
       .addChild(f1o = LevelFactory.MakeFlame(MainGameColor.Blue))
       .addChild(f1p = LevelFactory.MakeFlame(MainGameColor.Red))
-      .addChild(end1 = LevelFactory.MakeEndZone());
+      .addChild(end1 = LevelFactory.MakeEndZone())
+      .addChild(abutton1 = new Sprite('a_button_icon', 'CakeWalk/AButtonIcon.png'))
+      .addChild(xbutton1 = new Sprite('x_button_icon', 'CakeWalk/XButtonIcon.png'));
 
     var env2 = new DisplayObjectContainer('level0_bottom', '')
       .addChild(b2start = LevelFactory.MakeWall())
@@ -229,7 +233,9 @@ export class LevelFactory {
       .addChild(f2n = LevelFactory.MakeFlame(MainGameColor.Blue))
       .addChild(f2o = LevelFactory.MakeFlame(MainGameColor.Red))
       .addChild(f2p = LevelFactory.MakeFlame(MainGameColor.Blue))
-      .addChild(end2 = LevelFactory.MakeEndZone());
+      .addChild(end2 = LevelFactory.MakeEndZone())
+      .addChild(abutton2 = new Sprite('a_button_icon', 'CakeWalk/AButtonIcon.png'))
+      .addChild(xbutton2 = new Sprite('x_button_icon', 'CakeWalk/XButtonIcon.png'));
 
     // ground
     p1.position = new Vector(-200, 280);
@@ -240,18 +246,17 @@ export class LevelFactory {
     b2start.position = new Vector(-50,-500);
     b2end.position = new Vector(3000,-500);
     //first obstacle
-
     c1a.position = new Vector(250,220);
     c2a.position = new Vector(250,220);
     //second obstacle
     f1a.position = new Vector(600, 220);
     f2a.position = new Vector(600, 220);
     //third obstacle
-    c1b.position = new Vector(900,180);
-    c2b.position = new Vector(900,180);
+    c1b.position = new Vector(900,160);
+    c2b.position = new Vector(900,160);
     //fourth obstacle
-    c1c.position = new Vector(1100,180);
-    c2c.position = new Vector(1100,180);
+    c1c.position = new Vector(1100,160);
+    c2c.position = new Vector(1100,160);
     // checkpoint 1
     q1a.position = new Vector(1200, 0);
     q1a.spawnPoint = new Vector(1200, 200);
@@ -322,6 +327,15 @@ export class LevelFactory {
     end1.dimensions = new Vector(200, 300);
     end2.position = new Vector(2850, 0);
     end2.dimensions = new Vector(200, 300);
+    // button icons
+    abutton1.position = new Vector(250 + 16, 75);
+    abutton2.position = new Vector(250 + 16, 75);
+    xbutton1.position = new Vector(1000 + 16, 75);
+    xbutton2.position = new Vector(1000 + 16, 75);
+    [abutton1, abutton2, xbutton1, xbutton2].map((b : Sprite) => {
+      b.dimensions = new Vector(64, 64);
+      b.pivotPoint = new Vector(0.5, 0.5);
+    });
 
     return {
       topLevel: env1,
