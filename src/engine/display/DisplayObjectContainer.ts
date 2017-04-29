@@ -118,6 +118,14 @@ export class DisplayObjectContainer extends DisplayObject {
     return this;
   }
 
+  // removes references in DisplayObject id hash to any node in this tree
+  //  should be called when this tree will no longer be used
+  clearReferences() : void {
+    this.map((o : DisplayObject) => {
+      DisplayObject.removeReference(o.id);
+    });
+  }
+
   static DrainRemoveQueue() {
     for (var i = 0; i < DisplayObjectContainer._removeQueue.length; i++) {
       var child = DisplayObjectContainer._removeQueue[i];

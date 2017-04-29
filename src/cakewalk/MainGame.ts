@@ -310,6 +310,11 @@ export class MainGame extends Game {
   private loadLevel() {
     // insert new environment into display tree
     var levelParams = LevelFactory.GetLevel(this.gameLevelNumber);
+    if (this.world1.children.length > 2 && this.world2.children.length > 2) {
+      // clean previous level
+      (<DisplayObjectContainer>this.world1.getChild(2)).clearReferences();
+      (<DisplayObjectContainer>this.world2.getChild(2)).clearReferences();
+    }
     this.world1.setChild(levelParams.topLevel, 2);
     this.world2.setChild(levelParams.bottomLevel, 2);
     this.end1 = levelParams.topEndZone;

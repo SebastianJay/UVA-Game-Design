@@ -260,6 +260,12 @@ export class DisplayObject {
 	protected get filename(): string { return this._filename; }
 
 	static getById(id : string) : DisplayObject {
-		return this._objectHash[id];
+		return DisplayObject._objectHash[id];
+	}
+
+	static removeReference(id : string) : DisplayObject {
+		var ret = DisplayObject._objectHash[id];
+		delete DisplayObject._objectHash[id];
+		return ret;
 	}
 }
