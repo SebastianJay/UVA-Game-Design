@@ -10,7 +10,7 @@ import { CallbackManager } from '../engine/events/CallbackManager';
 import { TweenManager } from '../engine/tween/TweenManager';
 import { Tween } from '../engine/tween/Tween';
 import { TweenParam, TweenAttributeType, TweenFunctionType } from '../engine/tween/TweenParam';
-import { TweenEventArgs } from '../engine/events/EventTypes';
+import { CameraScrollEventArgs, TweenEventArgs } from '../engine/events/EventTypes';
 import { SoundManager } from '../engine/sound/SoundManager';
 import { Sprite } from '../engine/display/Sprite';
 import { Vector } from '../engine/util/Vector';
@@ -96,6 +96,8 @@ export class MainGame extends Game {
     this.world2.setFocus(1, this.width / 2, this.width);
     this.world1.dimensions = new Vector(this.width, this.height / 2);
     this.world2.dimensions = new Vector(this.width, this.height / 2);
+    this.world1.addEventListener(CameraScrollEventArgs.ClassName, this.background1.handleCameraScroll);
+    this.world2.addEventListener(CameraScrollEventArgs.ClassName, this.background2.handleCameraScroll);
     // players
     this.player1.localScale = new Vector(1.0, 0.75);
     this.player2.localScale = new Vector(1.0, 0.75);

@@ -4,6 +4,8 @@ import { DisplayObjectContainer } from '../engine/display/DisplayObjectContainer
 import { TiledSpriteContainer } from '../engine/display/TiledSpriteContainer';
 import { Sprite } from '../engine/display/Sprite';
 import { Vector } from '../engine/util/Vector';
+import { CameraScrollEventArgs } from '../engine/events/EventTypes';
+
 
 /**
  * Contains logic to randomly create background layers and have parallaxed movement as camera moves.
@@ -33,6 +35,16 @@ export class BGLayerContainer extends DisplayObjectContainer {
     }
   }
 
+  get handleCameraScroll() {
+    var self = this;
+    return (args : CameraScrollEventArgs) => {
+      if (self.children.length >= 3) {
+        self.getChild(0).position = self.getChild(0).position.add(args.dp.multiply(0.45));
+        self.getChild(1).position = self.getChild(1).position.add(args.dp.multiply(0.3));
+        self.getChild(2).position = self.getChild(2).position.add(args.dp.multiply(0.15));
+      }
+    };
+  }
 
   reset() : void {
     // pick three different layers randomly

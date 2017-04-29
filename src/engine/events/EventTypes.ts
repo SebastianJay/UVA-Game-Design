@@ -25,3 +25,10 @@ export class TweenEventArgs extends EventArgs {
   // the Tween object can be found by type casting the src
   constructor () { super(); }
 }
+
+export class CameraScrollEventArgs extends EventArgs {
+  static get ClassName() : string { return "CameraScrollEventArgs"; }
+  constructor(public dp : Vector) {
+    super();
+  }
+}

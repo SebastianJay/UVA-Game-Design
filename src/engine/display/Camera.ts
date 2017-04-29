@@ -1,9 +1,12 @@
 "use strict";
 
 import { DisplayObjectContainer } from './DisplayObjectContainer';
+import { IEventDispatcher, EventDispatcher, EventCallback, EventArgs } from '../events/EventDispatcher';
+import { CameraScrollEventArgs } from '../events/EventTypes';
 import { Vector } from '../util/Vector';
+import { applyMixins } from '../util/mixins';
 
-export class Camera extends DisplayObjectContainer {
+export class Camera extends DisplayObjectContainer implements IEventDispatcher {
   private _screenPosition : Vector; // where the object appears relative to the parent
                                     // real world coordinates can be different to separate collisions
   private _focusIndex : number;  // index of the child that is focus of the camera
@@ -14,6 +17,7 @@ export class Camera extends DisplayObjectContainer {
 
   constructor(id : string){
     super(id, '');
+    this.initDispatcher();
     this._screenPosition = Vector.zero;
     this._focusIndex = -1;
     this._focusThreshold = 0;
@@ -47,6 +51,7 @@ export class Camera extends DisplayObjectContainer {
 
   update(dt : number = 0) : void {
     super.update(dt);
+    var previousPosition = this.screenPosition;
     if (this._focusIndex >= 0 && this._focusIndex < this.children.size()) {
       var child = this.children.get(this._focusIndex);
       var childScreenPos = child.position.x + this.screenPosition.x;
@@ -59,6 +64,9 @@ export class Camera extends DisplayObjectContainer {
       }
     }
     this.boundPosition();
+    if (!this.screenPosition.equals(previousPosition)) {
+      this.dispatchEvent(new CameraScrollEventArgs(this.screenPosition.subtract(previousPosition)));
+    }
   }
 
   draw(g : CanvasRenderingContext2D) : void {
@@ -105,4 +113,11 @@ export class Camera extends DisplayObjectContainer {
         -this.parent.pivotPoint.y * this.parent.unscaledHeight);
     }
   }
+
+  addEventListener : (type : string, callback : EventCallback) => void;
+  removeEventListener : (type : string, callback : EventCallback) => void;
+  hasEventListener : (type : string, callback : EventCallback) => boolean;
+  protected initDispatcher : () => void;
+  protected dispatchEvent : (args : EventArgs) => void;
 }
+applyMixins(Camera, [EventDispatcher]);
