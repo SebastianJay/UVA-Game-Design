@@ -19,11 +19,13 @@ export class BGLayerContainer extends DisplayObjectContainer {
     'CakeWalk/wave_purple.png',
   ];
 
+  private _staticlayer : Sprite;
   private _layers : DisplayObjectContainer[];
 
   constructor(id : string, width : number, height : number) {
     super(id, '');
     // create all possible layers at start
+    this._staticlayer = new Sprite(this.id+'_staticlayer', 'CakeWalk/staticbg.png');
     this._layers = [];
     for (var i = 0; i < BGLayerContainer.LayerAssets.length; i++) {
       this._layers.push(
@@ -38,10 +40,11 @@ export class BGLayerContainer extends DisplayObjectContainer {
   get handleCameraScroll() {
     var self = this;
     return (args : CameraScrollEventArgs) => {
-      if (self.children.length >= 3) {
-        self.getChild(0).position = self.getChild(0).position.add(args.dp.multiply(0.45));
-        self.getChild(1).position = self.getChild(1).position.add(args.dp.multiply(0.3));
-        self.getChild(2).position = self.getChild(2).position.add(args.dp.multiply(0.15));
+      if (self.children.length >= 4) {
+        self.getChild(0).position = self.getChild(0).position.subtract(args.dp);  // keep in same place on screen
+        self.getChild(1).position = self.getChild(1).position.add(args.dp.multiply(0.45));
+        self.getChild(2).position = self.getChild(2).position.add(args.dp.multiply(0.3));
+        self.getChild(3).position = self.getChild(3).position.add(args.dp.multiply(0.15));
       }
     };
   }
@@ -60,8 +63,9 @@ export class BGLayerContainer extends DisplayObjectContainer {
     var child2 = this._layers[indices[ind2]];
     indices.splice(ind2, 1);
 
-    // set three layers as children with right positions and scales
+    // set layers as children with right positions and scales
     // NOTE some magic numbers specific to the game are used here
+    this._staticlayer.position = new Vector(0, 0);
     child0.position = new Vector(0, 120);
     child0.localScale = new Vector(0.6, 0.6);
     child1.position = new Vector(0, 150);
@@ -69,6 +73,7 @@ export class BGLayerContainer extends DisplayObjectContainer {
     child2.position = new Vector(0, 180);
     child2.localScale = new Vector(1, 1);
     this.clearChildren();
+    this.addChild(this._staticlayer);
     this.addChild(child0);
     this.addChild(child1);
     this.addChild(child2);
