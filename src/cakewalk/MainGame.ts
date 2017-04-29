@@ -23,6 +23,7 @@ import { MainGameAction, MainGameState, MainGameColor } from './MainGameEnums';
 import { TimerUI } from './TimerUI';
 import { ScreenTransitionUI } from './ScreenTransitionUI';
 import { MenuUI } from './MenuUI';
+import { BGLayerContainer } from './BGLayerContainer';
 
 export class MainGame extends Game {
 
@@ -38,6 +39,9 @@ export class MainGame extends Game {
   // end1 and end2 are trigger zones that indicate player has reached end of level
   private end1 : TriggerZone;
   private end2 : TriggerZone;
+  // background containers
+  private background1 : BGLayerContainer;
+  private background2 : BGLayerContainer;
 
   // UI elements
   private timerParent : Sprite;
@@ -61,9 +65,11 @@ export class MainGame extends Game {
     this.addChild(new DisplayObjectContainer('root', '')
       .addChild(this.rootEnv = new DisplayObjectContainer('root_env', '')
         .addChild(this.world2 = new Camera('world2')
+          .addChild(this.background2 = new BGLayerContainer('background2', this.width * 4, 200))
           .addChild(this.player2 = new PlayerObject('player2', 'animations/fullblueman.png', MainGameColor.Blue))
           // level environments are inserted here
         ).addChild(this.world1 = new Camera('world1')
+          .addChild(this.background1 = new BGLayerContainer('background1', this.width * 4, 200))
           .addChild(this.player1 = new PlayerObject('player1', 'animations/fullredman.png', MainGameColor.Red))
           // level environments are inserted here
         )
@@ -86,8 +92,8 @@ export class MainGame extends Game {
     this.world2.position = new Vector(1e6, 1e6); // arbitrarily far away, so 2 worlds do not collide
     this.world1.screenPosition = new Vector(0, 0);
     this.world2.screenPosition = new Vector(0, this.height / 2);
-    this.world1.setFocus(0, this.width / 2, this.width);
-    this.world2.setFocus(0, this.width / 2, this.width);
+    this.world1.setFocus(1, this.width / 2, this.width);
+    this.world2.setFocus(1, this.width / 2, this.width);
     this.world1.dimensions = new Vector(this.width, this.height / 2);
     this.world2.dimensions = new Vector(this.width, this.height / 2);
     // players
@@ -175,7 +181,7 @@ export class MainGame extends Game {
 
     if (this.gameState == MainGameState.MenuOpen && !this.menuLock) {
       // if pause is pressed in game it closes the menu (second check is a proxy for "environment is loaded")
-      if (this.getActionInput(MainGameAction.Pause) > 0 && this.world1.children.length > 1) {
+      if (this.getActionInput(MainGameAction.Pause) > 0 && this.world1.children.length > 2) {
         this.closeMenu();
       }
       if (this.getActionInput(MainGameAction.MenuConfirm) > 0) {
@@ -252,12 +258,12 @@ export class MainGame extends Game {
           this.player2.respawnPoint = tmp;
 
           // switch two players in display tree
-          if (this.world1.getChild(0) == this.player1) {
-            this.world2.setChild(this.player1, 0);
-            this.world1.setChild(this.player2, 0);
+          if (this.world1.getChild(1) == this.player1) {
+            this.world2.setChild(this.player1, 1);
+            this.world1.setChild(this.player2, 1);
           } else {
-            this.world1.setChild(this.player1, 0);
-            this.world2.setChild(this.player2, 0);
+            this.world1.setChild(this.player1, 1);
+            this.world2.setChild(this.player2, 1);
           }
         }
       }
@@ -302,14 +308,14 @@ export class MainGame extends Game {
   private loadLevel() {
     // insert new environment into display tree
     var levelParams = LevelFactory.GetLevel(this.gameLevelNumber);
-    this.world1.setChild(levelParams.topLevel, 1);
-    this.world2.setChild(levelParams.bottomLevel, 1);
+    this.world1.setChild(levelParams.topLevel, 2);
+    this.world2.setChild(levelParams.bottomLevel, 2);
     this.end1 = levelParams.topEndZone;
     this.end2 = levelParams.bottomEndZone;
 
     // set player and camera positions
-    this.world1.setChild(this.player1, 0);
-    this.world2.setChild(this.player2, 0);
+    this.world1.setChild(this.player1, 1);
+    this.world2.setChild(this.player2, 1);
     this.player1.position = this.player1.respawnPoint = levelParams.topStartPoint;
     this.player2.position = this.player2.respawnPoint = levelParams.bottomStartPoint;
     this.world1.screenPosition.x = -(this.player1.position.x - this.width / 2);
@@ -322,6 +328,8 @@ export class MainGame extends Game {
     this.timer.gameDuration = levelParams.gameDuration;
     this.player1.reset();
     this.player2.reset();
+    this.background1.reset();
+    this.background2.reset();
     this.rootEnv.active = this.rootEnv.visible = true;
     this.timerParent.active = this.timerParent.visible = true;
   }

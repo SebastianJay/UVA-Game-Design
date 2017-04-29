@@ -25,7 +25,6 @@ export class TiledSpriteContainer extends DisplayObjectContainer {
     var numTiles = this._targetWidth / (imgWidth * scaleRatio);
 
     // this object now becomes a container for others
-    this.localScale = Vector.one;
     for (var i = 0; i < numTiles; i++) {
       this.addChild(c = this._factoryMethod(this.id + '_' + i, this.filename));
       var c;
