@@ -10,7 +10,7 @@ idle:
   startRowPixel: 0
   height: 74
   width: 42
-  numStates: 1
+  numStates: 4
   framesPerState: 12
   endBehavior:
     name: loop

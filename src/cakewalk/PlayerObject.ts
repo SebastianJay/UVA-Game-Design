@@ -99,13 +99,21 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     if (direction < -0.5 && !this._inDeathState) {
       this.addForce(this.moveForce.multiply(-1)
         .multiply(this.velocity.x > this.runningSpeed && this.grounded ? this.reverseFactor : 1));
-        this.animate('walk_left');
       this._currentDirectionRight = false;
+      if (this.grounded) {
+        this.animate('walk_left');
+      } else {
+        this.animate('jump_left');
+      }
     } else if (direction > 0.5 && !this._inDeathState) {
       this.addForce(this.moveForce
         .multiply(this.velocity.x < -this.runningSpeed && this.grounded ? this.reverseFactor : 1));
-        this.animate('walk');
       this._currentDirectionRight = true;
+      if (this.grounded) {
+        this.animate('walk');
+      } else {
+        this.animate('jump');
+      }
     } else {
       if (Math.abs(this.velocity.x) < this.stillSpeed) {
         // effectively moves velocity back to zero
@@ -116,19 +124,11 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
           / Physics.DeltaTime * this.mass, 0));
       }
 
-      if (!this._inDeathState) {
+      if (!this._inDeathState && this.grounded) {
         if (this._currentDirectionRight) {
-          if(this.jumping && !this.grounded){
-            this.animate('jump')
-          }else{
-            this.animate('idle');
-          }
-        } else {
-          if(this.jumping && !this.grounded){
-            this.animate('jump_left')
-          }else{
-            this.animate('idle_left');
-          }    
+          this.animate('idle');
+        } else{
+          this.animate('idle_left');
         }
       }
     }
@@ -143,6 +143,11 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
       this.addForce(new Vector(0, -this.jumpTargetSpeed / Physics.DeltaTime * this.mass)
         .add(Physics.Gravity.multiply(this.mass)));
       this.jumping = true;
+      if (this._currentDirectionRight) {
+        this.animate('jump');
+      } else {
+        this.animate('jump_left');
+      }
     }
   }
 
