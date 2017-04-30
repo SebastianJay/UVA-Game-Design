@@ -39,17 +39,8 @@ export class Flame extends MainGameSprite implements IAnimatedSprite {
     this.addChild(hitbox);
 
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
-    SoundManager.instance.loadSound('burn', 'CakeWalk/music/burn.wav');
-    SoundManager.instance.loadSound('button', 'CakeWalk/music/buttonclick.wav');
-    SoundManager.instance.loadSound('checkpoint', 'CakeWalk/music/checkpoint.wav');
-    SoundManager.instance.loadSound('jump', 'CakeWalk/music/jump.wav');
-    SoundManager.instance.loadSound('loss', 'CakeWalk/music/loss.wav');
-    SoundManager.instance.loadSound('squash', 'CakeWalk/music/squash.wav');
-    SoundManager.instance.loadSound('tada', 'CakeWalk/music/tada.wav');
-    SoundManager.instance.loadSound('thud', 'CakeWalk/music/thud.aiff');
-    SoundManager.instance.loadSound('swap', 'CakeWalk/music/swap.mp3');
-    SoundManager.instance.loadSound('badswap', 'CakeWalk/music/badswap.wav');
-    SoundManager.instance.loadSound('respawn', 'CakeWalk/music/respawn.wav');
+    SoundManager.instance.loadSound('burn', 'CakeWalk/music/burn.mp3');
+
   }
 
   update(dt : number = 0) : void{

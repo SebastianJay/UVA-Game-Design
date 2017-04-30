@@ -61,17 +61,12 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     this.elasticity = 0.0;
     this.terminalSpeeds.x = this.topSpeed;
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
-    SoundManager.instance.loadSound('burn', 'CakeWalk/music/burn.wav');
-    SoundManager.instance.loadSound('button', 'CakeWalk/music/buttonclick.wav');
-    SoundManager.instance.loadSound('checkpoint', 'CakeWalk/music/checkpoint.wav');
-    SoundManager.instance.loadSound('jump', 'CakeWalk/music/jump.wav');
-    SoundManager.instance.loadSound('loss', 'CakeWalk/music/loss.wav');
-    SoundManager.instance.loadSound('squash', 'CakeWalk/music/squash.wav');
-    SoundManager.instance.loadSound('tada', 'CakeWalk/music/tada.wav');
-    SoundManager.instance.loadSound('thud', 'CakeWalk/music/thud.aiff');
+
+    SoundManager.instance.loadSound('jump', 'CakeWalk/music/jump.mp3');
+    SoundManager.instance.loadSound('squash', 'CakeWalk/music/squash.mp3');
+    SoundManager.instance.loadSound('thud', 'CakeWalk/music/thud.mp3');
     SoundManager.instance.loadSound('swap', 'CakeWalk/music/swap.mp3');
-    SoundManager.instance.loadSound('badswap', 'CakeWalk/music/badswap.wav');
-    SoundManager.instance.loadSound('respawn', 'CakeWalk/music/respawn.wav');
+
   }
 
   update(dt : number = 0) : void{
@@ -227,7 +222,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
       self.alpha = 1.0;
     }, this.respawnTime);
 
-    
+
 
   }
 

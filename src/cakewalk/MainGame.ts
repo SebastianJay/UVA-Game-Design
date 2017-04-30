@@ -159,22 +159,16 @@ export class MainGame extends Game {
     // NOTE the bg music ids need to match gameSongs
     SoundManager.instance.loadSound('jacket', 'CakeWalk/music/short_skirt_long_jacket.mp3');
     SoundManager.instance.loadSound('atop', 'CakeWalk/music/atop_a_cake.mp3');
-    SoundManager.instance.loadSound('ocean', 'CakeWalk/music/cake_by_the_ocean.wav');
+    SoundManager.instance.loadSound('ocean', 'CakeWalk/music/cake_by_the_ocean.mp3');
     SoundManager.instance.loadSound('distance', 'CakeWalk/music/the_distance.mp3');
     SoundManager.instance.loadSound('cake', 'CakeWalk/music/cake_martinez.mp3');
     SoundManager.instance.playMusic(this.gameSongs[0]);
 
     //load all sound effects
-    SoundManager.instance.loadSound('burn', 'CakeWalk/music/burn.wav');
-    SoundManager.instance.loadSound('button', 'CakeWalk/music/buttonclick.wav');
-    SoundManager.instance.loadSound('checkpoint', 'CakeWalk/music/checkpoint.wav');
-    SoundManager.instance.loadSound('jump', 'CakeWalk/music/jump.wav');
-    SoundManager.instance.loadSound('loss', 'CakeWalk/music/loss.wav');
-    SoundManager.instance.loadSound('squash', 'CakeWalk/music/squash.wav');
-    SoundManager.instance.loadSound('tada', 'CakeWalk/music/tada.wav');
-    SoundManager.instance.loadSound('thud', 'CakeWalk/music/thud.aiff');
-    SoundManager.instance.loadSound('swap', 'CakeWalk/music/swap.mp3');
-    SoundManager.instance.loadSound('badswap', 'CakeWalk/music/badswap.wav');
+  
+    SoundManager.instance.loadSound('loss', 'CakeWalk/music/loss.mp3');
+    SoundManager.instance.loadSound('tada', 'CakeWalk/music/tada.mp3');
+
 
     // create collision matrix
     // 0 - neutral objects that collide both players
