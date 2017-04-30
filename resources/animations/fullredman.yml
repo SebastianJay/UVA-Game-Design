@@ -34,16 +34,16 @@ jump:
   startRowPixel: 296
   height: 74
   width: 42
-  numStates: 1
-  framesPerState: 100
+  numStates: 4
+  framesPerState: 4
   endBehavior:
-    name: loop
+    name: stayInState
 jump_left:
   startRowPixel: 370
   height: 74
   width: 42
-  numStates: 1
-  framesPerState: 100
+  numStates: 4
+  framesPerState: 4
   endBehavior:
-    name: loop
+    name: stayInState
 default: idle
