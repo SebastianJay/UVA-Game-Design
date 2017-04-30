@@ -15,7 +15,7 @@ import { Rectangle } from '../engine/util/Rectangle';
 import { Vector } from '../engine/util/Vector';
 import { Physics } from '../engine/util/Physics';
 import { applyMixins } from '../engine/util/mixins';
-
+import { SoundManager } from '../engine/sound/SoundManager';
 import { MainGameColor } from './MainGameEnums';
 import { MainGameSprite } from './MainGameSprite';
 
@@ -41,6 +41,8 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   private _canSwap : boolean; // whether the character is able to swap
   private _respawnPoint : Vector;  // if player dies, where to respawn
   private _eventQueue : CollisionEventArgs[]; // for processing multiple collisions in the update loop
+  private gameSoundEffects : string[] = ['burn', 'button', 'checkpoint', 'jump', 'loss', 'squash', 'tada', 'thud', 'swap', 'badswap', 'respawn']; // soundeffects
+
 
   constructor(id: string, filename: string, color : MainGameColor) {
     super(id, filename, color);
@@ -59,6 +61,17 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     this.elasticity = 0.0;
     this.terminalSpeeds.x = this.topSpeed;
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
+    SoundManager.instance.loadSound('burn', 'CakeWalk/music/burn.wav');
+    SoundManager.instance.loadSound('button', 'CakeWalk/music/buttonclick.wav');
+    SoundManager.instance.loadSound('checkpoint', 'CakeWalk/music/checkpoint.wav');
+    SoundManager.instance.loadSound('jump', 'CakeWalk/music/jump.wav');
+    SoundManager.instance.loadSound('loss', 'CakeWalk/music/loss.wav');
+    SoundManager.instance.loadSound('squash', 'CakeWalk/music/squash.wav');
+    SoundManager.instance.loadSound('tada', 'CakeWalk/music/tada.wav');
+    SoundManager.instance.loadSound('thud', 'CakeWalk/music/thud.aiff');
+    SoundManager.instance.loadSound('swap', 'CakeWalk/music/swap.mp3');
+    SoundManager.instance.loadSound('badswap', 'CakeWalk/music/badswap.wav');
+    SoundManager.instance.loadSound('respawn', 'CakeWalk/music/respawn.wav');
   }
 
   update(dt : number = 0) : void{
@@ -75,20 +88,25 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
           }
           if (this._eventQueue[i].normal.x > 0) {
             normalDirs[1] = true;
+            SoundManager.instance.playFX(this.gameSoundEffects[7]);
           }
           if (this._eventQueue[i].normal.y > 0) {
             normalDirs[2] = true;
           }
           if (this._eventQueue[i].normal.x < 0) {
             normalDirs[3] = true;
+            SoundManager.instance.playFX(this.gameSoundEffects[7]);
           }
         }
       }
       if ((normalDirs[0] && normalDirs[2]) || (normalDirs[1] && normalDirs[3])) {
+        SoundManager.instance.playFX(this.gameSoundEffects[5]);
         this.respawn();
+
       }
     }
     this._eventQueue = [];
+
   }
 
   /**
@@ -138,11 +156,14 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   * Called when the player wants the player to jump
   */
   jump() : void {
+    SoundManager.instance.playFX(this.gameSoundEffects[3]);
     if (this.grounded && !this._inDeathState) {
+
       // add force that would equate player's y speed to jumpTargetSpeed
       this.addForce(new Vector(0, -this.jumpTargetSpeed / Physics.DeltaTime * this.mass)
         .add(Physics.Gravity.multiply(this.mass)));
       this.jumping = true;
+
       if (this._currentDirectionRight) {
         this.animate('jump');
       } else {
@@ -165,6 +186,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
 
   /** Called when this player executed a swap */
   didSwap() : void {
+    SoundManager.instance.playFX(this.gameSoundEffects[8]);
     this._canSwap = false;
     CallbackManager.instance.addCallback(() => {
       this._canSwap = true;
@@ -196,6 +218,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
       TweenManager.instance.add(tw = new Tween(this)
         .animate(new TweenParam(TweenAttributeType.Alpha, 1.0, 0.0, this.respawnTime - 0.5, TweenFunctionType.Linear)));
     }
+
     var self = this;
     CallbackManager.instance.addCallback(() => {
       self.position = self.respawnPoint;
@@ -203,6 +226,9 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
       self._inDeathState = false;
       self.alpha = 1.0;
     }, this.respawnTime);
+
+    
+
   }
 
   /** Resets internal state to be what it would be when a level starts */
