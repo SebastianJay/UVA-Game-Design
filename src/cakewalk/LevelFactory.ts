@@ -129,7 +129,7 @@ export class LevelFactory {
    */
   static GetLevel(num : number) {
     if (num == -1) {
-      return LevelFactory.GetLevelThree();
+      return LevelFactory.GetLevelTest();
     } else if (num == 0) {
       return LevelFactory.GetLevelOne();
     } else if (num == 1) {
