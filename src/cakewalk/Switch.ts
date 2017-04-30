@@ -5,10 +5,11 @@ import { Rectangle } from '../engine/util/Rectangle';
 import { CollisionEventArgs, CollisionType } from '../engine/events/EventTypes';
 import { EventDispatcher } from '../engine/events/EventDispatcher';
 import { applyMixins } from '../engine/util/mixins';
-
+import { SoundManager } from '../engine/sound/SoundManager';
 import { PlayerObject } from './PlayerObject';
 import { MainGameColor } from './MainGameEnums';
 import { MainGameSprite } from './MainGameSprite';
+
 
 /**
  * A switch that executes some given callback when pressed or unpressed.
@@ -20,6 +21,8 @@ export class Switch extends MainGameSprite implements IRectCollider {
   private _onExit : (() => void)[];
   private _isPressed : boolean;
   private _eventQueue : CollisionEventArgs[];
+  private gameSoundEffects : string[] = ['burn', 'button', 'checkpoint', 'jump', 'loss', 'squash', 'tada', 'thud', 'swap', 'badswap']; // soundeffects
+
 
   constructor(id: string, filename: string, color : MainGameColor = MainGameColor.Neutral) {
     super(id, filename, color);
@@ -30,6 +33,9 @@ export class Switch extends MainGameSprite implements IRectCollider {
     this._onEnter = [];
     this._onExit = [];
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
+
+    SoundManager.instance.loadSound('button', 'CakeWalk/music/buttonclick.wav');
+    
   }
 
   update(dt : number = 0) : void{
@@ -42,6 +48,7 @@ export class Switch extends MainGameSprite implements IRectCollider {
         for (var i = 0; i < this._onEnter.length; i++) {
           this._onEnter[i]();
         }
+        SoundManager.instance.playFX(this.gameSoundEffects[1]);
         this._isPressed = true;
       } else if (this._isPressed && args.type == CollisionType.Exit) {
         for (var i = 0; i < this._onExit.length; i++) {

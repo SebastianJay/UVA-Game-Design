@@ -8,7 +8,7 @@ import { Rectangle } from '../engine/util/Rectangle';
 import { Vector } from '../engine/util/Vector';
 import { ArrayList } from '../engine/util/ArrayList';
 import { applyMixins } from '../engine/util/mixins';
-
+import { SoundManager } from '../engine/sound/SoundManager';
 import { PlayerObject } from './PlayerObject';
 
 export class Checkpoint extends DisplayObjectContainer implements IRectCollider {
@@ -16,6 +16,8 @@ export class Checkpoint extends DisplayObjectContainer implements IRectCollider 
   // internally this is relative to this object's position
   // but externally (setter and getter) is embeds position info as well
   private _spawnPoint : Vector;
+  private gameSoundEffects : string[] = ['burn', 'button', 'checkpoint', 'jump', 'loss', 'squash', 'tada', 'thud', 'swap', 'badswap']; // soundeffects
+
 
   constructor(id : string) {
     super(id, '');
@@ -23,6 +25,7 @@ export class Checkpoint extends DisplayObjectContainer implements IRectCollider 
     this.isTrigger = true;    // does not alter collider physics
     this._spawnPoint = Vector.zero;
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
+    SoundManager.instance.loadSound('checkpoint', 'CakeWalk/music/checkpoint.wav');
   }
 
   get spawnPoint() : Vector { return this._spawnPoint.add(this.position); }
@@ -38,7 +41,8 @@ export class Checkpoint extends DisplayObjectContainer implements IRectCollider 
         // set the player's respawn point if this point is further along the level
         if (args.type == CollisionType.Enter && self.spawnPoint.x > player.respawnPoint.x) {
           player.respawnPoint = self.spawnPoint;
-          // make noise
+          SoundManager.instance.playFX(this.gameSoundEffects[2]);
+
         }
       }
     }

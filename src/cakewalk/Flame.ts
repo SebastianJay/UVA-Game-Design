@@ -9,7 +9,7 @@ import { DisplayObjectContainer } from '../engine/display/DisplayObjectContainer
 import { Sprite } from '../engine/display/Sprite';
 import { CircleColliderSprite } from '../engine/display/ColliderSprite';
 import { applyMixins } from '../engine/util/mixins';
-
+import { SoundManager } from '../engine/sound/SoundManager';
 import { PlayerObject } from './PlayerObject';
 import { MainGameSprite } from './MainGameSprite';
 import { MainGameColor } from './MainGameEnums';
@@ -20,6 +20,8 @@ import { MainGameColor } from './MainGameEnums';
  */
 export class Flame extends MainGameSprite implements IAnimatedSprite {
   private reflameDuration : number;
+  private gameSoundEffects : string[] = ['burn', 'button', 'checkpoint', 'jump', 'loss', 'squash', 'tada', 'thud', 'swap', 'badswap']; // soundeffects
+
 
   constructor(id : string, filename : string, color : MainGameColor = MainGameColor.Neutral, reflameDuration : number = -1) {
     super(id, filename, color);
@@ -37,6 +39,17 @@ export class Flame extends MainGameSprite implements IAnimatedSprite {
     this.addChild(hitbox);
 
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
+    SoundManager.instance.loadSound('burn', 'CakeWalk/music/burn.wav');
+    SoundManager.instance.loadSound('button', 'CakeWalk/music/buttonclick.wav');
+    SoundManager.instance.loadSound('checkpoint', 'CakeWalk/music/checkpoint.wav');
+    SoundManager.instance.loadSound('jump', 'CakeWalk/music/jump.wav');
+    SoundManager.instance.loadSound('loss', 'CakeWalk/music/loss.wav');
+    SoundManager.instance.loadSound('squash', 'CakeWalk/music/squash.wav');
+    SoundManager.instance.loadSound('tada', 'CakeWalk/music/tada.wav');
+    SoundManager.instance.loadSound('thud', 'CakeWalk/music/thud.aiff');
+    SoundManager.instance.loadSound('swap', 'CakeWalk/music/swap.mp3');
+    SoundManager.instance.loadSound('badswap', 'CakeWalk/music/badswap.wav');
+    SoundManager.instance.loadSound('respawn', 'CakeWalk/music/respawn.wav');
   }
 
   update(dt : number = 0) : void{
@@ -66,7 +79,9 @@ export class Flame extends MainGameSprite implements IAnimatedSprite {
           }
         } else {
           // different color -> flame puts out player
+          SoundManager.instance.playFX(this.gameSoundEffects[0]);
           player.respawn();
+          SoundManager.instance.playFX(this.gameSoundEffects[10]);
         }
       }
     }

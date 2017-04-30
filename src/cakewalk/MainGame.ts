@@ -59,6 +59,7 @@ export class MainGame extends Game {
   private gameLevelNumber : number = 0; // which level players are on
   private gameDuration : number = 100;  // amount of time (seconds) before game over
   private gameSongs : string[] = ['jacket', 'atop', 'ocean', 'distance', 'cake']; // order that songs are played
+  private gameSoundEffects : string[] = ['burn', 'button', 'checkpoint', 'jump', 'loss', 'squash', 'tada', 'thud', 'swap', 'badswap']; // soundeffects
 
   constructor (canvas : HTMLCanvasElement) {
     super("Cakewalk Game", 1280, 720, canvas);
@@ -158,10 +159,22 @@ export class MainGame extends Game {
     // NOTE the bg music ids need to match gameSongs
     SoundManager.instance.loadSound('jacket', 'CakeWalk/music/short_skirt_long_jacket.mp3');
     SoundManager.instance.loadSound('atop', 'CakeWalk/music/atop_a_cake.mp3');
-    SoundManager.instance.loadSound('ocean', 'CakeWalk/music/cake_by_the_ocean.ogg');
+    SoundManager.instance.loadSound('ocean', 'CakeWalk/music/cake_by_the_ocean.wav');
     SoundManager.instance.loadSound('distance', 'CakeWalk/music/the_distance.mp3');
     SoundManager.instance.loadSound('cake', 'CakeWalk/music/cake_martinez.mp3');
     SoundManager.instance.playMusic(this.gameSongs[0]);
+
+    //load all sound effects
+    SoundManager.instance.loadSound('burn', 'CakeWalk/music/burn.wav');
+    SoundManager.instance.loadSound('button', 'CakeWalk/music/buttonclick.wav');
+    SoundManager.instance.loadSound('checkpoint', 'CakeWalk/music/checkpoint.wav');
+    SoundManager.instance.loadSound('jump', 'CakeWalk/music/jump.wav');
+    SoundManager.instance.loadSound('loss', 'CakeWalk/music/loss.wav');
+    SoundManager.instance.loadSound('squash', 'CakeWalk/music/squash.wav');
+    SoundManager.instance.loadSound('tada', 'CakeWalk/music/tada.wav');
+    SoundManager.instance.loadSound('thud', 'CakeWalk/music/thud.aiff');
+    SoundManager.instance.loadSound('swap', 'CakeWalk/music/swap.mp3');
+    SoundManager.instance.loadSound('badswap', 'CakeWalk/music/badswap.wav');
 
     // create collision matrix
     // 0 - neutral objects that collide both players
@@ -230,6 +243,7 @@ export class MainGame extends Game {
       // player 1 running and jumping
       this.player1.run(this.getActionInput(MainGameAction.PlayerOneRun));
       if (this.getActionInput(MainGameAction.PlayerOneJump) > 0) {
+
         this.player1.jump();
       } else if (this.getActionInput(MainGameAction.PlayerOneJumpStop) > 0) {
         this.player1.cancelJump();
@@ -238,6 +252,7 @@ export class MainGame extends Game {
       // player 2 running and jumping
       this.player2.run(this.getActionInput(MainGameAction.PlayerTwoRun));
       if (this.getActionInput(MainGameAction.PlayerTwoJump) > 0) {
+
         this.player2.jump();
       } else if (this.getActionInput(MainGameAction.PlayerTwoJumpStop) > 0) {
         this.player2.cancelJump();
@@ -248,10 +263,13 @@ export class MainGame extends Game {
         var doSwap = 0;
         if (this.getActionInput(MainGameAction.PlayerOneSwap) > 0 && this.player1.canSwap) {
           doSwap = 1;
+
         } else if (this.getActionInput(MainGameAction.PlayerTwoSwap) > 0 && this.player2.canSwap) {
           doSwap = 2;
+
         }
         if (doSwap > 0) {
+
           this.swapLock = true;
           this.rootEnv.active = false;
           this.swapAnimator.burstAnimate(0.5, doSwap == 1);
@@ -278,6 +296,7 @@ export class MainGame extends Game {
 
             // switch two players in display tree
             if (self.world1.getChild(1) == self.player1) {
+
               self.world2.setChild(self.player1, 1);
               self.world1.setChild(self.player2, 1);
             } else {
@@ -286,6 +305,7 @@ export class MainGame extends Game {
             }
           }, 0.5);
         }
+
       }
 
       // opening pause menu
@@ -298,6 +318,7 @@ export class MainGame extends Game {
         // if timer is finished, players lose
         // if both players are alive and in end zone, they win
         if (this.timer.isFinished) {
+          SoundManager.instance.playFX(this.gameSoundEffects[4]);
           this.gameOverLock = true;
           var self = this;
           this.transitionLose.fadeIn(() => {
@@ -308,6 +329,7 @@ export class MainGame extends Game {
           }, 2.0);
         } else if (this.end1.isPlayerInZone && this.end2.isPlayerInZone
             && this.player1.isAlive && this.player2.isAlive) {
+              SoundManager.instance.playFX(this.gameSoundEffects[6]);
           this.gameOverLock = true;
           var self = this;
           this.transitionWin.fadeIn(() => {
@@ -389,6 +411,7 @@ export class MainGame extends Game {
           ? (InputHandler.instance.keyHeld(InputKeyCode.Left) ? -1 : 1) : 0;
       }
     } else if (action == MainGameAction.PlayerOneJump) {
+
       if (InputHandler.instance.gamepadPresent(0)) {
         return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.A) ? 1 : 0;
       } else {
@@ -401,6 +424,7 @@ export class MainGame extends Game {
         return InputHandler.instance.keyUp(InputKeyCode.Up) ? 1 : 0;
       }
     } else if (action == MainGameAction.PlayerOneSwap) {
+
       if (InputHandler.instance.gamepadPresent(0)) {
         return InputHandler.instance.gamepadButtonDown(0, InputGamepadButton.X) ? 1 : 0;
       } else {
@@ -414,6 +438,7 @@ export class MainGame extends Game {
           ? (InputHandler.instance.keyHeld('A') ? -1 : 1) : 0;
       }
     } else if (action == MainGameAction.PlayerTwoJump) {
+
       if (InputHandler.instance.gamepadPresent(1)) {
         return InputHandler.instance.gamepadButtonDown(1, InputGamepadButton.A) ? 1 : 0;
       } else {
@@ -426,6 +451,7 @@ export class MainGame extends Game {
         return InputHandler.instance.keyUp('W') ? 1 : 0;
       }
     } else if (action == MainGameAction.PlayerTwoSwap) {
+
       if (InputHandler.instance.gamepadPresent(1)) {
         return InputHandler.instance.gamepadButtonDown(1, InputGamepadButton.X) ? 1 : 0;
       } else {
