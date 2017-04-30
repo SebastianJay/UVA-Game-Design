@@ -199,13 +199,13 @@ export class DisplayObject {
 	set active(mActive : boolean){ this._active = mActive; }
 	get active() : boolean { return this._active; }
 
-	set position(mPosition: Vector){this._position = mPosition;}
+	set position(mPosition: Vector){this._position = mPosition.clone();}
 	get position() : Vector{return this._position;}
 
-	set pivotPoint(mPivotPoint : Vector){this._pivotPoint = mPivotPoint;}
+	set pivotPoint(mPivotPoint : Vector){this._pivotPoint = mPivotPoint.clone();}
 	get pivotPoint() : Vector{return this._pivotPoint;}
 
-	set localScale(mLocalScale : Vector){this._localScale = mLocalScale;}
+	set localScale(mLocalScale : Vector){this._localScale = mLocalScale.clone();}
 	get localScale() : Vector{return this._localScale;}
 
 	set rotation(mRotation: number){this._rotation = mRotation;}

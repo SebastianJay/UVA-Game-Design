@@ -24,6 +24,7 @@ import { TimerUI } from './TimerUI';
 import { ScreenTransitionUI } from './ScreenTransitionUI';
 import { MenuUI } from './MenuUI';
 import { BGLayerContainer } from './BGLayerContainer';
+import { SwapAnimator } from './SwapAnimator';
 
 export class MainGame extends Game {
 
@@ -48,9 +49,11 @@ export class MainGame extends Game {
   private transitionWin : ScreenTransitionUI;
   private transitionLose : ScreenTransitionUI;
   private menu : MenuUI;
+  private swapAnimator : SwapAnimator;
   private menuLock : boolean;
   private transitionLock : boolean;
   private gameOverLock : boolean;
+  private swapLock : boolean;
 
   private gameState : MainGameState = MainGameState.MenuOpen;
   private gameLevelNumber : number = 0; // which level players are on
@@ -65,11 +68,11 @@ export class MainGame extends Game {
     this.addChild(new DisplayObjectContainer('root', '')
       .addChild(this.rootEnv = new DisplayObjectContainer('root_env', '')
         .addChild(this.world2 = new Camera('world2')
-          .addChild(this.background2 = new BGLayerContainer('background2', this.width * 4, 200))
+          .addChild(this.background2 = new BGLayerContainer('background2', this.width * 5, 200))
           .addChild(this.player2 = new PlayerObject('player2', 'animations/fullblueman.png', MainGameColor.Blue))
           // level environments are inserted here
         ).addChild(this.world1 = new Camera('world1')
-          .addChild(this.background1 = new BGLayerContainer('background1', this.width * 4, 200))
+          .addChild(this.background1 = new BGLayerContainer('background1', this.width * 5, 200))
           .addChild(this.player1 = new PlayerObject('player1', 'animations/fullredman.png', MainGameColor.Red))
           // level environments are inserted here
         )
@@ -78,6 +81,7 @@ export class MainGame extends Game {
           .addChild(new TimerUI('timerUI', 'animations/StopWatchSprite.png', this.gameDuration,
             new Vector(-10, 0), new Vector(961.5, 0))) // x-values found through trial and error
         ).addChild(this.menu = new MenuUI('menuUI', 'CakeWalk/title.png'))
+        .addChild(this.swapAnimator = new SwapAnimator('swapAnimator', this.world1, this.world2, this.player1, this.player2))
         .addChild(this.transitionWin = new ScreenTransitionUI('winTransitionUI', 'CakeWalk/win_screen.png'))
         .addChild(this.transitionLose = new ScreenTransitionUI('loseTransitionUI', 'CakeWalk/lose_screen.png'))
         .addChild(plotScreen = new ScreenTransitionUI('plotScreen', 'CakeWalk/plot_screen.png'))
@@ -148,6 +152,7 @@ export class MainGame extends Game {
     this.menuLock = false;
     this.transitionLock = false;
     this.gameOverLock = false;
+    this.swapLock = false;
 
     // load all sounds and music
     // NOTE the bg music ids need to match gameSongs
@@ -216,8 +221,12 @@ export class MainGame extends Game {
         SoundManager.instance.fadeToNext(this.gameSongs[this.gameLevelNumber % this.gameSongs.length], 1.0);
       }
     } else if (this.gameState == MainGameState.InGame) {
-      // handle input
+      // if swap animation is happening, suspend this update
+      if (this.swapLock) {
+        return;
+      }
 
+      // handle input
       // player 1 running and jumping
       this.player1.run(this.getActionInput(MainGameAction.PlayerOneRun));
       if (this.getActionInput(MainGameAction.PlayerOneJump) > 0) {
@@ -236,37 +245,46 @@ export class MainGame extends Game {
 
       // player swapping
       if (!this.gameOverLock && this.player1.isAlive && this.player2.isAlive) {
-        var doSwap = false;
+        var doSwap = 0;
         if (this.getActionInput(MainGameAction.PlayerOneSwap) > 0 && this.player1.canSwap) {
-          this.player1.didSwap();
-          doSwap = true;
+          doSwap = 1;
         } else if (this.getActionInput(MainGameAction.PlayerTwoSwap) > 0 && this.player2.canSwap) {
-          this.player2.didSwap();
-          doSwap = true;
+          doSwap = 2;
         }
-        if (doSwap) {
-          // swap player attributes
-          var tmp = this.player1.position;
-          this.player1.position = this.player2.position;
-          this.player2.position = tmp;
-          tmp = this.player1.previousPosition;
-          this.player1.previousPosition = this.player2.previousPosition;
-          this.player2.previousPosition = tmp;
-          tmp = this.player1.velocity;
-          this.player1.velocity = this.player2.velocity;
-          this.player2.velocity = tmp;
-          tmp = this.player1.respawnPoint;
-          this.player1.respawnPoint = this.player2.respawnPoint;
-          this.player2.respawnPoint = tmp;
+        if (doSwap > 0) {
+          this.swapLock = true;
+          this.rootEnv.active = false;
+          this.swapAnimator.burstAnimate(0.5, doSwap == 1);
 
-          // switch two players in display tree
-          if (this.world1.getChild(1) == this.player1) {
-            this.world2.setChild(this.player1, 1);
-            this.world1.setChild(this.player2, 1);
-          } else {
-            this.world1.setChild(this.player1, 1);
-            this.world2.setChild(this.player2, 1);
-          }
+          var self = this;
+          CallbackManager.instance.addCallback(() => {
+            self.swapLock = false;
+            self.rootEnv.active = true;
+            (doSwap == 1 ? self.player1 : self.player2).didSwap();
+
+            // swap player attributes
+            var tmp = self.player1.position;
+            self.player1.position = self.player2.position;
+            self.player2.position = tmp;
+            tmp = self.player1.previousPosition;
+            self.player1.previousPosition = self.player2.previousPosition;
+            self.player2.previousPosition = tmp;
+            tmp = self.player1.velocity;
+            self.player1.velocity = self.player2.velocity;
+            self.player2.velocity = tmp;
+            tmp = self.player1.respawnPoint;
+            self.player1.respawnPoint = self.player2.respawnPoint;
+            self.player2.respawnPoint = tmp;
+
+            // switch two players in display tree
+            if (self.world1.getChild(1) == self.player1) {
+              self.world2.setChild(self.player1, 1);
+              self.world1.setChild(self.player2, 1);
+            } else {
+              self.world1.setChild(self.player1, 1);
+              self.world2.setChild(self.player2, 1);
+            }
+          }, 0.5);
         }
       }
 
@@ -285,7 +303,7 @@ export class MainGame extends Game {
           this.transitionLose.fadeIn(() => {
             self.rootEnv.active = false;
             self.timerParent.active = false;
-            self.gameState = MainGameState.EndGameLoss
+            self.gameState = MainGameState.EndGameLoss;
             self.gameOverLock = false;
           }, 2.0);
         } else if (this.end1.isPlayerInZone && this.end2.isPlayerInZone
@@ -295,7 +313,7 @@ export class MainGame extends Game {
           this.transitionWin.fadeIn(() => {
             self.rootEnv.active = false;
             self.timerParent.active = false;
-            self.gameState = MainGameState.EndGameWin
+            self.gameState = MainGameState.EndGameWin;
             self.gameOverLock = false;
           }, 2.0);
         }
