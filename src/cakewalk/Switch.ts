@@ -34,7 +34,7 @@ export class Switch extends MainGameSprite implements IRectCollider {
     this._onExit = [];
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
 
-    SoundManager.instance.loadSound('button', 'CakeWalk/music/buttonclick.mp3');
+    
 
   }
 

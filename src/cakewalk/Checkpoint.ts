@@ -25,7 +25,7 @@ export class Checkpoint extends DisplayObjectContainer implements IRectCollider 
     this.isTrigger = true;    // does not alter collider physics
     this._spawnPoint = Vector.zero;
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
-    SoundManager.instance.loadSound('checkpoint', 'CakeWalk/music/checkpoint.mp3');
+    
   }
 
   get spawnPoint() : Vector { return this._spawnPoint.add(this.position); }

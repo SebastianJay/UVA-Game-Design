@@ -518,9 +518,9 @@ private static GetLevelTwo() : LevelParams {
   c1d.position = new Vector(775,190);
   c2d.position = new Vector(775,190);
   q1a.position = new Vector(800, 0);
-  q1a.spawnPoint = new Vector(800, 40);
+  q1a.spawnPoint = new Vector(800, 0);
   q2a.position = new Vector(800, 0);
-  q2a.spawnPoint = new Vector(800, 40);
+  q2a.spawnPoint = new Vector(800, 0);
 
   //third obstacle
   c1e.position = new Vector(1200,160);

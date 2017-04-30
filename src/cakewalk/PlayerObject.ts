@@ -31,7 +31,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   rampDownFactor : number = 5; // how much to scale down velocity each frame when still (friction)
   rampDownAirFactor : number = 12; // how much to scale down velocity in midair when still (drag)
 
-  respawnTime : number = 3; // how much time elapses from death to respawn
+  respawnTime : number = 2; // how much time elapses from death to respawn
   swapCooldownTime : number = 3; // how much time elapses after player swaps before they can do it again
 
   grounded : boolean;  // whether the player is on the ground
@@ -61,11 +61,8 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     this.elasticity = 0.0;
     this.terminalSpeeds.x = this.topSpeed;
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
+    
 
-    SoundManager.instance.loadSound('jump', 'CakeWalk/music/jump.mp3');
-    SoundManager.instance.loadSound('squash', 'CakeWalk/music/squash.mp3');
-    SoundManager.instance.loadSound('thud', 'CakeWalk/music/thud.mp3');
-    SoundManager.instance.loadSound('swap', 'CakeWalk/music/swap.mp3');
 
   }
 
@@ -151,9 +148,9 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   * Called when the player wants the player to jump
   */
   jump() : void {
-    SoundManager.instance.playFX(this.gameSoundEffects[3]);
-    if (this.grounded && !this._inDeathState) {
 
+    if (this.grounded && !this._inDeathState) {
+      SoundManager.instance.playFX(this.gameSoundEffects[3]);
       // add force that would equate player's y speed to jumpTargetSpeed
       this.addForce(new Vector(0, -this.jumpTargetSpeed / Physics.DeltaTime * this.mass)
         .add(Physics.Gravity.multiply(this.mass)));

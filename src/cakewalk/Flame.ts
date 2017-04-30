@@ -39,7 +39,7 @@ export class Flame extends MainGameSprite implements IAnimatedSprite {
     this.addChild(hitbox);
 
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
-    SoundManager.instance.loadSound('burn', 'CakeWalk/music/burn.mp3');
+    
 
   }
 

@@ -165,9 +165,16 @@ export class MainGame extends Game {
     SoundManager.instance.playMusic(this.gameSongs[0]);
 
     //load all sound effects
-  
+
     SoundManager.instance.loadSound('loss', 'CakeWalk/music/loss.mp3');
     SoundManager.instance.loadSound('tada', 'CakeWalk/music/tada.mp3');
+    SoundManager.instance.loadSound('burn', 'CakeWalk/music/burn.mp3');
+    SoundManager.instance.loadSound('checkpoint', 'CakeWalk/music/checkpoint.mp3');
+    SoundManager.instance.loadSound('jump', 'CakeWalk/music/jump.mp3');
+    SoundManager.instance.loadSound('squash', 'CakeWalk/music/squash.mp3');
+    SoundManager.instance.loadSound('thud', 'CakeWalk/music/thud.mp3');
+    SoundManager.instance.loadSound('swap', 'CakeWalk/music/swap.mp3');
+    SoundManager.instance.loadSound('button', 'CakeWalk/music/buttonclick.mp3');
 
 
     // create collision matrix
