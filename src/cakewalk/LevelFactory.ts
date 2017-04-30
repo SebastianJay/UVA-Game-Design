@@ -129,7 +129,7 @@ export class LevelFactory {
    */
   static GetLevel(num : number) {
     if (num == -1) {
-      return LevelFactory.GetLevelTest();
+      return LevelFactory.GetLevelThree();
     } else if (num == 0) {
       return LevelFactory.GetLevelOne();
     } else if (num == 1) {
@@ -348,7 +348,7 @@ export class LevelFactory {
       bottomEndZone: end2,
       bottomXBounds: [0, 3000],
 
-      gameDuration: 100,
+      gameDuration: 120,
     };
   }
 
@@ -384,7 +384,7 @@ private static GetLevelTwo() : LevelParams {
   // trigger zones for end of level
   var end1: TriggerZone, end2: TriggerZone;
 
-  var env1 = new DisplayObjectContainer('level1_top', '')
+  var env1 = new DisplayObjectContainer('level0_top', '')
     .addChild(b1start = LevelFactory.MakeWall())
     .addChild(b1end = LevelFactory.MakeWall())
     .addChild(c1a = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
@@ -440,7 +440,7 @@ private static GetLevelTwo() : LevelParams {
     .addChild(f1uu= LevelFactory.MakeFlame(MainGameColor.Neutral))
     .addChild(end1 = LevelFactory.MakeEndZone());
 
-  var env2 = new DisplayObjectContainer('level1_bottom', '')
+  var env2 = new DisplayObjectContainer('level0_bottom', '')
     .addChild(b2start = LevelFactory.MakeWall())
     .addChild(b2end = LevelFactory.MakeWall())
     .addChild(c2a = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
@@ -505,8 +505,8 @@ private static GetLevelTwo() : LevelParams {
   b2start.position = new Vector(-50,-500);
   b2end.position = new Vector(3000,-500);
   //first obstacle
-  f1a.position = new Vector(50, 150);
-  f2a.position = new Vector(50, 150);
+  f1a.position = new Vector(50, 220);
+  f2a.position = new Vector(50, 220);
 
   //second obstacle
   c1a.position = new Vector(300,190);
@@ -518,9 +518,9 @@ private static GetLevelTwo() : LevelParams {
   c1d.position = new Vector(775,190);
   c2d.position = new Vector(775,190);
   q1a.position = new Vector(800, 0);
-  q1a.spawnPoint = new Vector(800, 110);
+  q1a.spawnPoint = new Vector(800, 40);
   q2a.position = new Vector(800, 0);
-  q2a.spawnPoint = new Vector(800, 110);
+  q2a.spawnPoint = new Vector(800, 40);
 
   //third obstacle
   c1e.position = new Vector(1200,160);
@@ -635,7 +635,7 @@ private static GetLevelTwo() : LevelParams {
     bottomEndZone: end2,
     bottomXBounds: [0, 3000],
 
-    gameDuration: 100,
+    gameDuration: 120,
   };
 }
 
@@ -663,9 +663,9 @@ private static GetLevelThree() : LevelParams {
     f2bb: Flame, f2cc: Flame, f2dd: Flame, f2ee: Flame, f2ff: Flame, f2gg: Flame, f2hh: Flame,
     f2ii: Flame, f2jj: Flame, f2kk: Flame, f2ll: Flame, f2mm: Flame, f2nn: Flame, f2oo: Flame, f2pp: Flame,
     f2qq: Flame, f2rr: Flame, f2ss: Flame, f2tt: Flame,  f2uu: Flame;
-    var g1a: Gate, g1b: Gate, g1c: Gate,g1d: Gate,g1e: Gate,g1f: Gate;
+    var g1a: Gate, g1b: Gate, g1c: Gate,g1d: Gate,g1e: Gate,g1f: Gate, g1g: Gate;
     var s1a: Switch , s1b: Switch , s1c: Switch , s1d: Switch , s1e: Switch , s1f: Switch ;
-    var g2a: Gate, g2b: Gate, g2c: Gate,g2d: Gate,g2e: Gate,g2f: Gate;
+    var g2a: Gate, g2b: Gate, g2c: Gate,g2d: Gate,g2e: Gate,g2f: Gate, g2g: Gate;
     var s2a: Switch , s2b: Switch , s2c: Switch , s2d: Switch , s2e: Switch , s2f: Switch ;
 
   var q1a: Checkpoint, q1b: Checkpoint;
@@ -673,7 +673,7 @@ private static GetLevelThree() : LevelParams {
   // trigger zones for end of level
   var end1: TriggerZone, end2: TriggerZone;
 
-  var env1 = new DisplayObjectContainer('level2_top', '')
+  var env1 = new DisplayObjectContainer('level0_top', '')
     .addChild(b1start = LevelFactory.MakeWall())
     .addChild(b1end = LevelFactory.MakeWall())
     .addChild(c1a = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
@@ -700,6 +700,7 @@ private static GetLevelThree() : LevelParams {
     .addChild(g1d = LevelFactory.MakeGateHoriz(MainGameColor.Neutral))
     .addChild(g1e = LevelFactory.MakeGateHoriz(MainGameColor.Neutral))
     .addChild(g1f = LevelFactory.MakeGate(MainGameColor.Neutral))
+    .addChild(g1g = LevelFactory.MakeGate(MainGameColor.Neutral))
     //.addChild(f1a = LevelFactory.MakeFlame(MainGameColor.Blue))
     .addChild(f1b = LevelFactory.MakeFlame(MainGameColor.Neutral))
     .addChild(f1c = LevelFactory.MakeFlame(MainGameColor.Neutral))
@@ -721,11 +722,11 @@ private static GetLevelThree() : LevelParams {
     .addChild(f1s = LevelFactory.MakeFlame(MainGameColor.Neutral))
     .addChild(f1t = LevelFactory.MakeFlame(MainGameColor.Neutral))
     .addChild(f1u = LevelFactory.MakeFlame(MainGameColor.Neutral))
-    .addChild(f1bb = LevelFactory.MakeFlame(MainGameColor.Neutral))
-    .addChild(f1cc = LevelFactory.MakeFlame(MainGameColor.Neutral))
-    .addChild(f1dd = LevelFactory.MakeFlame(MainGameColor.Neutral))
-    .addChild(f1ee = LevelFactory.MakeFlame(MainGameColor.Neutral))
-    .addChild(f1ff = LevelFactory.MakeFlame(MainGameColor.Neutral))
+    .addChild(f1bb = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f1cc = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f1dd = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f1ee = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f1ff = LevelFactory.MakeFlame(MainGameColor.Red))
     .addChild(c1h = LevelFactory.MakeCandle(MainGameColor.Red))
     /*.addChild(f1gg = LevelFactory.MakeFlame(MainGameColor.Red))
     .addChild(f1hh = LevelFactory.MakeFlame(MainGameColor.Neutral))
@@ -744,7 +745,7 @@ private static GetLevelThree() : LevelParams {
     .addChild(f1uu= LevelFactory.MakeFlame(MainGameColor.Neutral))*/
     .addChild(end1 = LevelFactory.MakeEndZone());
 
-  var env2 = new DisplayObjectContainer('level2_bottom', '')
+  var env2 = new DisplayObjectContainer('level0_bottom', '')
     .addChild(b2start = LevelFactory.MakeWall())
     .addChild(b2end = LevelFactory.MakeWall())
     .addChild(c2a = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
@@ -770,6 +771,7 @@ private static GetLevelThree() : LevelParams {
     .addChild(g2d = LevelFactory.MakeGateHoriz(MainGameColor.Neutral))
     .addChild(g2e = LevelFactory.MakeGateHoriz(MainGameColor.Neutral))
     .addChild(g2f = LevelFactory.MakeGate(MainGameColor.Neutral))
+    .addChild(g2g = LevelFactory.MakeGate(MainGameColor.Neutral))
     //.addChild(f2a = LevelFactory.MakeFlame(MainGameColor.Red))
     .addChild(f2b = LevelFactory.MakeFlame(MainGameColor.Neutral))
     .addChild(f2c = LevelFactory.MakeFlame(MainGameColor.Neutral))
@@ -791,11 +793,11 @@ private static GetLevelThree() : LevelParams {
     .addChild(f2s = LevelFactory.MakeFlame(MainGameColor.Neutral))
     .addChild(f2t = LevelFactory.MakeFlame(MainGameColor.Neutral))
     .addChild(f2u = LevelFactory.MakeFlame(MainGameColor.Neutral))
-    .addChild(f2bb = LevelFactory.MakeFlame(MainGameColor.Neutral))
-    .addChild(f2cc = LevelFactory.MakeFlame(MainGameColor.Neutral))
-    .addChild(f2dd = LevelFactory.MakeFlame(MainGameColor.Neutral))
-    .addChild(f2ee = LevelFactory.MakeFlame(MainGameColor.Neutral))
-    .addChild(f2ff = LevelFactory.MakeFlame(MainGameColor.Neutral))
+    .addChild(f2bb = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f2cc = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f2dd = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f2ee = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f2ff = LevelFactory.MakeFlame(MainGameColor.Blue))
     .addChild(c2h = LevelFactory.MakeCandle(MainGameColor.Blue))
     /*.addChild(f2gg = LevelFactory.MakeFlame(MainGameColor.Blue))
     .addChild(f2hh = LevelFactory.MakeFlame(MainGameColor.Neutral))
@@ -825,17 +827,23 @@ private static GetLevelThree() : LevelParams {
   //first obstacle
   c1a.position = new Vector(0,130);
   c2a.position = new Vector(0,130);
-  g1a.restPosition = g1a.position = new Vector(200, 15);
-  g1a.targetPosition = g1a.position.add(new Vector(800, 15));
-  g2a.restPosition = g2a.position = new Vector(200, 15);
-  g2a.targetPosition = g2a.position.add(new Vector(800, 15));
+  g1a.restPosition = g1a.position = new Vector(300, 0);
+  g1a.targetPosition = g1a.position.add(new Vector(950, 0));
+  g2a.restPosition = g2a.position = new Vector(300, 0);
+  g2a.targetPosition = g2a.position.add(new Vector(950, 0));
+  g1g.restPosition = g1g.position = new Vector(600, 91);
+  g1g.targetPosition = g1g.position.add(new Vector(0, 200));
+  g2g.restPosition = g2g.position = new Vector(600, 91);
+  g2g.targetPosition = g2g.position.add(new Vector(0, 200));
 
-  s1a.position = new Vector(200,200);
+  s1a.position = new Vector(300,185);
   s1a.localScale = new Vector(0.28, 0.28);
-  s2a.position = new Vector(200,200);
+  s2a.position = new Vector(300,185);
   s2a.localScale = new Vector(0.28, 0.28);
-  g1a.syncSwitch(s2a);
-  g2a.syncSwitch(s1a);
+  g1a.syncSwitch(s1a);
+  g2a.syncSwitch(s2a);
+  g1g.syncSwitch(s1a);
+  g2g.syncSwitch(s2a);
   q1a.position = new Vector(680, 0);
   q1a.spawnPoint = new Vector(680, 50);
   q2a.position = new Vector(680, 0);
@@ -874,41 +882,41 @@ private static GetLevelThree() : LevelParams {
   g1e.targetPosition = g1e.position.add(new Vector(-200, 190));
   g2e.restPosition = g2e.position = new Vector(1700, 20);
   g2e.targetPosition = g2e.position.add(new Vector(-200, 190));
-  g1f.restPosition = g1f.position = new Vector(2098, 190);
+  g1f.restPosition = g1f.position = new Vector(2098, 180);
   g1f.targetPosition = g1f.position.add(new Vector(-200, 0));
-  g2f.restPosition = g2f.position = new Vector(2098, 190);
+  g2f.restPosition = g2f.position = new Vector(2098, 180);
   g2f.targetPosition = g2f.position.add(new Vector(-200, 0));
   c1g.position = new Vector(1900, 20);
   c2g.position = new Vector(1900, 20);
-  c1h.position = new Vector(2100,190);
-  c2h.position = new Vector(2100,190);
-  s1b.position = new Vector(1150,195);
+  c1h.position = new Vector(2100,180);
+  c2h.position = new Vector(2100,180);
+  s1b.position = new Vector(1150,190);
   s1b.localScale = new Vector(0.28, 0.28);
-  s2b.position = new Vector(1150,195);
+  s2b.position = new Vector(1150,190);
   s2b.localScale = new Vector(0.28, 0.28);
   g1b.syncSwitch(s2b);
   g2b.syncSwitch(s1b);
-  s1c.position = new Vector(1350,195);
+  s1c.position = new Vector(1350,190);
   s1c.localScale = new Vector(0.28, 0.28);
-  s2c.position = new Vector(1350,195);
+  s2c.position = new Vector(1350,190);
   s2c.localScale = new Vector(0.28, 0.28);
   g1c.syncSwitch(s1c);
   g2c.syncSwitch(s2c);
-  s1d.position = new Vector(1550,195);
+  s1d.position = new Vector(1550,190);
   s1d.localScale = new Vector(0.28, 0.28);
-  s2d.position = new Vector(1550,195);
+  s2d.position = new Vector(1550,190);
   s2d.localScale = new Vector(0.28, 0.28);
   g1d.syncSwitch(s2e);
   g2d.syncSwitch(s1e);
-  s1e.position = new Vector(1750,195);
+  s1e.position = new Vector(1750,190);
   s1e.localScale = new Vector(0.28, 0.28);
-  s2e.position = new Vector(1750,195);
+  s2e.position = new Vector(1750,190);
   s2e.localScale = new Vector(0.28, 0.28);
   g1e.syncSwitch(s2d);
   g2e.syncSwitch(s1d);
-  s1f.position = new Vector(1950,195);
+  s1f.position = new Vector(1950,190);
   s1f.localScale = new Vector(0.28, 0.28);
-  s2f.position = new Vector(1950,195);
+  s2f.position = new Vector(1950,190);
   s2f.localScale = new Vector(0.28, 0.28);
   g1f.syncSwitch(s1f);
   g2f.syncSwitch(s2f);
@@ -995,6 +1003,7 @@ private static GetLevelThree() : LevelParams {
     gameDuration: 100,
   };
 }
+
 
 private static GetLevelTest() : LevelParams {
   var tg1a : TimedGate, tg1b : TimedGate, tg2a : TimedGate, tg2b : TimedGate;
