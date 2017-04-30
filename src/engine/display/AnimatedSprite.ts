@@ -100,7 +100,7 @@ export abstract class AnimatedSpriteBase extends Sprite {
             this._isReversed = !this._isReversed;
             break;
           case 'stayInState':
-            this._currentState = this.getCurrentConfig().endBehavior.arg;
+            this._currentState = this.getCurrentConfig().numStates-1;
             this._isStuck = true;
           default:
             console.log("unrecognized animation end behavior: "
