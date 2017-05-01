@@ -94,7 +94,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
       }
       if ((normalDirs[0] && normalDirs[2]) || (normalDirs[1] && normalDirs[3])) {
         SoundManager.instance.playFX(this.gameSoundEffects[5]);
-        this.respawn();
+        this.respawn('squash');
 
       }
     }
@@ -206,6 +206,12 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     if (reason != null) {
       if(reason == 'fire'){
         this.animate('burn')
+        var tw : Tween;
+        TweenManager.instance.add(tw = new Tween(this)
+          .animate(new TweenParam(TweenAttributeType.Alpha, 1.0, 0.0, this.respawnTime - 0.5, TweenFunctionType.Linear)));
+      }
+      if(reason == 'squash'){
+        this.animate('squash')
         var tw : Tween;
         TweenManager.instance.add(tw = new Tween(this)
           .animate(new TweenParam(TweenAttributeType.Alpha, 1.0, 0.0, this.respawnTime - 0.5, TweenFunctionType.Linear)));
