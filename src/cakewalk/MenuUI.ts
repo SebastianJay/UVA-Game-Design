@@ -25,7 +25,7 @@ export class MenuUI extends Sprite {
     // add display tree of option text and cursor
     var t0 : TextObject, t1 : TextObject, t2 : TextObject,
       t3 : TextObject, t4 : TextObject, t5 : TextObject, t6 : TextObject,
-      t7 : TextObject, t8 : TextObject, t9 : TextObject, t10 : TextObject, t11 : TextObject;
+      t7 : TextObject, t8 : TextObject, t9 : TextObject, t10 : TextObject, t11 : TextObject, t12 : TextObject;
     var tn0 : TextObject, tn1 : TextObject, tn2 : TextObject,
       tn3 : TextObject, tn4 : TextObject, tn5 : TextObject, tn6 : TextObject, tn7 : TextObject;
     this.addChild(this._cursor = new Sprite(id+'_cursor', 'CakeWalk/cake2.png'))
@@ -47,6 +47,7 @@ export class MenuUI extends Sprite {
         .addChild(t7 = new TextObject(id+'_t7'))
         .addChild(t8 = new TextObject(id+'_t8'))
         .addChild(t9 = new TextObject(id+'_t9'))
+        .addChild(t12 = new TextObject(id+'_t12'))
         .addChild(t10 = new TextObject(id+'_t10'))
       )
     ).addChild(new DisplayObjectContainer(id+'_credits', '')
@@ -79,11 +80,13 @@ export class MenuUI extends Sprite {
     t6.position = new Vector(1280 / 2 - 100, 550);
     t6.text = 'Go Back';
     t7.position = new Vector(1280 / 2 - 100, 350);
-    t7.text = 'One (Short)';
+    t7.text = 'Short';
     t8.position = new Vector(1280 / 2 - 100, 400);
-    t8.text = 'Two (Pound)';
+    t8.text = 'Pound';
     t9.position = new Vector(1280 / 2 - 100, 450);
-    t9.text = 'Three (Cheese)';
+    t9.text = 'Cheese';
+    t12.position = new Vector(1280 / 2 - 100, 500);
+    t12.text = 'Sponge';
     t10.position = new Vector(1280 / 2 - 100, 550);
     t10.text = 'Go Back';
 
@@ -104,7 +107,7 @@ export class MenuUI extends Sprite {
     tn7.position = new Vector(1280 / 2 - 250, 475);
     tn7.text = 'Cake - Melanie Martinez, arranged by ZaneDobler';
 
-    [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, tn0, tn1, tn2].map((t : TextObject) => {
+    [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, tn0, tn1, tn2].map((t : TextObject) => {
       t.color = new Vector(0, 0, 0);
       t.fontSize = 48;
       t.fontFamily = 'Sanchez';
@@ -181,7 +184,7 @@ export class MenuUI extends Sprite {
       }
     } else if (this._menuIndex == 2) {
       // level select
-      if (this._optionIndex == 3) {
+      if (this._optionIndex == 4) {
         this.menuChange(0);
       } else {
         // start level with given index

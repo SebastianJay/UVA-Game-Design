@@ -1,5 +1,6 @@
 "use strict";
 
+import { DisplayObject } from '../engine/display/DisplayObject';
 import { DisplayObjectContainer } from '../engine/display/DisplayObjectContainer';
 import { TiledSpriteContainer } from '../engine/display/TiledSpriteContainer';
 import { Sprite } from '../engine/display/Sprite';
@@ -92,6 +93,11 @@ export class LevelFactory {
       c == MainGameColor.Neutral ? 'CakeWalk/YellowCandle.png'
       : (c == MainGameColor.Red ? 'CakeWalk/RedCandle.png' : 'CakeWalk/BlueCandle.png'), halfCycleTime, c);
   }
+  private static MakeTimedGateHoriz(c : MainGameColor = MainGameColor.Neutral, halfCycleTime : number) : TimedGate {
+    return new TimedGate('gate' + LevelFactory.Counter,
+      c == MainGameColor.Neutral ? 'CakeWalk/YellowCandleRotated.png'
+      : (c == MainGameColor.Red ? 'CakeWalk/RedCandleRotated.png' : 'CakeWalk/BlueCandleRotated.png'), halfCycleTime, c);
+  }
 
   private static MakeFlame(c : MainGameColor = MainGameColor.Neutral) : Flame {
     return new Flame('flame' + LevelFactory.Counter,
@@ -139,8 +145,10 @@ export class LevelFactory {
       return LevelFactory.GetLevelOne();
     } else if (num == 1) {
       return LevelFactory.GetLevelTwo();
-    } else {
+    } else if (num == 2) {
       return LevelFactory.GetLevelThree();
+    } else {
+      return LevelFactory.GetLevelFour();
     }
   }
 
@@ -1013,6 +1021,338 @@ private static GetLevelThree() : LevelParams {
   };
 }
 
+
+private static GetLevelFour() : LevelParams {
+
+  var b1start: Platform, b2start: Platform, b1end: Platform, b2end: Platform;
+  var p1 : TiledSpriteContainer, p2 : TiledSpriteContainer;
+  var end1 : TriggerZone, end2 : TriggerZone;
+  // naming convention: object, world, order
+  // object: c = candle, f = flame, g = gate, s = switch, q = checkpoint
+  // world: 1 = world 1, 2 = world 2
+  // order: from leftmost to right most type of that object a,b,c, etc.  after z it will go aa, ab, ac
+  var c1a, c1b, c1c, c1d;
+  var c2a, c2b, c2c, c2d;
+  var g1a, g1b, g1c, g1d, g1e, g1f, g1g, g1h, g1i, g1j, g1k, g1l, g1m, g1n, g1o;
+  var s1a;
+  var g2a, g2b, g2c, g2d, g2e, g2f, g2g, g2h, g2i, g2j, g2k, g2l, g2m;
+  var s2a, s2b, s2c;
+  var q1a, q1b;
+  var q2a, q2b;
+  var f1a, f1b, f1c, f1d, f1e, f1f, f1g, f1h,
+      f1i, f1j, f1k, f1l, f1m, f1n, f1o, f1p,
+      f1q, f1r, f1s, f1t, f1u, f1v, f1w, f1x,
+      f1y, f1z, f1aa, f1ab, f1ac, f1ad, f1ae, f1af;
+  var f2a, f2b, f2c, f2d, f2e, f2f, f2g, f2h,
+      f2i, f2j, f2k, f2l, f2m, f2n, f2o, f2p,
+      f2q, f2r, f2s, f2t, f2u, f2v, f2w, f2x,
+      f2y, f2z, f2aa, f2ab, f2ac, f2ad, f2ae, f2af;
+
+  var env1 = new DisplayObjectContainer('level3_top', '')
+    .addChild(b1start = LevelFactory.MakeWall())
+    .addChild(b1end = LevelFactory.MakeWall())
+    .addChild(g1a = LevelFactory.MakeGate(MainGameColor.Neutral))
+    .addChild(g1b = LevelFactory.MakeGate(MainGameColor.Neutral))
+    .addChild(g1c = LevelFactory.MakeGate(MainGameColor.Neutral))
+    .addChild(s1a = LevelFactory.MakeSwitch(MainGameColor.Red))
+    .addChild(c1a = LevelFactory.MakeCandle(MainGameColor.Red))
+    .addChild(c1b = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(c1c = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(g1d = LevelFactory.MakeTimedGateHoriz(MainGameColor.Blue, 3.0))
+    .addChild(g1e = LevelFactory.MakeTimedGateHoriz(MainGameColor.Red, 3.0))
+    .addChild(g1f = LevelFactory.MakeTimedGateHoriz(MainGameColor.Blue, 3.0))
+    .addChild(g1g = LevelFactory.MakeTimedGateHoriz(MainGameColor.Red, 3.0))
+    .addChild(g1h = LevelFactory.MakeTimedGate(MainGameColor.Red, 2.5))
+    .addChild(g1i = LevelFactory.MakeTimedGate(MainGameColor.Blue, 2.5))
+    .addChild(g1j = LevelFactory.MakeTimedGate(MainGameColor.Blue, 2.0))
+    .addChild(g1k = LevelFactory.MakeTimedGate(MainGameColor.Red, 2.0))
+    .addChild(g1l = LevelFactory.MakeTimedGate(MainGameColor.Red, 1.5))
+    .addChild(g1m = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 1.5))
+    .addChild(g1n = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 1.0))
+    .addChild(g1o = LevelFactory.MakeTimedGate(MainGameColor.Blue, 1.0))
+    .addChild(q1a = LevelFactory.MakeCheckpoint())
+    .addChild(q1b = LevelFactory.MakeCheckpoint())
+    .addChild(p1 = LevelFactory.MakeGround(4000, 80))
+    .addChild(f1a = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f1b = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f1c = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f1d = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f1e = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f1f = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f1g = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f1h = LevelFactory.MakeFlame(MainGameColor.Red))
+
+    .addChild(f1i = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f1j = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f1k = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f1l = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f1m = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f1n = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f1o = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f1p = LevelFactory.MakeFlame(MainGameColor.Blue))
+
+    .addChild(f1q = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f1r = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f1s = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f1t = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f1u = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f1v = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f1w = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f1x = LevelFactory.MakeFlame(MainGameColor.Red))
+
+    .addChild(f1y = LevelFactory.MakeFlame(MainGameColor.Neutral))
+    .addChild(f1z = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f1aa = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f1ab = LevelFactory.MakeFlame(MainGameColor.Neutral))
+    .addChild(f1ac = LevelFactory.MakeFlame(MainGameColor.Neutral))
+    .addChild(f1ad = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f1ae = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f1af = LevelFactory.MakeFlame(MainGameColor.Neutral))
+
+    .addChild(end1 = LevelFactory.MakeEndZone());
+
+  var env2 = new DisplayObjectContainer('level3_bottom', '')
+    .addChild(b2start = LevelFactory.MakeWall())
+    .addChild(b2end = LevelFactory.MakeWall())
+    .addChild(s2a = LevelFactory.MakeSwitch(MainGameColor.Blue))
+    .addChild(s2b = LevelFactory.MakeSwitch(MainGameColor.Red))
+    .addChild(s2c = LevelFactory.MakeSwitch(MainGameColor.Blue))
+    .addChild(g2a = LevelFactory.MakeGate(MainGameColor.Neutral))
+    .addChild(g2b = LevelFactory.MakeTimedGateHoriz(MainGameColor.Red, 3.0))
+    .addChild(g2c = LevelFactory.MakeTimedGateHoriz(MainGameColor.Blue, 3.0))
+    .addChild(g2d = LevelFactory.MakeTimedGateHoriz(MainGameColor.Red, 3.0))
+    .addChild(g2e = LevelFactory.MakeTimedGateHoriz(MainGameColor.Blue, 3.0))
+    .addChild(g2f = LevelFactory.MakeTimedGate(MainGameColor.Red, 2.5))
+    .addChild(g2g = LevelFactory.MakeTimedGate(MainGameColor.Blue, 2.5))
+    .addChild(g2h = LevelFactory.MakeTimedGate(MainGameColor.Blue, 2.0))
+    .addChild(g2i = LevelFactory.MakeTimedGate(MainGameColor.Red, 2.0))
+    .addChild(g2j = LevelFactory.MakeTimedGate(MainGameColor.Red, 1.5))
+    .addChild(g2k = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 1.5))
+    .addChild(g2l = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 1.0))
+    .addChild(g2m = LevelFactory.MakeTimedGate(MainGameColor.Blue, 1.0))
+    .addChild(q2a = LevelFactory.MakeCheckpoint())
+    .addChild(q2b = LevelFactory.MakeCheckpoint())
+    .addChild(p2 = LevelFactory.MakeGround(4000, 80))
+    .addChild(f2a = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f2b = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f2c = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f2d = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f2e = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f2f = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f2g = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f2h = LevelFactory.MakeFlame(MainGameColor.Blue))
+
+    .addChild(f2i = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f2j = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f2k = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f2l = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f2m = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f2n = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f2o = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f2p = LevelFactory.MakeFlame(MainGameColor.Red))
+
+    .addChild(f2q = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f2r = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f2s = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f2t = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f2u = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f2v = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f2w = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f2x = LevelFactory.MakeFlame(MainGameColor.Blue))
+
+    .addChild(f2y = LevelFactory.MakeFlame(MainGameColor.Neutral))
+    .addChild(f2z = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f2aa = LevelFactory.MakeFlame(MainGameColor.Blue))
+    .addChild(f2ab = LevelFactory.MakeFlame(MainGameColor.Neutral))
+    .addChild(f2ac = LevelFactory.MakeFlame(MainGameColor.Neutral))
+    .addChild(f2ad = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f2ae = LevelFactory.MakeFlame(MainGameColor.Red))
+    .addChild(f2af = LevelFactory.MakeFlame(MainGameColor.Neutral))
+
+    .addChild(end2 = LevelFactory.MakeEndZone());
+
+  // ground
+  p1.position = new Vector(-200, 280);
+  p2.position = new Vector(-200, 280);
+  // invisible walls
+  b1start.position = new Vector(-50,-500);
+  b1end.position = new Vector(3000,-500);
+  b2start.position = new Vector(-50,-500);
+  b2end.position = new Vector(3000,-500);
+  // trigger zones
+  end1.position = new Vector(2850, 0);
+  end1.dimensions = new Vector(200, 300);
+  end2.position = new Vector(2850, 0);
+  end2.dimensions = new Vector(200, 300);
+  // puzzle 1
+  g1a.position = g1a.restPosition = new Vector(150, 152);
+  g1a.targetPosition = g1a.position.add(new Vector(0, -90));
+  g1b.position = g1b.restPosition = new Vector(250, 152);
+  g1b.targetPosition = g1b.position.add(new Vector(0, -90));
+  g1c.position = g1c.restPosition = new Vector(350, 152);
+  g1c.targetPosition = g1c.position.add(new Vector(0, -90));
+  s2a.position = new Vector(150, 244);
+  g1a.syncSwitch(s2a);
+  g1a.syncSwitch(s2b);
+  s2b.position = new Vector(250, 244);
+  g1b.syncSwitch(s2a);
+  g1b.syncSwitch(s2c);
+  s2c.position = new Vector(350, 244);
+  g1c.syncSwitch(s2b);
+  g1c.syncSwitch(s2c);
+  g2a.position = g2a.restPosition = new Vector(700, 152);
+  g2a.targetPosition = g2a.position.add(new Vector(0, -90));
+  s1a.position = new Vector(50, 50);
+  g2a.syncSwitch(s1a);
+  c1a.position = new Vector(450, 200);
+  c1b.position = new Vector(600, 152);
+  c1c.position = new Vector(632, 200);
+  // checkpoint
+  q1a.position = new Vector(800, 0);
+  q1a.spawnPoint = new Vector(800, 200);
+  q2a.position = new Vector(800, 0);
+  q2a.spawnPoint = new Vector(800, 200);
+  // puzzle 2
+  f1a.position = new Vector(900, 0);
+  f1b.position = new Vector(950, 0);
+  f1c.position = new Vector(1000, 0);
+  f1d.position = new Vector(1050, 0);
+  f1e.position = new Vector(900, 216);
+  f1f.position = new Vector(950, 216);
+  f1g.position = new Vector(1000, 216);
+  f1h.position = new Vector(1050, 216);
+  g1d.position = g1d.restPosition = new Vector(940, 200);
+  g1d.targetPosition = g1d.position.add(new Vector(0, -136));
+  f1i.position = new Vector(1100, 0);
+  f1j.position = new Vector(1150, 0);
+  f1k.position = new Vector(1200, 0);
+  f1l.position = new Vector(1250, 0);
+  f1m.position = new Vector(1100, 216);
+  f1n.position = new Vector(1150, 216);
+  f1o.position = new Vector(1200, 216);
+  f1p.position = new Vector(1250, 216);
+  g1e.position = g1e.restPosition = new Vector(1140, 200);
+  g1e.targetPosition = g1e.position.add(new Vector(0, -136));
+  f1q.position = new Vector(1300, 0);
+  f1r.position = new Vector(1350, 0);
+  f1s.position = new Vector(1400, 0);
+  f1t.position = new Vector(1450, 0);
+  f1u.position = new Vector(1300, 216);
+  f1v.position = new Vector(1350, 216);
+  f1w.position = new Vector(1400, 216);
+  f1x.position = new Vector(1450, 216);
+  g1f.position = g1f.restPosition = new Vector(1340, 200);
+  g1f.targetPosition = g1f.position.add(new Vector(0, -136));
+  f1y.position = new Vector(1500, 0);
+  f1z.position = new Vector(1550, 0);
+  f1aa.position = new Vector(1600, 0);
+  f1ab.position = new Vector(1650, 0);
+  f1ac.position = new Vector(1500, 216);
+  f1ad.position = new Vector(1550, 216);
+  f1ae.position = new Vector(1600, 216);
+  f1af.position = new Vector(1650, 216);
+  g1g.position = g1g.restPosition = new Vector(1540, 200);
+  g1g.targetPosition = g1g.position.add(new Vector(0, -136));
+
+  f2a.position = new Vector(900, 0);
+  f2b.position = new Vector(950, 0);
+  f2c.position = new Vector(1000, 0);
+  f2d.position = new Vector(1050, 0);
+  f2e.position = new Vector(900, 216);
+  f2f.position = new Vector(950, 216);
+  f2g.position = new Vector(1000, 216);
+  f2h.position = new Vector(1050, 216);
+  g2b.position = g2b.restPosition = new Vector(940, 200);
+  g2b.targetPosition = g2b.position.add(new Vector(0, -136));
+  f2i.position = new Vector(1100, 0);
+  f2j.position = new Vector(1150, 0);
+  f2k.position = new Vector(1200, 0);
+  f2l.position = new Vector(1250, 0);
+  f2m.position = new Vector(1100, 216);
+  f2n.position = new Vector(1150, 216);
+  f2o.position = new Vector(1200, 216);
+  f2p.position = new Vector(1250, 216);
+  g2c.position = g2c.restPosition = new Vector(1140, 200);
+  g2c.targetPosition = g2c.position.add(new Vector(0, -136));
+  f2q.position = new Vector(1300, 0);
+  f2r.position = new Vector(1350, 0);
+  f2s.position = new Vector(1400, 0);
+  f2t.position = new Vector(1450, 0);
+  f2u.position = new Vector(1300, 216);
+  f2v.position = new Vector(1350, 216);
+  f2w.position = new Vector(1400, 216);
+  f2x.position = new Vector(1450, 216);
+  g2d.position = g2d.restPosition = new Vector(1340, 200);
+  g2d.targetPosition = g2d.position.add(new Vector(0, -136));
+  f2y.position = new Vector(1500, 0);
+  f2z.position = new Vector(1550, 0);
+  f2aa.position = new Vector(1600, 0);
+  f2ab.position = new Vector(1650, 0);
+  f2ac.position = new Vector(1500, 216);
+  f2ad.position = new Vector(1550, 216);
+  f2ae.position = new Vector(1600, 216);
+  f2af.position = new Vector(1650, 216);
+  g2e.position = g2e.restPosition = new Vector(1540, 200);
+  g2e.targetPosition = g2e.position.add(new Vector(0, -136));
+  // checkpoint 2
+  q1b.position = new Vector(1800, 0);
+  q1b.spawnPoint = new Vector(1800, 200);
+  q2b.position = new Vector(1800, 0);
+  q2b.spawnPoint = new Vector(1800, 200);
+
+  // puzzle 3
+  g1h.position = g1h.restPosition = new Vector(2000, -50);
+  g1h.targetPosition = g1h.position.add(new Vector(0, 50));
+  g1i.position = g1i.restPosition = new Vector(2000, 200);
+  g1i.targetPosition = g1i.position.add(new Vector(0, -50));
+  g1j.position = g1j.restPosition = new Vector(2200, -50);
+  g1j.targetPosition = g1j.position.add(new Vector(0, 50));
+  g1k.position = g1k.restPosition = new Vector(2200, 200);
+  g1k.targetPosition = g1k.position.add(new Vector(0, -50));
+  g1l.position = g1l.restPosition = new Vector(2400, -50);
+  g1l.targetPosition = g1l.position.add(new Vector(0, 50));
+  g1m.position = g1m.restPosition = new Vector(2400, 200);
+  g1m.targetPosition = g1m.position.add(new Vector(0, -50));
+  g1n.position = g1n.restPosition = new Vector(2600, -50);
+  g1n.targetPosition = g1n.position.add(new Vector(0, 50));
+  g1o.position = g1o.restPosition = new Vector(2600, 200);
+  g1o.targetPosition = g1o.position.add(new Vector(0, -50));
+
+  g2f.position = g2f.restPosition = new Vector(2000, -50);
+  g2f.targetPosition = g2f.position.add(new Vector(0, 50));
+  g2g.position = g2g.restPosition = new Vector(2000, 200);
+  g2g.targetPosition = g2g.position.add(new Vector(0, -50));
+  g2h.position = g2h.restPosition = new Vector(2200, -50);
+  g2h.targetPosition = g2h.position.add(new Vector(0, 50));
+  g2i.position = g2i.restPosition = new Vector(2200, 200);
+  g2i.targetPosition = g2i.position.add(new Vector(0, -50));
+  g2j.position = g2j.restPosition = new Vector(2400, -50);
+  g2j.targetPosition = g2j.position.add(new Vector(0, 50));
+  g2k.position = g2k.restPosition = new Vector(2400, 200);
+  g2k.targetPosition = g2k.position.add(new Vector(0, -50));
+  g2l.position = g2l.restPosition = new Vector(2600, -50);
+  g2l.targetPosition = g2l.position.add(new Vector(0, 50));
+  g2m.position = g2m.restPosition = new Vector(2600, 200);
+  g2m.targetPosition = g2m.position.add(new Vector(0, -50));
+
+  [s1a, s2a, s2b, s2c].map((o : DisplayObject) => {
+    o.dimensions = new Vector(36, 36);
+  });
+
+  return {
+    topLevel: env1,
+    topStartPoint: new Vector(50, 200),
+    topEndZone: end1,
+    topXBounds: [0, 3000],
+
+    bottomLevel :env2,
+    bottomStartPoint: new Vector(50, 200),
+    bottomEndZone: end2,
+    bottomXBounds: [0, 3000],
+
+    gameDuration: 150,
+  };
+}
 
 private static GetLevelTest() : LevelParams {
   var tg1a : TimedGate, tg1b : TimedGate, tg2a : TimedGate, tg2b : TimedGate;
