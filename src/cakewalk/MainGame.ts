@@ -171,7 +171,8 @@ export class MainGame extends Game {
     SoundManager.instance.loadSound('jump', 'CakeWalk/music/jump.mp3');
     SoundManager.instance.loadSound('squash', 'CakeWalk/music/squash.mp3');
     SoundManager.instance.loadSound('thud', 'CakeWalk/music/thud.mp3');
-    SoundManager.instance.loadSound('swap', 'CakeWalk/music/swap.mp3');
+    SoundManager.instance.loadSound('swap_red', 'CakeWalk/music/swap1.mp3');
+    SoundManager.instance.loadSound('swap_blue', 'CakeWalk/music/swap2.mp3');
     SoundManager.instance.loadSound('button', 'CakeWalk/music/buttonclick.mp3');
 
     // create collision matrix
@@ -269,7 +270,7 @@ export class MainGame extends Game {
         if (doSwap > 0) {
           this.swapLock = true;
           this.rootEnv.active = false;
-          SoundManager.instance.playFX('swap');
+          SoundManager.instance.playFX(doSwap == 1 ? 'swap_red' : 'swap_blue');
           this.swapAnimator.burstAnimate(0.5, doSwap == 1);
 
           var self = this;
