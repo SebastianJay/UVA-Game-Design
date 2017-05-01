@@ -25,7 +25,8 @@ export class MenuUI extends Sprite {
     // add display tree of option text and cursor
     var t0 : TextObject, t1 : TextObject, t2 : TextObject,
       t3 : TextObject, t4 : TextObject, t5 : TextObject, t6 : TextObject;
-    var tn0 : TextObject, tn1 : TextObject, tn2 : TextObject;
+    var tn0 : TextObject, tn1 : TextObject, tn2 : TextObject,
+      tn3 : TextObject, tn4 : TextObject, tn5 : TextObject, tn6 : TextObject, tn7 : TextObject;
     this.addChild(this._cursor = new Sprite(id+'_cursor', 'CakeWalk/cake2.png'))
     .addChild(new DisplayObjectContainer(id+'_mainmenu', '')
       .addChild(new DisplayObjectContainer(id+'mainmenu_options', '')
@@ -45,6 +46,11 @@ export class MenuUI extends Sprite {
       ).addChild(tn0 = new TextObject(id+'_tn0'))
       .addChild(tn1 = new TextObject(id+'_tn1'))
       .addChild(tn2 = new TextObject(id+'_tn2'))
+      .addChild(tn3 = new TextObject(id+'_tn3'))
+      .addChild(tn4 = new TextObject(id+'_tn4'))
+      .addChild(tn5 = new TextObject(id+'_tn5'))
+      .addChild(tn6 = new TextObject(id+'_tn6'))
+      .addChild(tn7 = new TextObject(id+'_tn7'))
     );
 
     t0.position = new Vector(1280 / 2 - 100, 350);
@@ -53,25 +59,40 @@ export class MenuUI extends Sprite {
     t1.text = 'Sound';
     t2.position = new Vector(1280 / 2 - 100, 450);
     t2.text = 'Credits';
-    t3.position = new Vector(1280 / 2 - 100, 400);
+    t3.position = new Vector(1280 / 2 - 125, 350);
     t3.text = 'Mute Music';
-    t4.position = new Vector(1280 / 2 - 100, 450);
+    t4.position = new Vector(1280 / 2 - 200, 400);
     t4.text = 'Mute Sound Effects';
     t5.position = new Vector(1280 / 2 - 100, 550);
     t5.text = 'Go Back';
     t6.position = new Vector(1280 / 2 - 100, 550);
     t6.text = 'Go Back';
 
-    tn0.position = new Vector(1280 / 2 - 100, 350);
+    tn0.position = new Vector(1280 / 2 - 430, 325);
     tn0.text = 'Jeffery Cui';
-    tn1.position = new Vector(1280 / 2 - 100, 400);
+    tn1.position = new Vector(1280 / 2 - 150, 325);
     tn1.text = 'Alec Miller';
-    tn2.position = new Vector(1280 / 2 - 100, 450);
+    tn2.position = new Vector(1280 / 2 + 130, 325);
     tn2.text = 'Jay Sebastian';
+    tn3.position = new Vector(1280 / 2 - 250, 375);
+    tn3.text = 'Short Skirt Long Jacket - Cake, arranged by 8bitmusic';
+    tn4.position = new Vector(1280 / 2 - 250, 400);
+    tn4.text = 'Atop a Cake - Alvvays, arranged by UnivMead';
+    tn5.position = new Vector(1280 / 2 - 250, 425);
+    tn5.text = 'Cake by the Ocean - DNCE, arranged by Ion';
+    tn6.position = new Vector(1280 / 2 - 250, 450);
+    tn6.text = 'The Distance - Cake, arranged by TheMusickGuy';
+    tn7.position = new Vector(1280 / 2 - 250, 475);
+    tn7.text = 'Cake - Melanie Martinez, arranged by ZaneDobler';
 
     [t0, t1, t2, t3, t4, t5, t6, tn0, tn1, tn2].map((t : TextObject) => {
       t.color = new Vector(0, 0, 0);
       t.fontSize = 48;
+      t.fontFamily = 'Sanchez';
+    });
+    [tn3, tn4, tn5, tn6, tn7].map((t : TextObject) => {
+      t.color = new Vector(0, 0, 0);
+      t.fontSize = 20;
       t.fontFamily = 'Sanchez';
     });
 
