@@ -35,6 +35,8 @@ export class Gate extends Platform {
   set restPosition(v : Vector) { this._restPosition = v; }
   get targetPosition() : Vector { return this._targetPosition; }
   set targetPosition(v : Vector) { this._targetPosition = v; }
+  get smoothFactor() : number { return this._smoothFactor; }
+  set smoothFactor(f : number) { this._smoothFactor = f; }
 
   update(dt : number = 0) : void {
     super.update(dt);

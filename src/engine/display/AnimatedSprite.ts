@@ -102,6 +102,7 @@ export abstract class AnimatedSpriteBase extends Sprite {
           case 'stayInState':
             this._currentState = this.getCurrentConfig().numStates-1;
             this._isStuck = true;
+            break;
           default:
             console.log("unrecognized animation end behavior: "
               + this.getCurrentConfig().endBehavior.name);

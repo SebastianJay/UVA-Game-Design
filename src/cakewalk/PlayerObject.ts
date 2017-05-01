@@ -254,6 +254,9 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   private get collisionHandler() {
     var self = this;
     return (args : CollisionEventArgs) => {
+      if (!self.isAlive) {
+        return; // ignore event
+      }
       if (args.obj1 === self || args.obj2 === self) {
         if ((args.type == CollisionType.Enter || args.type == CollisionType.Stay) && args.normal.y < 0) {
           this.grounded = true;

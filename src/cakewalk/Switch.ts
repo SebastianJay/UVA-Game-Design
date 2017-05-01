@@ -69,7 +69,7 @@ export class Switch extends MainGameSprite implements IRectCollider {
         if (player.color == self.color || self.color == MainGameColor.Neutral) {
           // only handle the events in the update() loop because if a player swaps
           //  multiple collision events will be thrown, causing a "race condition"
-          if (args.type != CollisionType.Stay) {
+          if (args.type == CollisionType.Exit || (args.type == CollisionType.Enter && player.isAlive)) {
             self._eventQueue.push(args);
           }
         }

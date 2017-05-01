@@ -41,10 +41,11 @@ export class Checkpoint extends DisplayObjectContainer implements IRectCollider 
         if (args.type == CollisionType.Enter && self.spawnPoint.x > player.respawnPoint.x) {
           player.respawnPoint = self.spawnPoint;
           SoundManager.instance.playFX('checkpoint');
-          // this.clearChildren();
-          this.addChild(new Sprite(this.id+'_post', 'CakeWalk/checkpoint2.png'));
-          this.getChild(1).position = new Vector(0, 60);
-          this.getChild(1).localScale = new Vector(0.3, 0.3);
+          if (this.children.length >= 2) {
+            // switch which image is visible to show player has made progress
+            this.getChild(0).visible = false;
+            this.getChild(1).visible = true;
+          }
         }
       }
     }
