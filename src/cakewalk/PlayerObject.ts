@@ -42,8 +42,6 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   private _canSwap : boolean; // whether the character is able to swap
   private _respawnPoint : Vector;  // if player dies, where to respawn
   private _eventQueue : CollisionEventArgs[]; // for processing multiple collisions in the update loop
-  private gameSoundEffects : string[] = ['burn', 'button', 'checkpoint', 'jump', 'loss', 'squash', 'tada', 'thud', 'swap', 'badswap', 'respawn']; // soundeffects
-
 
   constructor(id: string, filename: string, color : MainGameColor) {
     super(id, filename, color);
@@ -62,7 +60,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     this.elasticity = 0.0;
     this.terminalSpeeds.x = this.topSpeed;
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
-    
+
 
 
   }
@@ -81,19 +79,19 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
           }
           if (this._eventQueue[i].normal.x > 0) {
             normalDirs[1] = true;
-            SoundManager.instance.playFX(this.gameSoundEffects[7]);
+            SoundManager.instance.playFX('thud');
           }
           if (this._eventQueue[i].normal.y > 0) {
             normalDirs[2] = true;
           }
           if (this._eventQueue[i].normal.x < 0) {
             normalDirs[3] = true;
-            SoundManager.instance.playFX(this.gameSoundEffects[7]);
+            SoundManager.instance.playFX('thud');
           }
         }
       }
       if ((normalDirs[0] && normalDirs[2]) || (normalDirs[1] && normalDirs[3])) {
-        SoundManager.instance.playFX(this.gameSoundEffects[5]);
+        SoundManager.instance.playFX('squash');
         this.respawn('squash');
 
       }
@@ -151,7 +149,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   jump() : void {
 
     if (this.grounded && !this._inDeathState) {
-      SoundManager.instance.playFX(this.gameSoundEffects[3]);
+      SoundManager.instance.playFX('jump');
       // add force that would equate player's y speed to jumpTargetSpeed
       this.addForce(new Vector(0, -this.jumpTargetSpeed / Physics.DeltaTime * this.mass)
         .add(Physics.Gravity.multiply(this.mass)));
@@ -179,7 +177,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
 
   /** Called when this player executed a swap */
   didSwap() : void {
-    SoundManager.instance.playFX(this.gameSoundEffects[8]);
+    SoundManager.instance.playFX('swap');
     this._canSwap = false;
     CallbackManager.instance.addCallback(() => {
       this._canSwap = true;

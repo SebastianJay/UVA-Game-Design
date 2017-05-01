@@ -17,8 +17,6 @@ export class Checkpoint extends DisplayObjectContainer implements IRectCollider 
   // internally this is relative to this object's position
   // but externally (setter and getter) is embeds position info as well
   private _spawnPoint : Vector;
-  private gameSoundEffects : string[] = ['burn', 'button', 'checkpoint', 'jump', 'loss', 'squash', 'tada', 'thud', 'swap', 'badswap']; // soundeffects
-
 
   constructor(id : string) {
     super(id, '');
@@ -26,7 +24,7 @@ export class Checkpoint extends DisplayObjectContainer implements IRectCollider 
     this.isTrigger = true;    // does not alter collider physics
     this._spawnPoint = Vector.zero;
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
-    
+
   }
 
   get spawnPoint() : Vector { return this._spawnPoint.add(this.position); }
@@ -42,7 +40,7 @@ export class Checkpoint extends DisplayObjectContainer implements IRectCollider 
         // set the player's respawn point if this point is further along the level
         if (args.type == CollisionType.Enter && self.spawnPoint.x > player.respawnPoint.x) {
           player.respawnPoint = self.spawnPoint;
-          SoundManager.instance.playFX(this.gameSoundEffects[2]);
+          SoundManager.instance.playFX('checkpoint');
           // this.clearChildren();
           this.addChild(new Sprite(this.id+'_post', 'CakeWalk/checkpoint2.png'));
           this.getChild(1).position = new Vector(0, 60);

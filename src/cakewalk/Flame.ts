@@ -20,8 +20,6 @@ import { MainGameColor } from './MainGameEnums';
  */
 export class Flame extends MainGameSprite implements IAnimatedSprite {
   private reflameDuration : number;
-  private gameSoundEffects : string[] = ['burn', 'button', 'checkpoint', 'jump', 'loss', 'squash', 'tada', 'thud', 'swap', 'badswap']; // soundeffects
-
 
   constructor(id : string, filename : string, color : MainGameColor = MainGameColor.Neutral, reflameDuration : number = -1) {
     super(id, filename, color);
@@ -39,7 +37,7 @@ export class Flame extends MainGameSprite implements IAnimatedSprite {
     this.addChild(hitbox);
 
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
-    
+
 
   }
 
@@ -70,9 +68,8 @@ export class Flame extends MainGameSprite implements IAnimatedSprite {
           }
         } else {
           // different color -> flame puts out player
-          SoundManager.instance.playFX(this.gameSoundEffects[0]);
+          SoundManager.instance.playFX('burn');
           player.respawn('fire');
-          SoundManager.instance.playFX(this.gameSoundEffects[10]);
         }
       }
     }

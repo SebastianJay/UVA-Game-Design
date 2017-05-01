@@ -59,7 +59,6 @@ export class MainGame extends Game {
   private gameLevelNumber : number = 0; // which level players are on
   private gameDuration : number = 100;  // amount of time (seconds) before game over
   private gameSongs : string[] = ['jacket', 'atop', 'ocean', 'distance', 'cake']; // order that songs are played
-  private gameSoundEffects : string[] = ['burn', 'button', 'checkpoint', 'jump', 'loss', 'squash', 'tada', 'thud', 'swap', 'badswap']; // soundeffects
 
   constructor (canvas : HTMLCanvasElement) {
     super("Cakewalk Game", 1280, 720, canvas);
@@ -319,7 +318,7 @@ export class MainGame extends Game {
         // if timer is finished, players lose
         // if both players are alive and in end zone, they win
         if (this.timer.isFinished) {
-          SoundManager.instance.playFX(this.gameSoundEffects[4]);
+          SoundManager.instance.playFX('loss');
           this.gameOverLock = true;
           var self = this;
           this.transitionLose.fadeIn(() => {
@@ -330,7 +329,7 @@ export class MainGame extends Game {
           }, 2.0);
         } else if (this.end1.isPlayerInZone && this.end2.isPlayerInZone
             && this.player1.isAlive && this.player2.isAlive) {
-              SoundManager.instance.playFX(this.gameSoundEffects[6]);
+          SoundManager.instance.playFX('tada');
           this.gameOverLock = true;
           var self = this;
           this.transitionWin.fadeIn(() => {
