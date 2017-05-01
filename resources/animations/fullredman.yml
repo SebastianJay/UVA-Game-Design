@@ -46,4 +46,12 @@ jump_left:
   framesPerState: 3
   endBehavior:
     name: stayInState
+burn:
+  startRowPixel: 444
+  height: 74
+  width: 42
+  numStates: 5
+  framesPerState: 5
+  endBehavior:
+    name: stayInState
 default: idle

@@ -204,6 +204,12 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
 
     this._inDeathState = true;
     if (reason != null) {
+      if(reason == 'fire'){
+        this.animate('burn')
+        var tw : Tween;
+        TweenManager.instance.add(tw = new Tween(this)
+          .animate(new TweenParam(TweenAttributeType.Alpha, 1.0, 0.0, this.respawnTime - 0.5, TweenFunctionType.Linear)));
+      }
       // TODO death animation
     } else {
       // temporary fade-out death tween

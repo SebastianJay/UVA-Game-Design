@@ -71,7 +71,7 @@ export class Flame extends MainGameSprite implements IAnimatedSprite {
         } else {
           // different color -> flame puts out player
           SoundManager.instance.playFX(this.gameSoundEffects[0]);
-          player.respawn();
+          player.respawn('fire');
           SoundManager.instance.playFX(this.gameSoundEffects[10]);
         }
       }
