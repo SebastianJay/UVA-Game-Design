@@ -384,7 +384,7 @@ private static GetLevelTwo() : LevelParams {
   // trigger zones for end of level
   var end1: TriggerZone, end2: TriggerZone;
 
-  var env1 = new DisplayObjectContainer('level0_top', '')
+  var env1 = new DisplayObjectContainer('level1_top', '')
     .addChild(b1start = LevelFactory.MakeWall())
     .addChild(b1end = LevelFactory.MakeWall())
     .addChild(c1a = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
@@ -440,7 +440,7 @@ private static GetLevelTwo() : LevelParams {
     .addChild(f1uu= LevelFactory.MakeFlame(MainGameColor.Neutral))
     .addChild(end1 = LevelFactory.MakeEndZone());
 
-  var env2 = new DisplayObjectContainer('level0_bottom', '')
+  var env2 = new DisplayObjectContainer('level1_bottom', '')
     .addChild(b2start = LevelFactory.MakeWall())
     .addChild(b2end = LevelFactory.MakeWall())
     .addChild(c2a = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
@@ -673,7 +673,7 @@ private static GetLevelThree() : LevelParams {
   // trigger zones for end of level
   var end1: TriggerZone, end2: TriggerZone;
 
-  var env1 = new DisplayObjectContainer('level0_top', '')
+  var env1 = new DisplayObjectContainer('level2_top', '')
     .addChild(b1start = LevelFactory.MakeWall())
     .addChild(b1end = LevelFactory.MakeWall())
     .addChild(c1a = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
@@ -745,7 +745,7 @@ private static GetLevelThree() : LevelParams {
     .addChild(f1uu= LevelFactory.MakeFlame(MainGameColor.Neutral))*/
     .addChild(end1 = LevelFactory.MakeEndZone());
 
-  var env2 = new DisplayObjectContainer('level0_bottom', '')
+  var env2 = new DisplayObjectContainer('level2_bottom', '')
     .addChild(b2start = LevelFactory.MakeWall())
     .addChild(b2end = LevelFactory.MakeWall())
     .addChild(c2a = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))

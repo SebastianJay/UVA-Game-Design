@@ -154,8 +154,8 @@ export class MainGame extends Game {
     this.gameOverLock = false;
     this.swapLock = false;
 
-    // load all sounds and music
-    // NOTE the bg music ids need to match gameSongs
+    // load music
+    // NOTE bg music ids need to match gameSongs
     SoundManager.instance.loadSound('jacket', 'CakeWalk/music/short_skirt_long_jacket.mp3');
     SoundManager.instance.loadSound('atop', 'CakeWalk/music/atop_a_cake.mp3');
     SoundManager.instance.loadSound('ocean', 'CakeWalk/music/cake_by_the_ocean.mp3');
@@ -163,8 +163,7 @@ export class MainGame extends Game {
     SoundManager.instance.loadSound('cake', 'CakeWalk/music/cake_martinez.mp3');
     SoundManager.instance.playMusic(this.gameSongs[0]);
 
-    //load all sound effects
-
+    // load all sound effects
     SoundManager.instance.loadSound('loss', 'CakeWalk/music/loss.mp3');
     SoundManager.instance.loadSound('tada', 'CakeWalk/music/tada.mp3');
     SoundManager.instance.loadSound('burn', 'CakeWalk/music/burn.mp3');
@@ -174,7 +173,6 @@ export class MainGame extends Game {
     SoundManager.instance.loadSound('thud', 'CakeWalk/music/thud.mp3');
     SoundManager.instance.loadSound('swap', 'CakeWalk/music/swap.mp3');
     SoundManager.instance.loadSound('button', 'CakeWalk/music/buttonclick.mp3');
-
 
     // create collision matrix
     // 0 - neutral objects that collide both players
@@ -269,9 +267,9 @@ export class MainGame extends Game {
 
         }
         if (doSwap > 0) {
-
           this.swapLock = true;
           this.rootEnv.active = false;
+          SoundManager.instance.playFX('swap');
           this.swapAnimator.burstAnimate(0.5, doSwap == 1);
 
           var self = this;

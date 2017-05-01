@@ -35,13 +35,16 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   respawnTime : number = 2; // how much time elapses from death to respawn
   swapCooldownTime : number = 3; // how much time elapses after player swaps before they can do it again
 
+  thudThresholdSpeed : number = 7.5; // how fast player must go before collision to hear thud sound
+
   grounded : boolean;  // whether the player is on the ground
   jumping : boolean;  // whether the player is in process of jumping
-  private _currentDirectionRight : boolean;  // temp var
+  private _currentDirectionRight : boolean;  // which way the player is facing
   private _inDeathState : boolean; // whether the character has died and is waiting to respawn
   private _canSwap : boolean; // whether the character is able to swap
   private _respawnPoint : Vector;  // if player dies, where to respawn
   private _eventQueue : CollisionEventArgs[]; // for processing multiple collisions in the update loop
+  private _previousVelocity : Vector; // tells what velocity was before collision
 
   constructor(id: string, filename: string, color : MainGameColor) {
     super(id, filename, color);
@@ -54,19 +57,18 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     this._currentDirectionRight = true;
     this._canSwap = true;
     this._inDeathState = false;
+    this._previousVelocity = Vector.zero;
 
     this.collisionLayer = (this.color == MainGameColor.Red) ? 3 : 4;
     this.isTrigger = false;
     this.elasticity = 0.0;
     this.terminalSpeeds.x = this.topSpeed;
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
-
-
-
   }
 
   update(dt : number = 0) : void{
     super.update(dt);
+    this._previousVelocity = this.velocity;
     this.updatePhysics();
     this.updateAnimation();
     // process multiple collisions for player getting "squished" and dying
@@ -79,25 +81,26 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
           }
           if (this._eventQueue[i].normal.x > 0) {
             normalDirs[1] = true;
-            SoundManager.instance.playFX('thud');
           }
           if (this._eventQueue[i].normal.y > 0) {
             normalDirs[2] = true;
           }
           if (this._eventQueue[i].normal.x < 0) {
             normalDirs[3] = true;
-            SoundManager.instance.playFX('thud');
           }
+        }
+        // play sound if collision happened from sides or top
+        if (this._eventQueue[i].type == CollisionType.Enter
+          && (this._eventQueue[i].normal.y > 0 || this._eventQueue[i].normal.x != 0)
+          && this._previousVelocity.length() >= this.thudThresholdSpeed) {
+          SoundManager.instance.playFX('thud');
         }
       }
       if ((normalDirs[0] && normalDirs[2]) || (normalDirs[1] && normalDirs[3])) {
-        SoundManager.instance.playFX('squash');
         this.respawn('squash');
-
       }
     }
     this._eventQueue = [];
-
   }
 
   /**
@@ -147,7 +150,6 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   * Called when the player wants the player to jump
   */
   jump() : void {
-
     if (this.grounded && !this._inDeathState) {
       SoundManager.instance.playFX('jump');
       // add force that would equate player's y speed to jumpTargetSpeed
@@ -177,13 +179,13 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
 
   /** Called when this player executed a swap */
   didSwap() : void {
-    SoundManager.instance.playFX('swap');
+    // player can only swap again after recharging
     this._canSwap = false;
     CallbackManager.instance.addCallback(() => {
       this._canSwap = true;
     }, this.swapCooldownTime);
-    // TODO animation to show when you can swap again
-    // temp animation - black circle appears over head
+
+    // animation for player recharging
     var c : SwapCooldownUI;
     this.addChild(c = new SwapCooldownUI(this.id+'_swap_circle', 'animations/refresh.png'));
     c.localScale = new Vector(0.45, 0.45);
@@ -202,23 +204,20 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
 
     this._inDeathState = true;
     if (reason != null) {
-      if(reason == 'fire'){
-        this.animate('burn')
-        var tw : Tween;
-        TweenManager.instance.add(tw = new Tween(this)
+      if (reason == 'fire') {
+        SoundManager.instance.playFX('burn');
+        this.animate('burn');
+        TweenManager.instance.add(new Tween(this)
+          .animate(new TweenParam(TweenAttributeType.Alpha, 1.0, 0.0, this.respawnTime - 0.5, TweenFunctionType.Linear)));
+      } else if (reason == 'squash') {
+        SoundManager.instance.playFX('squash');
+        this.animate('squash');
+        TweenManager.instance.add(new Tween(this)
           .animate(new TweenParam(TweenAttributeType.Alpha, 1.0, 0.0, this.respawnTime - 0.5, TweenFunctionType.Linear)));
       }
-      if(reason == 'squash'){
-        this.animate('squash')
-        var tw : Tween;
-        TweenManager.instance.add(tw = new Tween(this)
-          .animate(new TweenParam(TweenAttributeType.Alpha, 1.0, 0.0, this.respawnTime - 0.5, TweenFunctionType.Linear)));
-      }
-      // TODO death animation
     } else {
       // temporary fade-out death tween
-      var tw : Tween;
-      TweenManager.instance.add(tw = new Tween(this)
+      TweenManager.instance.add(new Tween(this)
         .animate(new TweenParam(TweenAttributeType.Alpha, 1.0, 0.0, this.respawnTime - 0.5, TweenFunctionType.Linear)));
     }
 
@@ -226,12 +225,11 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     CallbackManager.instance.addCallback(() => {
       self.position = self.respawnPoint;
       self.velocity = Vector.zero;
-      self._inDeathState = false;
       self.alpha = 1.0;
+      self.animate('idle');
+      self._currentDirectionRight = true;
+      self._inDeathState = false;
     }, this.respawnTime);
-
-
-
   }
 
   /** Resets internal state to be what it would be when a level starts */

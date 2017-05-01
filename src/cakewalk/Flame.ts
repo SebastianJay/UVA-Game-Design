@@ -50,7 +50,8 @@ export class Flame extends MainGameSprite implements IAnimatedSprite {
     var self = this;
     return (args : CollisionEventArgs) => {
       // if player enters the flame
-      if (args.type == CollisionType.Enter && (args.obj1 === self.getChild(0) || args.obj2 === self.getChild(0))
+      if (args.type == CollisionType.Enter
+        && (args.obj1 === self.getChild(0) || args.obj2 === self.getChild(0))
         && (args.obj1 instanceof PlayerObject || args.obj2 instanceof PlayerObject)) {
         var player = ((args.obj1 instanceof PlayerObject) ? args.obj1 : args.obj2) as PlayerObject;
         if (player.color == self.color) {
@@ -68,7 +69,6 @@ export class Flame extends MainGameSprite implements IAnimatedSprite {
           }
         } else {
           // different color -> flame puts out player
-          SoundManager.instance.playFX('burn');
           player.respawn('fire');
         }
       }
