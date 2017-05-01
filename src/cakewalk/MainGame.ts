@@ -140,6 +140,7 @@ export class MainGame extends Game {
         .animate(new TweenParam(TweenAttributeType.Alpha, 1.0, 0.0, 1, TweenFunctionType.Linear)));
       tw.addEventListener(TweenEventArgs.ClassName, (args : TweenEventArgs) => {
         if ((args.src as Tween).isComplete) {
+          SoundManager.instance.fadeToNext(this.gameSongs[levelNumber % this.gameSongs.length], 1);
           if (levelNumber == 0) {
             plotScreen.fadeIn(() => {
               CallbackManager.instance.addCallback(() => {
