@@ -118,28 +118,39 @@ export class MainGame extends Game {
     this.timer.reset();
 
     var self = this;
-    this.menu.registerGameStartCallback(() => {
+    this.menu.registerGameStartCallback((levelNumber : number) => {
+      // helper function when finished with intro screens
+      var onceFinished = () => {
+        self.menuLock = false;
+        self.menu.setGameStarted();
+        self.menu.reset();
+        self.menu.alpha = 1.0;  // reset alpha and set invisible instead so toggling is easy
+        self.menu.visible = false;
+        self.gameLevelNumber = levelNumber;
+        self.gameState = MainGameState.InGame;
+        self.loadLevel();
+      }
+
       // produce a series of events by chaining callbacks
       //  fade out menu, fade in plot screen, wait, fade out plot screen, then start game
       self.menuLock = true;
+      this.resumeGlobalUpdates();
       var tw : Tween;
       TweenManager.instance.add(tw = new Tween(self.menu)
         .animate(new TweenParam(TweenAttributeType.Alpha, 1.0, 0.0, 1, TweenFunctionType.Linear)));
       tw.addEventListener(TweenEventArgs.ClassName, (args : TweenEventArgs) => {
         if ((args.src as Tween).isComplete) {
-          plotScreen.fadeIn(() => {
-            CallbackManager.instance.addCallback(() => {
-              plotScreen.fadeOut(() => {
-                self.menuLock = false;
-                self.menu.visible = false;
-                self.menu.alpha = 1.0;  // reset alpha and set invisible instead so toggling is easy
-                self.menu.setGameStarted();
-                self.gameState = MainGameState.InGame;
-                self.gameLevelNumber = 0;
-                self.loadLevel();
-              }, 1);
-            }, 5);
-          }, 1);
+          if (levelNumber == 0) {
+            plotScreen.fadeIn(() => {
+              CallbackManager.instance.addCallback(() => {
+                plotScreen.fadeOut(() => {
+                  onceFinished();
+                }, 1);
+              }, 5);
+            }, 1);
+          } else {
+            onceFinished();
+          }
         }
       });
     });
