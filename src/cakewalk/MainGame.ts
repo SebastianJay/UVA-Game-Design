@@ -259,7 +259,6 @@ export class MainGame extends Game {
       // player 1 running and jumping
       this.player1.run(this.getActionInput(MainGameAction.PlayerOneRun));
       if (this.getActionInput(MainGameAction.PlayerOneJump) > 0) {
-
         this.player1.jump();
       } else if (this.getActionInput(MainGameAction.PlayerOneJumpStop) > 0) {
         this.player1.cancelJump();
@@ -268,7 +267,6 @@ export class MainGame extends Game {
       // player 2 running and jumping
       this.player2.run(this.getActionInput(MainGameAction.PlayerTwoRun));
       if (this.getActionInput(MainGameAction.PlayerTwoJump) > 0) {
-
         this.player2.jump();
       } else if (this.getActionInput(MainGameAction.PlayerTwoJumpStop) > 0) {
         this.player2.cancelJump();
@@ -279,10 +277,8 @@ export class MainGame extends Game {
         var doSwap = 0;
         if (this.getActionInput(MainGameAction.PlayerOneSwap) > 0 && this.player1.canSwap) {
           doSwap = 1;
-
         } else if (this.getActionInput(MainGameAction.PlayerTwoSwap) > 0 && this.player2.canSwap) {
           doSwap = 2;
-
         }
         if (doSwap > 0) {
           this.swapLock = true;
@@ -312,7 +308,6 @@ export class MainGame extends Game {
 
             // switch two players in display tree
             if (self.world1.getChild(1) == self.player1) {
-
               self.world2.setChild(self.player1, 1);
               self.world1.setChild(self.player2, 1);
             } else {

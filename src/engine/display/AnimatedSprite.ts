@@ -20,6 +20,7 @@ interface AnimationConfig {
 /** Interface for publicly visible members of AnimatedSprite */
 export interface IAnimatedSprite {
   animate : (animId: string) => void;
+  restartAnimation : () => void;
   isPaused : () => boolean;
   setPaused : (b : boolean) => void;
   getGlobalSpeed : () => number;
@@ -32,6 +33,7 @@ export interface IAnimatedSprite {
  * Classes applying the AnimatedSpriteBase should (1) implement IAnimatedSprite
  * (2) include the following interfaces in their class
 animate : (animId: string) => void;
+restartAnimation : () => void;
 isPaused : () => boolean;
 setPaused : (b : boolean) => void;
 setGlobalSpeed : (speed: number) => void;
@@ -140,12 +142,16 @@ export abstract class AnimatedSpriteBase extends Sprite {
   animate(animId: string) : void {
     if (this._currentAnimId != animId) {
       this._currentAnimId = animId;
-      this._currentState = 0;
-      this._frameCounter = 0;
-      this._isReversed = false;
-      this._isStuck = false;
-      this._isAnimating = true;
+      this.restartAnimation();
     }
+  }
+
+  restartAnimation() : void {
+    this._currentState = 0;
+    this._frameCounter = 0;
+    this._isReversed = false;
+    this._isStuck = false;
+    this._isAnimating = true;
   }
 }
 
@@ -163,6 +169,7 @@ export class AnimatedSprite extends Sprite implements IAnimatedSprite {
   }
 
   animate : (animId: string) => void;
+  restartAnimation : () => void;
   isPaused : () => boolean;
   setPaused : (b : boolean) => void;
   setGlobalSpeed : (speed: number) => void;

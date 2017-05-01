@@ -171,7 +171,7 @@ export class InputHandler{
 
   /** Value of given axis of given player index controller */
   gamepadAxis(controller : number, axis : InputGamepadAxis) : number {
-    if (this.gamepadStates[controller] == null) {
+    if (!this.gamepadPresent(controller)) {
       return 0;
     }
     if (axis == InputGamepadAxis.LeftHorizontal) {

@@ -59,6 +59,7 @@ export class LabFiveMario extends Sprite implements IRectCollider, IPhysicsSprit
   protected updatePhysics : () => void;
 
   animate : (animId: string) => void;
+  restartAnimation : () => void;
   isPaused : () => boolean;
   setPaused : (b : boolean) => void;
   setGlobalSpeed : (speed: number) => void;

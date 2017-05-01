@@ -363,7 +363,7 @@ export class LevelFactory {
       bottomEndZone: end2,
       bottomXBounds: [0, 3000],
 
-      gameDuration: 120,
+      gameDuration: 120*2,
     };
   }
 
@@ -650,7 +650,7 @@ private static GetLevelTwo() : LevelParams {
     bottomEndZone: end2,
     bottomXBounds: [0, 3000],
 
-    gameDuration: 120,
+    gameDuration: 120*2,
   };
 }
 
@@ -1017,7 +1017,7 @@ private static GetLevelThree() : LevelParams {
     bottomEndZone: end2,
     bottomXBounds: [0, 3000],
 
-    gameDuration: 100,
+    gameDuration: 100*2,
   };
 }
 
@@ -1350,7 +1350,7 @@ private static GetLevelFour() : LevelParams {
     bottomEndZone: end2,
     bottomXBounds: [0, 3000],
 
-    gameDuration: 150,
+    gameDuration: 150*2,
   };
 }
 

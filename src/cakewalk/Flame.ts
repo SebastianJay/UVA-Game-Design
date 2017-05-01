@@ -76,6 +76,7 @@ export class Flame extends MainGameSprite implements IAnimatedSprite {
   }
 
   animate : (animId: string) => void;
+  restartAnimation : () => void;
   isPaused : () => boolean;
   setPaused : (b : boolean) => void;
   setGlobalSpeed : (speed: number) => void;

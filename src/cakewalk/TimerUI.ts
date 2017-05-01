@@ -43,6 +43,7 @@ export class TimerUI extends Sprite implements IAnimatedSprite {
   get gameDuration() : number { return this._totalTime; }
 
   animate : (animId: string) => void;
+  restartAnimation : () => void;
   isPaused : () => boolean;
   setPaused : (b : boolean) => void;
   setGlobalSpeed : (speed: number) => void;

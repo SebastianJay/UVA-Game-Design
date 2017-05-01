@@ -3,7 +3,7 @@
 import { DisplayObject } from '../engine/display/DisplayObject';
 import { IRectCollider, RectColliderSpriteBase } from '../engine/display/ColliderSprite';
 import { IPhysicsSprite, PhysicsSpriteBase } from '../engine/display/PhysicsSprite';
-import { IAnimatedSprite, AnimatedSpriteBase } from '../engine/display/AnimatedSprite';
+import { IAnimatedSprite, AnimatedSpriteBase, AnimatedSprite } from '../engine/display/AnimatedSprite';
 import { CollisionEventArgs, CollisionType } from '../engine/events/EventTypes';
 import { CallbackManager } from '../engine/events/CallbackManager';
 import { EventDispatcher } from '../engine/events/EventDispatcher';
@@ -18,7 +18,6 @@ import { applyMixins } from '../engine/util/mixins';
 import { SoundManager } from '../engine/sound/SoundManager';
 import { MainGameColor } from './MainGameEnums';
 import { MainGameSprite } from './MainGameSprite';
-import { SwapCooldownUI } from './SwapCooldownUI';
 
 export class PlayerObject extends MainGameSprite implements IRectCollider, IPhysicsSprite, IAnimatedSprite {
   jumpTargetSpeed : number = 14; // m/s in y-axis that jump pulls player up to
@@ -46,6 +45,8 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   private _eventQueue : CollisionEventArgs[]; // for processing multiple collisions in the update loop
   private _previousVelocity : Vector; // tells what velocity was before collision
 
+  private _cooldownAnimation : AnimatedSprite;
+
   constructor(id: string, filename: string, color : MainGameColor) {
     super(id, filename, color);
     this.initPhysics();
@@ -58,6 +59,10 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     this._canSwap = true;
     this._inDeathState = false;
     this._previousVelocity = Vector.zero;
+    this.addChild(this._cooldownAnimation = new AnimatedSprite(this.id+'_swap_circle', 'animations/refresh.png'));
+    this._cooldownAnimation.localScale = new Vector(0.45, 0.45);
+    this._cooldownAnimation.position = new Vector(-10, -20);
+    this._cooldownAnimation.visible = false;
 
     this.collisionLayer = (this.color == MainGameColor.Red) ? 3 : 4;
     this.isTrigger = false;
@@ -179,20 +184,16 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
 
   /** Called when this player executed a swap */
   didSwap() : void {
-    // player can only swap again after recharging
     this._canSwap = false;
-    CallbackManager.instance.addCallback(() => {
-      this._canSwap = true;
-    }, this.swapCooldownTime);
 
-    // animation for player recharging
-    var c : SwapCooldownUI;
-    this.addChild(c = new SwapCooldownUI(this.id+'_swap_circle', 'animations/refresh.png'));
-    c.localScale = new Vector(0.45, 0.45);
-    c.position = new Vector(-10, -20);
+    // player can only swap again after recharging
+    //  -> play animation for player recharging
     var self = this;
+    this._cooldownAnimation.visible = true;
+    this._cooldownAnimation.restartAnimation();
     CallbackManager.instance.addCallback(() => {
-      self.removeChild(c);
+      this._cooldownAnimation.visible = false;
+      this._canSwap = true;
     }, this.swapCooldownTime);
   }
 
@@ -284,6 +285,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
   protected updatePhysics : () => void;
 
   animate : (animId: string) => void;
+  restartAnimation : () => void;
   isPaused : () => boolean;
   setPaused : (b : boolean) => void;
   setGlobalSpeed : (speed: number) => void;
