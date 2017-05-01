@@ -46,6 +46,7 @@ export class MainGame extends Game {
 
   // UI elements
   private timerParent : Sprite;
+  private transitionFinalWin : ScreenTransitionUI;
   private transitionWin : ScreenTransitionUI;
   private transitionLose : ScreenTransitionUI;
   private menu : MenuUI;
@@ -56,6 +57,7 @@ export class MainGame extends Game {
   private swapLock : boolean;
 
   private gameState : MainGameState = MainGameState.MenuOpen;
+  private totalNumberOfLevels : number = 4; // total number of levels in game
   private gameLevelNumber : number = 0; // which level players are on
   private gameDuration : number = 100;  // amount of time (seconds) before game over
   private gameSongs : string[] = ['jacket', 'atop', 'ocean', 'distance', 'cake']; // order that songs are played
@@ -82,6 +84,7 @@ export class MainGame extends Game {
             new Vector(-10, 0), new Vector(961.5, 0))) // x-values found through trial and error
         ).addChild(this.menu = new MenuUI('menuUI', 'CakeWalk/title.png'))
         .addChild(this.swapAnimator = new SwapAnimator('swapAnimator', this.world1, this.world2, this.player1, this.player2))
+        .addChild(this.transitionFinalWin = new ScreenTransitionUI('finalWinTransitionUI', 'CakeWalk/final_win_screen.png'))
         .addChild(this.transitionWin = new ScreenTransitionUI('winTransitionUI', 'CakeWalk/win_screen.png'))
         .addChild(this.transitionLose = new ScreenTransitionUI('loseTransitionUI', 'CakeWalk/lose_screen.png'))
         .addChild(plotScreen = new ScreenTransitionUI('plotScreen', 'CakeWalk/plot_screen.png'))
@@ -235,9 +238,11 @@ export class MainGame extends Game {
     } else if (this.gameState == MainGameState.EndGameWin && !this.transitionLock) {
       if (this.getActionInput(MainGameAction.EndGameContinue) > 0) {
         this.transitionLock = true;
+        // if on final level, use special win screen and go back to start
+        var transitionScreen = this.gameLevelNumber == this.totalNumberOfLevels - 1 ? this.transitionFinalWin : this.transitionWin;
+        this.gameLevelNumber = (this.gameLevelNumber + 1) % this.totalNumberOfLevels;
         var self = this;
-        self.gameLevelNumber += 1;
-        this.transitionWin.fadeOut(() => {
+        transitionScreen.fadeOut(() => {
           self.loadLevel(); // load next level
           self.gameState = MainGameState.InGame;
           self.transitionLock = false;
@@ -343,7 +348,8 @@ export class MainGame extends Game {
           SoundManager.instance.playFX('tada');
           this.gameOverLock = true;
           var self = this;
-          this.transitionWin.fadeIn(() => {
+          var transitionScreen = this.gameLevelNumber == this.totalNumberOfLevels - 1 ? this.transitionFinalWin : this.transitionWin;
+          transitionScreen.fadeIn(() => {
             self.rootEnv.active = false;
             self.timerParent.active = false;
             self.gameState = MainGameState.EndGameWin;
