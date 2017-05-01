@@ -35,7 +35,7 @@ jump:
   height: 74
   width: 42
   numStates: 4
-  framesPerState: 4
+  framesPerState: 3
   endBehavior:
     name: stayInState
 jump_left:
@@ -43,7 +43,7 @@ jump_left:
   height: 74
   width: 42
   numStates: 4
-  framesPerState: 4
+  framesPerState: 3
   endBehavior:
     name: stayInState
 default: idle

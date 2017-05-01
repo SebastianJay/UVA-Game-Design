@@ -10,6 +10,7 @@ import { ArrayList } from '../engine/util/ArrayList';
 import { applyMixins } from '../engine/util/mixins';
 import { SoundManager } from '../engine/sound/SoundManager';
 import { PlayerObject } from './PlayerObject';
+import { Sprite } from '../engine/display/Sprite';
 
 export class Checkpoint extends DisplayObjectContainer implements IRectCollider {
 
@@ -42,7 +43,10 @@ export class Checkpoint extends DisplayObjectContainer implements IRectCollider 
         if (args.type == CollisionType.Enter && self.spawnPoint.x > player.respawnPoint.x) {
           player.respawnPoint = self.spawnPoint;
           SoundManager.instance.playFX(this.gameSoundEffects[2]);
-
+          // this.clearChildren();
+          this.addChild(new Sprite(this.id+'_post', 'CakeWalk/checkpoint2.png'));
+          this.getChild(1).position = new Vector(0, 60);
+          this.getChild(1).localScale = new Vector(0.3, 0.3);
         }
       }
     }

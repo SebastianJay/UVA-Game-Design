@@ -3,7 +3,7 @@ swap:
   height: 64
   width: 64
   numStates: 4
-  framesPerState: 45
+  framesPerState: 44
   endBehavior:
-    name: loop
+    name: stayInState
 default: swap
