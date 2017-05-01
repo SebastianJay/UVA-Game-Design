@@ -18,6 +18,7 @@ import { applyMixins } from '../engine/util/mixins';
 import { SoundManager } from '../engine/sound/SoundManager';
 import { MainGameColor } from './MainGameEnums';
 import { MainGameSprite } from './MainGameSprite';
+import { SwapCooldownUI } from './SwapCooldownUI';
 
 export class PlayerObject extends MainGameSprite implements IRectCollider, IPhysicsSprite, IAnimatedSprite {
   jumpTargetSpeed : number = 14; // m/s in y-axis that jump pulls player up to
@@ -185,10 +186,10 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     }, this.swapCooldownTime);
     // TODO animation to show when you can swap again
     // temp animation - black circle appears over head
-    var c : DisplayObject;
-    this.addChild(c = new DisplayObject(this.id+'_swap_circle', 'lab3/black_circle.png'));
-    c.localScale = new Vector(0.1, 0.1);
-    c.position = new Vector(5, -15);
+    var c : SwapCooldownUI;
+    this.addChild(c = new SwapCooldownUI(this.id+'_swap_circle', 'animations/refresh.png'));
+    c.localScale = new Vector(0.45, 0.45);
+    c.position = new Vector(-10, -20);
     var self = this;
     CallbackManager.instance.addCallback(() => {
       self.removeChild(c);
