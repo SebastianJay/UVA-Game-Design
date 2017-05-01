@@ -1,5 +1,14 @@
 /* load custom font */
 @font-face {
   font-family: 'Sanchez';
-  src: url('resources/CakeWalk/font/Sanchez-Regular.ttf'); 
+  src: url('resources/CakeWalk/font/Sanchez-Regular.ttf');
+}
+
+.game-container {
+  width: 100%;
+  text-align: center;
+}
+
+canvas {
+  display: inline;
 }
