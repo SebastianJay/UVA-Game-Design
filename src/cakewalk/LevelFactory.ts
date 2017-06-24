@@ -101,8 +101,8 @@ export class LevelFactory {
 
   private static MakeFlame(c : MainGameColor = MainGameColor.Neutral) : Flame {
     return new Flame('flame' + LevelFactory.Counter,
-      c == MainGameColor.Neutral ? 'animations/YellowFlameSprite.png'
-      : (c == MainGameColor.Red ? 'animations/RedFlameSprite.png' : 'animations/BlueFlameSprite.png'), c, 3);
+      c == MainGameColor.Neutral ? 'CakeWalk/animations/YellowFlameSprite.png'
+      : (c == MainGameColor.Red ? 'CakeWalk/animations/RedFlameSprite.png' : 'CakeWalk/animations/BlueFlameSprite.png'), c, 3);
   }
 
   // TODO no neutral switch sprite

@@ -71,16 +71,16 @@ export class MainGame extends Game {
       .addChild(this.rootEnv = new DisplayObjectContainer('root_env', '')
         .addChild(this.world2 = new Camera('world2')
           .addChild(this.background2 = new BGLayerContainer('background2', this.width * 5, 200))
-          .addChild(this.player2 = new PlayerObject('player2', 'animations/fullblueman.png', MainGameColor.Blue))
+          .addChild(this.player2 = new PlayerObject('player2', 'CakeWalk/animations/fullblueman.png', MainGameColor.Blue))
           // level environments are inserted here
         ).addChild(this.world1 = new Camera('world1')
           .addChild(this.background1 = new BGLayerContainer('background1', this.width * 5, 200))
-          .addChild(this.player1 = new PlayerObject('player1', 'animations/fullredman.png', MainGameColor.Red))
+          .addChild(this.player1 = new PlayerObject('player1', 'CakeWalk/animations/fullredman.png', MainGameColor.Red))
           // level environments are inserted here
         )
       ).addChild(new DisplayObjectContainer('root_UI', '')
         .addChild(this.timerParent = new Sprite('timerUIPath', 'CakeWalk/TimerPath.png')
-          .addChild(new TimerUI('timerUI', 'animations/StopWatchSprite.png', this.gameDuration,
+          .addChild(new TimerUI('timerUI', 'CakeWalk/animations/StopWatchSprite.png', this.gameDuration,
             new Vector(-10, 0), new Vector(961.5, 0))) // x-values found through trial and error
         ).addChild(this.menu = new MenuUI('menuUI', 'CakeWalk/title.png'))
         .addChild(this.swapAnimator = new SwapAnimator('swapAnimator', this.world1, this.world2, this.player1, this.player2))

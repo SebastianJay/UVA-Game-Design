@@ -59,7 +59,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     this._canSwap = true;
     this._inDeathState = false;
     this._previousVelocity = Vector.zero;
-    this.addChild(this._cooldownAnimation = new AnimatedSprite(this.id+'_swap_circle', 'animations/refresh.png'));
+    this.addChild(this._cooldownAnimation = new AnimatedSprite(this.id+'_swap_circle', 'CakeWalk/animations/refresh.png'));
     this._cooldownAnimation.localScale = new Vector(0.45, 0.45);
     this._cooldownAnimation.position = new Vector(-10, -20);
     this._cooldownAnimation.visible = false;
