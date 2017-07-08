@@ -28,7 +28,7 @@ export class MenuUI extends Sprite {
       t7 : TextObject, t8 : TextObject, t9 : TextObject, t10 : TextObject, t11 : TextObject, t12 : TextObject;
     var tn0 : TextObject, tn1 : TextObject, tn2 : TextObject,
       tn3 : TextObject, tn4 : TextObject, tn5 : TextObject, tn6 : TextObject, tn7 : TextObject;
-    this.addChild(this._cursor = new Sprite(id+'_cursor', 'CakeWalk/cake2.png'))
+    this.addChild(this._cursor = new Sprite(id+'_cursor', 'CakeWalk/cake_small.png'))
     .addChild(new DisplayObjectContainer(id+'_mainmenu', '')
       .addChild(new DisplayObjectContainer(id+'mainmenu_options', '')
         .addChild(this._startButton = t0 = new TextObject(id+'_t0'))
@@ -119,8 +119,7 @@ export class MenuUI extends Sprite {
     });
 
     this._cursor.position = new Vector(1280 / 2 - 150, 350);
-    this._cursor.pivotPoint = new Vector(0.5, 0.8);
-    this._cursor.localScale = new Vector(0.3, 0.3);
+    this._cursor.pivotPoint = new Vector(0.5, 0.90);
 
     this._gameStarted = false;
     this._optionIndex = 0;
