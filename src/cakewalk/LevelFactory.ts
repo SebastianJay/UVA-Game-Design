@@ -126,9 +126,7 @@ export class LevelFactory {
     c.addChild(s1 = new Sprite(c.id+'_post0', 'CakeWalk/checkpoint1.png'));
     c.addChild(s2 = new Sprite(c.id+'_post1', 'CakeWalk/checkpoint2.png'));
     s1.position = new Vector(0, 60);
-    s1.localScale = new Vector(0.3, 0.3);
     s2.position = new Vector(0, 60);
-    s2.localScale = new Vector(0.3, 0.3);
     s2.visible = false;
     return c;
   }
@@ -305,8 +303,7 @@ export class LevelFactory {
     //seventh obstacle
     g1a.restPosition = g1a.position = new Vector(2200, 160);
     g1a.targetPosition = g1a.position.add(new Vector(0, -150));
-    s2a.position = new Vector(2200, 190);
-    s2a.localScale = new Vector(0.3, 0.3);
+    s2a.position = new Vector(2200, 205);
     g1a.syncSwitch(s2a);
     c2g.position = new Vector(2205, 220);
     // 2nd checkpoint
@@ -330,12 +327,10 @@ export class LevelFactory {
     g1b.restPosition = g1b.position = new Vector(2550, 25);
     g1b.targetPosition = g1b.position.add(new Vector(0, -150));
     s2b.position = new Vector(2500, 130);
-    s2b.localScale = new Vector(0.3, 0.3);
     g1b.syncSwitch(s2b);
     g2a.restPosition = g2a.position = new Vector(2550, 25);
     g2a.targetPosition = g2a.position.add(new Vector(0, 150));
     s1a.position = new Vector(2700, 250);
-    s1a.localScale = new Vector(0.3, 0.3);
     g2a.syncSwitch(s1a);
     // ending trigger zones
     end1.position = new Vector(2850, 0);
@@ -348,7 +343,6 @@ export class LevelFactory {
     xbutton1.position = new Vector(1000 + 16, 75);
     xbutton2.position = new Vector(1000 + 16, 75);
     [abutton1, abutton2, xbutton1, xbutton2].map((b : Sprite) => {
-      b.dimensions = new Vector(64, 64);
       b.pivotPoint = new Vector(0.5, 0.5);
     });
 
@@ -854,9 +848,7 @@ private static GetLevelThree() : LevelParams {
   g2g.smoothFactor = 0.025;
 
   s1a.position = new Vector(300,185);
-  s1a.localScale = new Vector(0.28, 0.28);
   s2a.position = new Vector(300,185);
-  s2a.localScale = new Vector(0.28, 0.28);
   g1a.syncSwitch(s1a);
   g2a.syncSwitch(s2a);
   g1g.syncSwitch(s1a);
@@ -908,33 +900,23 @@ private static GetLevelThree() : LevelParams {
   c1h.position = new Vector(2100,180);
   c2h.position = new Vector(2100,180);
   s1b.position = new Vector(1150,190);
-  s1b.localScale = new Vector(0.28, 0.28);
   s2b.position = new Vector(1150,190);
-  s2b.localScale = new Vector(0.28, 0.28);
   g1b.syncSwitch(s2b);
   g2b.syncSwitch(s1b);
   s1c.position = new Vector(1350,190);
-  s1c.localScale = new Vector(0.28, 0.28);
   s2c.position = new Vector(1350,190);
-  s2c.localScale = new Vector(0.28, 0.28);
   g1c.syncSwitch(s1c);
   g2c.syncSwitch(s2c);
   s1d.position = new Vector(1550,190);
-  s1d.localScale = new Vector(0.28, 0.28);
   s2d.position = new Vector(1550,190);
-  s2d.localScale = new Vector(0.28, 0.28);
   g1d.syncSwitch(s2e);
   g2d.syncSwitch(s1e);
   s1e.position = new Vector(1750,190);
-  s1e.localScale = new Vector(0.28, 0.28);
   s2e.position = new Vector(1750,190);
-  s2e.localScale = new Vector(0.28, 0.28);
   g1e.syncSwitch(s2d);
   g2e.syncSwitch(s1d);
   s1f.position = new Vector(1950,190);
-  s1f.localScale = new Vector(0.28, 0.28);
   s2f.position = new Vector(1950,190);
-  s2f.localScale = new Vector(0.28, 0.28);
   g1f.syncSwitch(s1f);
   g2f.syncSwitch(s2f);
   f1bb.position = new Vector(1150, 60);
@@ -1334,10 +1316,6 @@ private static GetLevelFour() : LevelParams {
   g2l.targetPosition = g2l.position.add(new Vector(0, 50));
   g2m.position = g2m.restPosition = new Vector(2600, 200);
   g2m.targetPosition = g2m.position.add(new Vector(0, -50));
-
-  [s1a, s2a, s2b, s2c].map((o : DisplayObject) => {
-    o.dimensions = new Vector(36, 36);
-  });
 
   return {
     topLevel: env1,

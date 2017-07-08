@@ -1,7 +1,7 @@
 flicker:
   startRowPixel: 0
-  height: 128
-  width: 128
+  height: 64
+  width: 64
   numStates: 33
   framesPerState: 3
   endBehavior:

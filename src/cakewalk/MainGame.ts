@@ -105,9 +105,6 @@ export class MainGame extends Game {
     this.world2.dimensions = new Vector(this.width, this.height / 2);
     this.world1.addEventListener(CameraScrollEventArgs.ClassName, this.background1.handleCameraScroll);
     this.world2.addEventListener(CameraScrollEventArgs.ClassName, this.background2.handleCameraScroll);
-    // players
-    this.player1.localScale = new Vector(1.0, 0.75);
-    this.player2.localScale = new Vector(1.0, 0.75);
 
     // UI
     this.timerParent.position = new Vector(50, this.height / 2);
@@ -116,7 +113,6 @@ export class MainGame extends Game {
     this.timerParent.visible = false;
     this.timerParent.active = false;  // do not show/update timer until level start
     // NOTE references to this.timer are getting type casted first child of timerParent
-    this.timer.localScale = new Vector(0.5, 0.5);
     this.timer.pivotPoint = new Vector(0.0, 0.5);
     this.timer.reset();
 

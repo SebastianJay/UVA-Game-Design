@@ -1,7 +1,7 @@
 swap:
   startRowPixel: 0
-  height: 64
-  width: 64
+  height: 32
+  width: 32
   numStates: 4
   framesPerState: 44
   endBehavior:
