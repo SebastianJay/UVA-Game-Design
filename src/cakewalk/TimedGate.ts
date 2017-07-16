@@ -8,25 +8,29 @@ import { CallbackManager } from '../engine/events/CallbackManager';
 /**
  * A TimedGate is a type of Gate which will alternate between two positions on a timer
  * If this gate is not synced with a switch before its first update() is posted, it will start moving immediately,
- * If it is synced, then it will start its movement cycle once the switch is pressed.
+ * If it is synced, then it will only go through the movement cycle when the switch is pressed.
  */
 export class TimedGate extends Gate {
 
   private _isSynced : boolean;
-  private _isStarted : boolean;
   private _halfCycleTime : number;  // amount of time (seconds) to wait before moving to other position
+  private _halfCycleTimer : number; // temp timer to
 
   constructor(id : string, filename : string, halfCycleTime : number, color : MainGameColor = MainGameColor.Neutral) {
     super(id, filename, color);
     this._halfCycleTime = halfCycleTime;
+    this._halfCycleTimer = 0;
     this._isSynced = false;
-    this._isStarted = false;
   }
 
   update(dt : number = 0) : void {
     super.update(dt);
-    if (!this._isSynced && !this._isStarted) {
-      this.makeMove();
+    if (!this._isSynced) {
+      this._halfCycleTimer += dt;
+      if (this._halfCycleTimer > this._halfCycleTime) {
+        this.moveMode = 1 - this.moveMode;
+        this._halfCycleTimer = 0;
+      }
     }
   }
 
@@ -34,18 +38,12 @@ export class TimedGate extends Gate {
     this._isSynced = true;
     var self = this;
     sw.addOnEnter(() => {
-      if (!self._isStarted) {
-        self.makeMove();
-      }
+      // starts movement
+      self._isSynced = false;
     });
-  }
-
-  private makeMove() {
-    this._isStarted = true;
-    this.moveMode = 1 - this.moveMode;
-    var self = this;
-    CallbackManager.instance.addCallback(() => {
-      self.makeMove();
-    }, this._halfCycleTime);
+    sw.addOnExit(() => {
+      // pauses movement
+      self._isSynced = true;
+    });
   }
 }

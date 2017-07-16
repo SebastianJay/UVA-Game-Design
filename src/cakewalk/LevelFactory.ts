@@ -145,8 +145,10 @@ export class LevelFactory {
       return LevelFactory.GetLevelTwo();
     } else if (num == 2) {
       return LevelFactory.GetLevelThree();
-    } else {
+    } else if (num == 3) {
       return LevelFactory.GetLevelFour();
+    } else {
+      return LevelFactory.GetLevelFive();
     }
   }
 
@@ -1047,7 +1049,6 @@ private static GetLevelThree() : LevelParams {
   };
 }
 
-
 private static GetLevelFour() : LevelParams {
 
   var b1start: Platform, b2start: Platform, b1end: Platform, b2end: Platform;
@@ -1375,6 +1376,382 @@ private static GetLevelFour() : LevelParams {
     gameDuration: 275,
   };
 }
+
+private static GetLevelFive() : LevelParams {
+
+  var b1start: Platform, b2start: Platform, b1end: Platform, b2end: Platform;
+  var p1 : TiledSpriteContainer, p2 : TiledSpriteContainer;
+  var end1 : TriggerZone, end2 : TriggerZone;
+
+  var c1a: Platform, c1b: Platform, c1c: Platform, c1d: Platform,
+    c1e: Platform, c1f: Platform, c1g: Platform, c1h: Platform,
+    c1i: Platform, c1j: Platform, c1k: Platform, c1l: Platform;
+  var c2a: Platform, c2b: Platform, c2c: Platform, c2d: Platform,
+    c2e: Platform, c2f: Platform, c2g: Platform, c2h: Platform,
+    c2i: Platform, c2j: Platform, c2k: Platform, c2l: Platform,
+    c2m: Platform, c2n: Platform, c2o: Platform, c2p: Platform,
+    c2q: Platform, c2r: Platform, c2s: Platform, c2t: Platform,
+    c2u: Platform, c2v: Platform, c2w: Platform, c2x: Platform,
+    c2y: Platform, c2z: Platform, c2aa: Platform, c2bb: Platform,
+    c2cc: Platform, c2dd: Platform, c2ee: Platform, c2ff: Platform,
+    c2gg: Platform, c2hh: Platform, c2ii: Platform, c2jj: Platform;
+  var g1a: Gate, g1b: Gate, g1c: Gate, g1d: Gate,
+    g1e: Gate, g1f: Gate, g1g: Gate, g1h: Gate,
+    g1i: Gate, g1j: Gate, g1k: Gate, g1l: Gate,
+    g1m: Gate, g1n: Gate, g1o: Gate, g1p: Gate,
+    g1q: Gate, g1r: Gate, g1s: Gate, g1t: Gate,
+    g1u: Gate, g1v: Gate, g1w: Gate;
+  var g2a: Gate, g2b: Gate, g2c: Gate, g2d: Gate,
+    g2e: Gate, g2f: Gate, g2g: Gate, g2h: Gate,
+    g2i: Gate, g2j: Gate, g2k: Gate, g2l: Gate,
+    g2m: Gate, g2n: Gate, g2o: Gate, g2p: Gate,
+    g2q: Gate, g2r: Gate, g2s: Gate, g2t: Gate,
+    g2u: Gate, g2v: Gate, g2w: Gate;
+  var s1a: Switch, s1b: Switch, s1c: Switch, s1d: Switch,
+    s1e: Switch;
+  var s2a: Switch, s2b: Switch, s2c: Switch, s2d: Switch,
+    s2e: Switch, s2f: Switch, s2g: Switch, s2h: Switch,
+    s2i: Switch, s2j: Switch, s2k: Switch, s2l: Switch;
+  var q1a: Checkpoint, q1b: Checkpoint;
+  var q2a: Checkpoint, q2b: Checkpoint, q2c: Checkpoint;
+
+  var env1 = new DisplayObjectContainer('level4_top', '')
+    .addChild(b1start = LevelFactory.MakeWall())
+    .addChild(b1end = LevelFactory.MakeWall())
+    .addChild(c1a = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
+    .addChild(c1b = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
+    .addChild(c1c = LevelFactory.MakeCandleHoriz(MainGameColor.Red))
+    .addChild(c1d = LevelFactory.MakeCandleHoriz(MainGameColor.Blue))
+    .addChild(c1e = LevelFactory.MakeCandle(MainGameColor.Blue))
+    .addChild(c1f = LevelFactory.MakeCandle(MainGameColor.Red))
+    .addChild(c1g = LevelFactory.MakeCandle(MainGameColor.Blue))
+    .addChild(c1h = LevelFactory.MakeCandle(MainGameColor.Blue))
+    .addChild(c1i = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(c1j = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(c1k = LevelFactory.MakeCandle(MainGameColor.Red))
+    .addChild(c1l = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
+    .addChild(g1a = LevelFactory.MakeGate(MainGameColor.Blue))
+    .addChild(g1b = LevelFactory.MakeGate(MainGameColor.Blue))
+    .addChild(g1c = LevelFactory.MakeGate(MainGameColor.Red))
+    .addChild(g1d = LevelFactory.MakeGate(MainGameColor.Red))
+    .addChild(g1e = LevelFactory.MakeGateHoriz(MainGameColor.Blue))
+    .addChild(g1f = LevelFactory.MakeGateHoriz(MainGameColor.Red))
+    .addChild(g1g = LevelFactory.MakeGate(MainGameColor.Neutral))
+    .addChild(g1h = LevelFactory.MakeGate(MainGameColor.Neutral))
+    .addChild(g1i = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 2.0))
+    .addChild(g1j = LevelFactory.MakeGate(MainGameColor.Neutral))
+    .addChild(g1k = LevelFactory.MakeGateHoriz(MainGameColor.Neutral))
+    .addChild(g1l = LevelFactory.MakeGate(MainGameColor.Neutral))
+    .addChild(g1m = LevelFactory.MakeTimedGate(MainGameColor.Blue, 0.9))
+    .addChild(g1n = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
+    .addChild(g1o = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
+    .addChild(g1p = LevelFactory.MakeTimedGate(MainGameColor.Red, 0.9))
+    .addChild(g1q = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
+    .addChild(g1r = LevelFactory.MakeTimedGate(MainGameColor.Blue, 0.9))
+    .addChild(g1s = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
+    .addChild(g1t = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
+    .addChild(g1u = LevelFactory.MakeGate(MainGameColor.Neutral))
+    .addChild(g1v = LevelFactory.MakeGate(MainGameColor.Neutral))
+    .addChild(g1w = LevelFactory.MakeTimedGateHoriz(MainGameColor.Neutral, 7.5))
+    .addChild(q1a = LevelFactory.MakeCheckpoint())
+    .addChild(q1b = LevelFactory.MakeCheckpoint())
+    .addChild(p1 = LevelFactory.MakeGround(4000, 80))
+    .addChild(s1a = LevelFactory.MakeSwitch(MainGameColor.Red))
+    .addChild(s1b = LevelFactory.MakeSwitch(MainGameColor.Blue))
+    .addChild(s1c = LevelFactory.MakeSwitch(MainGameColor.Red))
+    .addChild(s1d = LevelFactory.MakeSwitch(MainGameColor.Red))
+    .addChild(s1e = LevelFactory.MakeSwitch(MainGameColor.Red))
+    .addChild(end1 = LevelFactory.MakeEndZone());
+
+  var env2 = new DisplayObjectContainer('level4_bottom', '')
+    .addChild(b2start = LevelFactory.MakeWall())
+    .addChild(b2end = LevelFactory.MakeWall())
+    .addChild(c2a = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(c2b = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(c2c = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(c2d = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(c2e = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
+    .addChild(c2f = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(c2g = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(c2h = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(c2i = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(c2j = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(c2k = LevelFactory.MakeCandleHoriz(MainGameColor.Blue))
+    .addChild(c2l = LevelFactory.MakeCandleHoriz(MainGameColor.Blue))
+    .addChild(c2m = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
+    .addChild(c2n = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
+    .addChild(c2o = LevelFactory.MakeCandleHoriz(MainGameColor.Red))
+    .addChild(c2p = LevelFactory.MakeCandleHoriz(MainGameColor.Blue))
+    .addChild(c2q = LevelFactory.MakeCandle(MainGameColor.Blue))
+    .addChild(c2r = LevelFactory.MakeCandle(MainGameColor.Red))
+    .addChild(c2s = LevelFactory.MakeCandle(MainGameColor.Red))
+    .addChild(c2t = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(c2u = LevelFactory.MakeCandle(MainGameColor.Blue))
+    .addChild(c2v = LevelFactory.MakeCandle(MainGameColor.Red))
+    .addChild(c2w = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(c2x = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(c2y = LevelFactory.MakeCandle(MainGameColor.Blue))
+    .addChild(c2z = LevelFactory.MakeCandle(MainGameColor.Blue))
+    .addChild(c2aa = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
+    .addChild(c2bb = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
+    .addChild(c2cc = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
+    .addChild(c2dd = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
+    .addChild(c2ee = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
+    .addChild(c2ff = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
+    .addChild(c2gg = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
+    .addChild(c2hh = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
+    .addChild(c2ii = LevelFactory.MakeCandleHoriz(MainGameColor.Neutral))
+    .addChild(c2jj = LevelFactory.MakeCandle(MainGameColor.Neutral))
+    .addChild(g2a = LevelFactory.MakeGateHoriz(MainGameColor.Neutral))
+    .addChild(g2b = LevelFactory.MakeGateHoriz(MainGameColor.Neutral))
+    .addChild(g2c = LevelFactory.MakeTimedGate(MainGameColor.Red, 2.0))
+    .addChild(g2d = LevelFactory.MakeTimedGateHoriz(MainGameColor.Red, 2.0))
+    .addChild(g2e = LevelFactory.MakeGateHoriz(MainGameColor.Neutral))
+    .addChild(g2f = LevelFactory.MakeGateHoriz(MainGameColor.Neutral))
+    .addChild(g2g = LevelFactory.MakeTimedGate(MainGameColor.Blue, 2.0))
+    .addChild(g2h = LevelFactory.MakeTimedGate(MainGameColor.Blue, 1.75))
+    .addChild(g2i = LevelFactory.MakeTimedGate(MainGameColor.Blue, 1.5))
+    .addChild(g2j = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 2.0))
+    .addChild(g2k = LevelFactory.MakeGate(MainGameColor.Neutral))
+    .addChild(g2l = LevelFactory.MakeGateHoriz(MainGameColor.Neutral))
+    .addChild(g2m = LevelFactory.MakeTimedGate(MainGameColor.Red, 0.9))
+    .addChild(g2n = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
+    .addChild(g2o = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
+    .addChild(g2p = LevelFactory.MakeTimedGate(MainGameColor.Blue, 0.9))
+    .addChild(g2q = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
+    .addChild(g2r = LevelFactory.MakeTimedGate(MainGameColor.Red, 0.9))
+    .addChild(g2s = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
+    .addChild(g2t = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
+    .addChild(g2u = LevelFactory.MakeGate(MainGameColor.Neutral))
+    .addChild(g2v = LevelFactory.MakeGate(MainGameColor.Neutral))
+    .addChild(g2w = LevelFactory.MakeTimedGateHoriz(MainGameColor.Neutral, 7.5))
+    .addChild(q2a = LevelFactory.MakeCheckpoint())
+    .addChild(q2b = LevelFactory.MakeCheckpoint())
+    .addChild(q2c = LevelFactory.MakeCheckpoint())
+    .addChild(p2 = LevelFactory.MakeGround(4000, 80))
+    .addChild(s2a = LevelFactory.MakeSwitch(MainGameColor.Blue))
+    .addChild(s2b = LevelFactory.MakeSwitch(MainGameColor.Blue))
+    .addChild(s2c = LevelFactory.MakeSwitch(MainGameColor.Blue))
+    .addChild(s2d = LevelFactory.MakeSwitch(MainGameColor.Blue))
+    .addChild(s2e = LevelFactory.MakeSwitch(MainGameColor.Red))
+    .addChild(s2f = LevelFactory.MakeSwitch(MainGameColor.Red))
+    .addChild(s2g = LevelFactory.MakeSwitch(MainGameColor.Red))
+    .addChild(s2h = LevelFactory.MakeSwitch(MainGameColor.Red))
+    .addChild(s2i = LevelFactory.MakeSwitch(MainGameColor.Blue))
+    .addChild(s2j = LevelFactory.MakeSwitch(MainGameColor.Blue))
+    .addChild(s2k = LevelFactory.MakeSwitch(MainGameColor.Red))
+    .addChild(s2l = LevelFactory.MakeSwitch(MainGameColor.Blue))
+    .addChild(end2 = LevelFactory.MakeEndZone());
+
+  // ground
+  p1.position = new Vector(-200, 280);
+  p2.position = new Vector(-200, 280);
+  // invisible walls
+  b1start.position = new Vector(-50,-500);
+  b1end.position = new Vector(3000,-500);
+  b2start.position = new Vector(-50,-500);
+  b2end.position = new Vector(3000,-500);
+  // trigger zones
+  end1.position = new Vector(2850, 0);
+  end1.dimensions = new Vector(200, 300);
+  end2.position = new Vector(2850, 0);
+  end2.dimensions = new Vector(200, 300);
+
+  // puzzle 1
+  g1a.position = g1a.restPosition = new Vector(225, 230);
+  g1a.targetPosition = g1a.position.add(new Vector(0, -60));
+  g1b.position = g1b.restPosition = new Vector(225+32+128, 230);
+  g1b.targetPosition = g1b.position.add(new Vector(0, -60));
+  g1e.position = g1e.restPosition = new Vector(225+32, 140);
+  g1e.targetPosition = g1e.position.add(new Vector(0, 120));
+  g1c.position = g1c.restPosition = new Vector(575, 230);
+  g1c.targetPosition = g1c.position.add(new Vector(0, -60));
+  g1d.position = g1d.restPosition = new Vector(575+32+128, 230);
+  g1d.targetPosition = g1d.position.add(new Vector(0, -60));
+  g1f.position = g1f.restPosition = new Vector(575+32, 140);
+  g1f.targetPosition = g1f.position.add(new Vector(0, 120));
+  g1g.position = g1g.restPosition = new Vector(925, 280-120);
+  g1g.targetPosition = g1g.position.add(new Vector(0, 70));
+  g1h.position = g1h.restPosition = new Vector(925, 280-120-150);
+  g1h.targetPosition = g1h.position.add(new Vector(0, -70));
+  s1a.position = new Vector(225+32+64-20, 280-36);
+  s1b.position = new Vector(575+32+64-20, 280-36);
+  g1a.syncSwitch(s1a);
+  g1b.syncSwitch(s1a);
+  g1c.syncSwitch(s1b);
+  g1d.syncSwitch(s1b);
+  c2a.position = new Vector(150, 280-128-60);
+  c2b.position = new Vector(150+35, 280-128-60-140);
+  c2c.position = new Vector(150+32+2*128, 280-128);
+  c2d.position = new Vector(150+32+2*128, 280-128-70);
+  g2a.position = g2a.restPosition = new Vector(150+32, 280-32);
+  g2a.targetPosition = g2a.position.add(new Vector(0, -325));
+  g2b.position = g2b.restPosition = new Vector(150+32+128, 280-32);
+  g2b.targetPosition = g2b.position.add(new Vector(0, -325));
+  g2a.syncSwitch(s1a);
+  g2b.syncSwitch(s1a);
+  g2c.position = g2c.restPosition = new Vector(360, 260);
+  g2c.targetPosition = g2c.position.add(new Vector(0, -75));
+  s2a.position = new Vector(360-40-8, 280-36);
+  s2b.position = new Vector(360+32+8, 280-36);
+  g2d.position = g2d.restPosition = new Vector(150+32, 80);
+  g2d.targetPosition = g2d.position.add(new Vector(0, 65));
+  s2c.position = new Vector(150+32+128-40, 80+65-36);
+  s2d.position = new Vector(150+32+2*128-40, 65);
+  [s2a, s2b, s2c, s2d].map((s : Switch) => {
+    g1e.syncSwitch(s);
+  });
+  c2e.position = new Vector(150+32+2*128, 280-128-70);
+  c2f.position = new Vector(150+3*128, 280-128-70);
+  c2g.position = new Vector(150+3*128, 280-128);
+  c2h.position = new Vector(150+5*128+32, 280-128-60);
+  c2i.position = new Vector(150+5*128+32, 280-128*2-60);
+  c2j.position = new Vector(150+5*128+32, 280-128*3-60);
+  g2e.position = g2e.restPosition = new Vector(150+3*128+32, 24);
+  g2e.targetPosition = g2e.position.add(new Vector(0, 280-24));
+  g2f.position = g2f.restPosition = new Vector(150+4*128+32, 24);
+  g2f.targetPosition = g2f.position.add(new Vector(0, 280-24));
+  g2e.syncSwitch(s1b);
+  g2f.syncSwitch(s1b);
+  c2k.position = new Vector(150+3*128+32, -8);
+  c2l.position = new Vector(150+4*128+32, -8);
+  g2g.position = g2g.restPosition = new Vector(150+3*128+32, 150);
+  g2g.targetPosition = g2g.position.add(new Vector(0, 80));
+  g2h.position = g2h.restPosition = new Vector(150+3*128+32 + 172, -8+32+60);
+  g2h.targetPosition = g2h.position.add(new Vector(0, 30));
+  g2i.position = g2i.restPosition = new Vector(150+3*128+32 + 82, -30);
+  g2i.targetPosition = g2i.position.add(new Vector(0, 250));
+  s2e.position = new Vector(150+3*128+32*2+20, 280-36);
+  s2f.position = new Vector(150+3*128+32*2+60+20, 280-36);
+  s2g.position = new Vector(150+3*128+32*2+60*2+20, 280-36);
+  [s2e, s2f, s2g].map((s : Switch) => {
+    g1f.syncSwitch(s);
+  });
+  s2h.position = new Vector(925, 280-36);
+  g1g.syncSwitch(s2h);
+  g1h.syncSwitch(s2h);
+  q1a.position = new Vector(1000, 0);
+  q1a.spawnPoint = new Vector(1000, 200);
+  q2a.position = new Vector(480, 0);
+  q2a.spawnPoint = new Vector(480, 20);
+  q2b.position = new Vector(1000, 0);
+  q2b.spawnPoint = new Vector(1000, 200);
+
+  // puzzle 2
+  g1i.position = g1i.restPosition = new Vector(1100+64-16, 150);
+  g1i.targetPosition = g1i.position.add(new Vector(0, 65));
+  g2j.position = g2j.restPosition = new Vector(1100+64-16, 150);
+  g2j.targetPosition = g2j.position.add(new Vector(0, 65));
+  c1a.position = new Vector(1100+128, 110);
+  c1b.position = new Vector(1100+128*2, 110);
+  c1c.position = new Vector(1100+128*3, 110);
+  c1d.position = new Vector(1100+128*4, 110);
+  c1e.position = new Vector(1100+128*2 - 16, 110-128);
+  c1f.position = new Vector(1100+128*2 - 16, 110+32);
+  g1j.position = g1j.restPosition = new Vector(1100+128*3 - 16, 110-128);
+  g1j.targetPosition = g1j.position.add(new Vector(0, -100));
+  c1g.position = new Vector(1100+128*3 - 16, 110+32);
+  c1h.position = new Vector(1100+128*4 - 16, 110-128);
+  c1i.position = new Vector(1100+128*4 - 16, 110+32);
+  c1j.position = new Vector(1100+128*5 - 16, 110-128);
+  c1k.position = new Vector(1100+128*5 - 16, 110+32);
+  g1k.position = g1k.restPosition = new Vector(1100+128*5, 110);
+  g1k.targetPosition = g1k.position.add(new Vector(0, 280-110));
+  g1l.position = g1l.restPosition = new Vector(1100+128*6-16, 110+32)
+  g1l.targetPosition = g1l.position.add(new Vector(0, -100));
+  c2m.position = new Vector(1100+128, 110);
+  c2n.position = new Vector(1100+128*2, 110);
+  c2o.position = new Vector(1100+128*3, 110);
+  c2p.position = new Vector(1100+128*4, 110);
+  c2q.position = new Vector(1100+128*2 - 16, 110-128);
+  c2r.position = new Vector(1100+128*2 - 16, 110+32);
+  c2s.position = new Vector(1100+128*3 - 16, 110-128);
+  c2t.position = new Vector(1100+128*3 - 16, 110+32);
+  g2k.position = g2k.restPosition = new Vector(1100+128*4 - 16, 110-128);
+  g2k.targetPosition = g2k.position.add(new Vector(0, -100));
+  c2u.position = new Vector(1100+128*4 - 16, 110+32);
+  c2v.position = new Vector(1100+128*5 - 16, 110-128);
+  c2w.position = new Vector(1100+128*5 - 16, 110+32);
+  c2x.position = new Vector(1100+128*5 - 16+32, 110+32+64);
+  g2l.position = g2l.restPosition = new Vector(1100+128*4, 110-128-32-20);
+  g2l.targetPosition = g2l.position.add(new Vector(0, 280-(110-128-32-20)));
+  s1c.position = new Vector(1100+128*5 - 16 - 40, 110-36);
+  s1d.position = new Vector(1100+128*6 - 64, 280-36);
+  s2i.position = new Vector(1100+128*3 - 64, 280-36);
+  s2j.position = new Vector(1100+128*5 - 64, 280-36);
+  s2k.position = new Vector(1100+128*6 - 64, 280-36);
+  g1j.syncSwitch(s2i);
+  g1k.syncSwitch(s1d);
+  g2k.syncSwitch(s1c);
+  g2l.syncSwitch(s2j);
+  g1l.syncSwitch(s2k);
+  q1b.position = new Vector(1950, 0);
+  q1b.spawnPoint = new Vector(1950, 200);
+  q2c.position = new Vector(1880, 0);
+  q2c.spawnPoint = new Vector(1880, 200);
+
+  // puzzle 3
+  c2y.position = new Vector(2050 - 32-44-32, 220);
+  c2z.position = new Vector(2050 - 32, 165);
+  c2aa.position = new Vector(2050, 0);
+  c2bb.position = new Vector(2050+128, 0);
+  c2cc.position = new Vector(2050+128*2, 0);
+  c2dd.position = new Vector(2050+128*3, 0);
+  c2ee.position = new Vector(2050, 110);
+  c2ff.position = new Vector(2050+128, 110);
+  c2gg.position = new Vector(2050+128*2, 110);
+  c2hh.position = new Vector(2050+128*3, 110);
+  c2ii.position = new Vector(2050+128*4, 0);
+  c2jj.position = new Vector(2050+128*4-32, 110+32);
+  c1l.position = new Vector(2050+128*4, 0);
+  var lstGates1 : Gate[] = [g1m, g1n, g1o, g1p, g1q, g1r, g1s, g1t];
+  var lstGates2 : Gate[] = [g2m, g2n, g2o, g2p, g2q, g2r, g2s, g2t];
+  for (var i = 0; i < lstGates1.length; i++) {
+    lstGates1[i].position = lstGates1[i].restPosition = new Vector(2050 + i*64, 280-128);
+    lstGates1[i].targetPosition = lstGates1[i].position.add(new Vector(0, -175));
+    lstGates2[i].position = lstGates2[i].restPosition = new Vector(2050 + i*64, 280-128-175);
+    lstGates2[i].targetPosition = lstGates2[i].position.add(new Vector(0, 175));
+    lstGates1[i].smoothFactor = lstGates2[i].smoothFactor = 0.1;
+  }
+  g1u.position = g1u.restPosition = new Vector(2050+128*4+64, 280-120);
+  g1u.targetPosition = g1u.position.add(new Vector(0, 70));
+  g1v.position = g1v.restPosition = new Vector(2050+128*4+64, 280-120-150);
+  g1v.targetPosition = g1v.position.add(new Vector(0, -70));
+  g2u.position = g2u.restPosition = new Vector(2050+128*4+64, 280-120);
+  g2u.targetPosition = g2u.position.add(new Vector(0, 70));
+  g2v.position = g2v.restPosition = new Vector(2050+128*4+64, 280-120-150);
+  g2v.targetPosition = g2v.position.add(new Vector(0, -70));
+  [g1u, g1v, g2u, g2v].map((g: Gate) => {
+    g.smoothFactor = 0.1;
+  });
+  s1e.position = new Vector(2050+128*4+64+32+45, 280-36);
+  s2l.position = new Vector(2050+128*4+5, 280-36);
+  g1u.syncSwitch(s2l);
+  g1v.syncSwitch(s2l);
+  g2u.syncSwitch(s1e);
+  g2v.syncSwitch(s1e);
+  g1w.position = g1w.restPosition = new Vector(2050+128*4, 0);
+  g1w.targetPosition = g1w.position.add(new Vector(0, 280));
+  g1w.smoothFactor = 0.115;
+  g2w.position = g2w.restPosition = new Vector(2050+128*4, 0);
+  g2w.targetPosition = g2w.position.add(new Vector(0, 280));
+  g2w.smoothFactor = 0.115;
+
+  return {
+    topLevel: env1,
+    topStartPoint: new Vector(50, 200),
+    topEndZone: end1,
+    topXBounds: [0, 3000],
+
+    bottomLevel: env2,
+    bottomStartPoint: new Vector(50, 200),
+    bottomEndZone: end2,
+    bottomXBounds: [0, 3000],
+
+    gameDuration: 300,
+  };
+}
+
 
 private static GetLevelTest() : LevelParams {
   var tg1a : TimedGate, tg1b : TimedGate, tg2a : TimedGate, tg2b : TimedGate;
