@@ -8,11 +8,12 @@ import { Vector } from '../engine/util/Vector';
 import { ArrayList } from '../engine/util/ArrayList';
 import { CollisionEventArgs, CollisionType } from '../engine/events/EventTypes';
 import { EventDispatcher } from '../engine/events/EventDispatcher';
+import { IRefreshable } from './MainGameSprite';
 
 /**
  * A gate is synced with a switch to have a resting position and target when switch is pressed
  */
-export class Gate extends Platform {
+export class Gate extends Platform implements IRefreshable {
 
   private _restPosition : Vector;
   private _targetPosition : Vector;
@@ -70,6 +71,13 @@ export class Gate extends Platform {
         i--;  // length decreases, so we want to at same index for next element
       }
     }
+  }
+
+  refreshState() : void {
+    this.position = this.restPosition;
+    this._moveMode = 0;
+    this._playersOnGate = new ArrayList<PlayerObject>();
+    this._playersOnSide = new ArrayList<PlayerObject>();
   }
 
   syncSwitch(sw : Switch) : void {

@@ -12,20 +12,22 @@ import { CallbackManager } from '../engine/events/CallbackManager';
  */
 export class TimedGate extends Gate {
 
-  private _isSynced : boolean;
+  private _isSynced : boolean;  // whether the gate is synced with a switch
+  private _isActive : boolean;  // if synced, whether the switch is pressed to activate the gate
   private _halfCycleTime : number;  // amount of time (seconds) to wait before moving to other position
   private _halfCycleTimer : number; // temp timer to
 
   constructor(id : string, filename : string, halfCycleTime : number, color : MainGameColor = MainGameColor.Neutral) {
     super(id, filename, color);
     this._halfCycleTime = halfCycleTime;
-    this._halfCycleTimer = 0;
     this._isSynced = false;
+    this._halfCycleTimer = 0;
+    this._isActive = false;
   }
 
   update(dt : number = 0) : void {
     super.update(dt);
-    if (!this._isSynced) {
+    if (!this._isSynced || this._isActive) {
       this._halfCycleTimer += dt;
       if (this._halfCycleTimer > this._halfCycleTime) {
         this.moveMode = 1 - this.moveMode;
@@ -34,16 +36,22 @@ export class TimedGate extends Gate {
     }
   }
 
+  refreshState() : void {
+    super.refreshState();
+    this._halfCycleTimer = 0;
+    this._isActive = false;
+  }
+
   syncSwitch(sw : Switch) : void {
     this._isSynced = true;
     var self = this;
     sw.addOnEnter(() => {
       // starts movement
-      self._isSynced = false;
+      self._isActive = true;
     });
     sw.addOnExit(() => {
       // pauses movement
-      self._isSynced = true;
+      self._isActive = false;
     });
   }
 }

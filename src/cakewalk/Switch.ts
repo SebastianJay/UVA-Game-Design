@@ -8,13 +8,13 @@ import { applyMixins } from '../engine/util/mixins';
 import { SoundManager } from '../engine/sound/SoundManager';
 import { PlayerObject } from './PlayerObject';
 import { MainGameColor } from './MainGameEnums';
-import { MainGameSprite } from './MainGameSprite';
+import { MainGameSprite, IRefreshable } from './MainGameSprite';
 
 /**
  * A switch that executes some given callback when pressed or unpressed.
  * Can be colored to only respond to certain players.
  */
-export class Switch extends MainGameSprite implements IRectCollider {
+export class Switch extends MainGameSprite implements IRectCollider, IRefreshable {
 
   private _onEnter : (() => void)[];
   private _onExit : (() => void)[];
@@ -32,7 +32,7 @@ export class Switch extends MainGameSprite implements IRectCollider {
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
   }
 
-  update(dt : number = 0) : void{
+  update(dt : number = 0) : void {
     super.update(dt);
     // only process collisions if one event was thrown last frame
     // NOTE this logic may not be valid if multiple players can touch the same switch
@@ -52,6 +52,11 @@ export class Switch extends MainGameSprite implements IRectCollider {
       }
     }
     this._eventQueue = [];  // reset queue every frame
+  }
+
+  refreshState() : void {
+    this._isPressed = false;
+    this._eventQueue = [];
   }
 
   getOnEnter() : (() => void)[] { return this._onEnter; }

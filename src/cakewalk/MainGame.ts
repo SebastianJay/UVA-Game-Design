@@ -186,6 +186,9 @@ export class MainGame extends Game {
     SoundManager.instance.loadSound('swap_blue', 'CakeWalk/music/swap2.mp3');
     SoundManager.instance.loadSound('button', 'CakeWalk/music/buttonclick.mp3');
 
+    // create and keep all the level data in memory
+    LevelFactory.PreloadLevels();
+
     // create collision matrix
     // 0 - neutral objects that collide both players
     // 1 - red objects that pass through player red
@@ -360,7 +363,7 @@ export class MainGame extends Game {
   private loadLevel() {
     // insert new environment into display tree
     var levelParams = LevelFactory.GetLevel(this.gameLevelNumber);
-    if (this.world1.children.length > 2 && this.world2.children.length > 2) {
+    if (this.world1.children.length > 2 && this.world2.children.length > 2 && !LevelFactory.IsPreloaded) {
       // clean previous level
       (<DisplayObjectContainer>this.world1.getChild(2)).clearReferences();
       (<DisplayObjectContainer>this.world2.getChild(2)).clearReferences();

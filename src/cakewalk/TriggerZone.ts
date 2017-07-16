@@ -9,8 +9,9 @@ import { ArrayList } from '../engine/util/ArrayList';
 import { applyMixins } from '../engine/util/mixins';
 
 import { PlayerObject } from './PlayerObject';
+import { IRefreshable } from './MainGameSprite';
 
-export class TriggerZone extends DisplayObjectContainer implements IRectCollider {
+export class TriggerZone extends DisplayObjectContainer implements IRectCollider, IRefreshable {
   private _playersInZone : ArrayList<PlayerObject>;
 
   constructor(id : string) {
@@ -19,6 +20,10 @@ export class TriggerZone extends DisplayObjectContainer implements IRectCollider
     this.isTrigger = true;    // does not alter collider physics
     this._playersInZone = new ArrayList<PlayerObject>();
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
+  }
+
+  refreshState() : void {
+    this._playersInZone = new ArrayList<PlayerObject>();
   }
 
   get isPlayerInZone() : boolean { return this._playersInZone.length > 0; }

@@ -11,3 +11,11 @@ export class MainGameSprite extends Sprite {
   get color() : MainGameColor { return this._color; }
   set color(c : MainGameColor) { this._color = c; }
 }
+
+export interface IRefreshable {
+  refreshState : () => void;
+}
+
+export function isRefreshable(o : any) : o is IRefreshable {
+  return 'refreshState' in o;
+}

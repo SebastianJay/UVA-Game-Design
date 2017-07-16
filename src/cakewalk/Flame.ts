@@ -37,8 +37,6 @@ export class Flame extends MainGameSprite implements IAnimatedSprite {
     this.addChild(hitbox);
 
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
-
-
   }
 
   update(dt : number = 0) : void{

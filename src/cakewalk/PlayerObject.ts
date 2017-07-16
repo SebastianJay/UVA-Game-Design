@@ -239,6 +239,7 @@ export class PlayerObject extends MainGameSprite implements IRectCollider, IPhys
     this.velocity = Vector.zero;
     this._currentDirectionRight = true;
     this._inDeathState = false;
+    this._cooldownAnimation.visible = false;
     this._canSwap = true;
     this.grounded = false;
     this.jumping = false;

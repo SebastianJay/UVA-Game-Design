@@ -12,7 +12,9 @@ import { SoundManager } from '../engine/sound/SoundManager';
 import { PlayerObject } from './PlayerObject';
 import { Sprite } from '../engine/display/Sprite';
 
-export class Checkpoint extends DisplayObjectContainer implements IRectCollider {
+import { IRefreshable } from './MainGameSprite';
+
+export class Checkpoint extends DisplayObjectContainer implements IRectCollider, IRefreshable {
 
   // internally this is relative to this object's position
   // but externally (setter and getter) is embeds position info as well
@@ -24,7 +26,14 @@ export class Checkpoint extends DisplayObjectContainer implements IRectCollider 
     this.isTrigger = true;    // does not alter collider physics
     this._spawnPoint = Vector.zero;
     EventDispatcher.addGlobalListener(CollisionEventArgs.ClassName, this.collisionHandler);
+  }
 
+  refreshState() : void {
+    if (this.children.length >= 2) {
+      // switch which image is visible to show player has made progress
+      this.getChild(0).visible = true;
+      this.getChild(1).visible = false;
+    }
   }
 
   get spawnPoint() : Vector { return this._spawnPoint.add(this.position); }

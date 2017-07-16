@@ -14,6 +14,7 @@ import { Flame } from './Flame';
 import { TriggerZone } from './TriggerZone';
 import { Checkpoint } from './Checkpoint';
 import { MainGameAction, MainGameState, MainGameColor } from './MainGameEnums';
+import { IRefreshable, isRefreshable } from './MainGameSprite';
 
 /**
  * Contains parameters needed to start up a new level. Top and bottom screens have separate params:
@@ -41,6 +42,10 @@ export interface LevelParams {
  * Exposes static methods that create levels to be used in the main game
  */
 export class LevelFactory {
+
+  /** List of cached levels */
+  private static _PreloadedLevels : LevelParams[] = [];
+  public static get IsPreloaded() : boolean { return LevelFactory._PreloadedLevels.length > 0; }
 
   /** Call the getter to generate a "GUID" for objects */
   private static _Counter: number = 0;
@@ -137,20 +142,52 @@ export class LevelFactory {
    *  creates the display tree for those levels.
    * Ideally, levels starting from a certain number will be procedurally generated.
    */
-  static GetLevel(num: number) {
+  static GetLevel(num: number) : LevelParams {
     if (num == -1) {
+      // debug level
       return LevelFactory.GetLevelTest();
-    } else if (num == 0) {
-      return LevelFactory.GetLevelOne();
-    } else if (num == 1) {
-      return LevelFactory.GetLevelTwo();
-    } else if (num == 2) {
-      return LevelFactory.GetLevelThree();
-    } else if (num == 3) {
-      return LevelFactory.GetLevelFour();
+    } else if (num < LevelFactory._PreloadedLevels.length) {
+      // level has already been created, so refresh levels and return params
+      var refreshTree = (o : DisplayObject) => {
+        if (isRefreshable(o)) {
+          o.refreshState();
+        }
+      };
+      LevelFactory._PreloadedLevels[num].topLevel.map(refreshTree);
+      LevelFactory._PreloadedLevels[num].bottomLevel.map(refreshTree);
+      return LevelFactory._PreloadedLevels[num];
     } else {
-      return LevelFactory.GetLevelFive();
+      // generate level on the fly
+      if (num == 0) {
+        return LevelFactory.GetLevelOne();
+      } else if (num == 1) {
+        return LevelFactory.GetLevelTwo();
+      } else if (num == 2) {
+        return LevelFactory.GetLevelThree();
+      } else if (num == 3) {
+        return LevelFactory.GetLevelFour();
+      } else {
+        return LevelFactory.GetLevelFive();
+      }
     }
+  }
+
+  /**
+   * Can be called at the start of the game to create and cache
+   *  all the levels in advance, reducing some lag when levels
+   *  need to be loaded.
+   */
+  static PreloadLevels() : void {
+    if (LevelFactory._PreloadedLevels.length > 0) {
+      return;
+    }
+    LevelFactory._PreloadedLevels = [
+      LevelFactory.GetLevelOne(),
+      LevelFactory.GetLevelTwo(),
+      LevelFactory.GetLevelThree(),
+      LevelFactory.GetLevelFour(),
+      LevelFactory.GetLevelFive()
+    ];
   }
 
   // first level - tutorial
