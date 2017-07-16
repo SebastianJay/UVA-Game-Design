@@ -57,7 +57,7 @@ export class MainGame extends Game {
   private swapLock : boolean;
 
   private gameState : MainGameState = MainGameState.MenuOpen;
-  private totalNumberOfLevels : number = 4; // total number of levels in game
+  private totalNumberOfLevels : number = 5; // total number of levels in game
   private gameLevelNumber : number = 0; // which level players are on
   private gameDuration : number = 100;  // amount of time (seconds) before game over
   private gameSongs : string[] = ['jacket', 'atop', 'ocean', 'distance', 'cake']; // order that songs are played
@@ -203,6 +203,8 @@ export class MainGame extends Game {
       this.gameState = MainGameState.InGame;
       this.gameLevelNumber = -1;
       this.loadLevel();
+      //this.player1.position = new Vector(2000, 30);
+      //this.player2.position = new Vector(1800, 30);
     }
   }
 

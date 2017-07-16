@@ -23,9 +23,10 @@ export class MenuUI extends Sprite {
     super(id, filename);
 
     // add display tree of option text and cursor
-    var t0 : TextObject, t1 : TextObject, t2 : TextObject,
-      t3 : TextObject, t4 : TextObject, t5 : TextObject, t6 : TextObject,
-      t7 : TextObject, t8 : TextObject, t9 : TextObject, t10 : TextObject, t11 : TextObject, t12 : TextObject;
+    var t0 : TextObject, t1 : TextObject, t2 : TextObject, t3 : TextObject,
+      t4 : TextObject, t5 : TextObject, t6 : TextObject, t7 : TextObject,
+      t8 : TextObject, t9 : TextObject, t10 : TextObject, t11 : TextObject,
+      t12 : TextObject, t13: TextObject;
     var tn0 : TextObject, tn1 : TextObject, tn2 : TextObject,
       tn3 : TextObject, tn4 : TextObject, tn5 : TextObject, tn6 : TextObject, tn7 : TextObject;
     this.addChild(this._cursor = new Sprite(id+'_cursor', 'CakeWalk/cake_small.png'))
@@ -48,6 +49,7 @@ export class MenuUI extends Sprite {
         .addChild(t8 = new TextObject(id+'_t8'))
         .addChild(t9 = new TextObject(id+'_t9'))
         .addChild(t12 = new TextObject(id+'_t12'))
+        .addChild(t13 = new TextObject(id+'_t13'))
         .addChild(t10 = new TextObject(id+'_t10'))
       )
     ).addChild(new DisplayObjectContainer(id+'_credits', '')
@@ -63,15 +65,15 @@ export class MenuUI extends Sprite {
       .addChild(tn7 = new TextObject(id+'_tn7'))
     );
 
-    t0.position = new Vector(1280 / 2 - 100, 350);
+    t0.position = new Vector(1280 / 2 - 150, 350);
     t0.text = 'Play Game!';
-    t1.position = new Vector(1280 / 2 - 100, 400);
+    t1.position = new Vector(1280 / 2 - 150, 400);
     t1.text = 'Sound';
-    t11.position = new Vector(1280 / 2 - 100, 450);
+    t11.position = new Vector(1280 / 2 - 150, 450);
     t11.text = 'Level Select';
-    t2.position = new Vector(1280 / 2 - 100, 500);
+    t2.position = new Vector(1280 / 2 - 150, 500);
     t2.text = 'Credits';
-    t3.position = new Vector(1280 / 2 - 125, 350);
+    t3.position = new Vector(1280 / 2 - 200, 350);
     t3.text = 'Mute Music';
     t4.position = new Vector(1280 / 2 - 200, 400);
     t4.text = 'Mute Sound Effects';
@@ -79,14 +81,16 @@ export class MenuUI extends Sprite {
     t5.text = 'Go Back';
     t6.position = new Vector(1280 / 2 - 100, 550);
     t6.text = 'Go Back';
-    t7.position = new Vector(1280 / 2 - 100, 350);
-    t7.text = 'Short';
-    t8.position = new Vector(1280 / 2 - 100, 400);
-    t8.text = 'Pound';
-    t9.position = new Vector(1280 / 2 - 100, 450);
+    t7.position = new Vector(1280 / 2 - 50, 340);
+    t7.text = 'Cup';
+    t8.position = new Vector(1280 / 2 - 50, 375);
+    t8.text = 'Bundt';
+    t9.position = new Vector(1280 / 2 - 50, 410);
     t9.text = 'Cheese';
-    t12.position = new Vector(1280 / 2 - 100, 500);
-    t12.text = 'Sponge';
+    t12.position = new Vector(1280 / 2 - 50, 445);
+    t12.text = 'Carrot';
+    t13.position = new Vector(1280 / 2 - 50, 480);
+    t13.text = 'Moon';
     t10.position = new Vector(1280 / 2 - 100, 550);
     t10.text = 'Go Back';
 
@@ -107,15 +111,20 @@ export class MenuUI extends Sprite {
     tn7.position = new Vector(1280 / 2 - 250, 475);
     tn7.text = 'Cake - Melanie Martinez, arranged by ZaneDobler';
 
-    [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, tn0, tn1, tn2].map((t : TextObject) => {
+    [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12,
+      t13, tn0, tn1, tn2, tn3, tn4, tn5, tn6, tn7].map((t : TextObject) => {
       t.color = new Vector(0, 0, 0);
       t.fontSize = 48;
       t.fontFamily = 'Sanchez';
     });
+    [tn0, tn1, tn2].map((t : TextObject) => {
+      t.fontSize = 46;
+    });
     [tn3, tn4, tn5, tn6, tn7].map((t : TextObject) => {
-      t.color = new Vector(0, 0, 0);
       t.fontSize = 20;
-      t.fontFamily = 'Sanchez';
+    });
+    [t7, t8, t9, t12, t13].map((t : TextObject) => {
+      t.fontSize = 32;
     });
 
     this._cursor.position = new Vector(1280 / 2 - 150, 350);
@@ -183,7 +192,7 @@ export class MenuUI extends Sprite {
       }
     } else if (this._menuIndex == 2) {
       // level select
-      if (this._optionIndex == 4) {
+      if (this._optionIndex == 5) {
         this.menuChange(0);
       } else {
         // start level with given index

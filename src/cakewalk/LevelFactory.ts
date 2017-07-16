@@ -328,11 +328,11 @@ export class LevelFactory {
     f2p.position = new Vector(2500,140);
     g1b.restPosition = g1b.position = new Vector(2550, 25);
     g1b.targetPosition = g1b.position.add(new Vector(0, -150));
-    s2b.position = new Vector(2500, 130);
+    s2b.position = new Vector(2500+16-20, 130);
     g1b.syncSwitch(s2b);
     g2a.restPosition = g2a.position = new Vector(2550, 25);
     g2a.targetPosition = g2a.position.add(new Vector(0, 150));
-    s1a.position = new Vector(2700, 250);
+    s1a.position = new Vector(2700, 280-36);
     g2a.syncSwitch(s1a);
     // ending trigger zones
     end1.position = new Vector(2850, 0);
@@ -354,12 +354,12 @@ export class LevelFactory {
       topEndZone: end1,
       topXBounds: [0, 3000],
 
-      bottomLevel :env2,
+      bottomLevel: env2,
       bottomStartPoint: new Vector(50, 200),
       bottomEndZone: end2,
       bottomXBounds: [0, 3000],
 
-      gameDuration: 180,
+      gameDuration: 200,
     };
   }
 
@@ -389,7 +389,6 @@ private static GetLevelTwo() : LevelParams {
     f2ii: Flame, f2jj: Flame, f2kk: Flame, f2ll: Flame, f2mm: Flame, f2nn: Flame, f2oo: Flame, f2pp: Flame,
     f2qq: Flame, f2rr: Flame, f2ss: Flame, f2tt: Flame,  f2uu: Flame;
 
-
   var q1a: Checkpoint;
   var q2a: Checkpoint;
   // trigger zones for end of level
@@ -405,7 +404,7 @@ private static GetLevelTwo() : LevelParams {
     .addChild(c1e = LevelFactory.MakeCandleHoriz(MainGameColor.Red))
     .addChild(c1f = LevelFactory.MakeCandleHoriz(MainGameColor.Blue))
     .addChild(c1g = LevelFactory.MakeCandleHoriz(MainGameColor.Red))
-    //.addChild(c1h = LevelFactory.MakeCandleHoriz(MainGameColor.Blue))
+    .addChild(c1h = LevelFactory.MakeCandle(MainGameColor.Neutral))
     .addChild(q1a = LevelFactory.MakeCheckpoint())
     .addChild(p1 = LevelFactory.MakeGround(4000, 80))
     .addChild(f1a = LevelFactory.MakeFlame(MainGameColor.Blue))
@@ -461,7 +460,7 @@ private static GetLevelTwo() : LevelParams {
     .addChild(c2e = LevelFactory.MakeCandleHoriz(MainGameColor.Blue))
     .addChild(c2f = LevelFactory.MakeCandleHoriz(MainGameColor.Red))
     .addChild(c2g = LevelFactory.MakeCandleHoriz(MainGameColor.Blue))
-    //.addChild(c2h = LevelFactory.MakeCandleHoriz(MainGameColor.Red))
+    .addChild(c2h = LevelFactory.MakeCandle(MainGameColor.Neutral))
     .addChild(q2a = LevelFactory.MakeCheckpoint())
     .addChild(p2 = LevelFactory.MakeGround(4000, 80))
     .addChild(f2a = LevelFactory.MakeFlame(MainGameColor.Red))
@@ -522,6 +521,8 @@ private static GetLevelTwo() : LevelParams {
   //second obstacle
   c1a.position = new Vector(300,190);
   c2a.position = new Vector(300,190);
+  c1h.position = new Vector(300-45, 190+32);
+  c2h.position = new Vector(300-45, 190+32);
   c1b.position = new Vector(600, 80);
   c2b.position = new Vector(600, 80);
   c1c.position = new Vector(750,190);
@@ -540,13 +541,6 @@ private static GetLevelTwo() : LevelParams {
   c2f.position = new Vector(1600, 120);
   c1g.position = new Vector(2050, 80);
   c2g.position = new Vector(2050, 80);
-  //c1h.position = new Vector(2400,500);
-  //c2h.position = new Vector(2400,50);
-
-
-  //fourth obstacle
-
-  // checkpoint 1
 
   //fire floor
   f1b.position = new Vector(450, 220);
@@ -641,12 +635,12 @@ private static GetLevelTwo() : LevelParams {
     topEndZone: end1,
     topXBounds: [0, 3000],
 
-    bottomLevel :env2,
+    bottomLevel: env2,
     bottomStartPoint: new Vector(50, 50),
     bottomEndZone: end2,
     bottomXBounds: [0, 3000],
 
-    gameDuration: 150,
+    gameDuration: 170,
   };
 }
 
@@ -1040,7 +1034,7 @@ private static GetLevelThree() : LevelParams {
     topEndZone: end1,
     topXBounds: [0, 3000],
 
-    bottomLevel :env2,
+    bottomLevel: env2,
     bottomStartPoint: new Vector(50, 50),
     bottomEndZone: end2,
     bottomXBounds: [0, 3000],
@@ -1058,8 +1052,8 @@ private static GetLevelFour() : LevelParams {
   // object: c = candle, f = flame, g = gate, s = switch, q = checkpoint
   // world: 1 = world 1, 2 = world 2
   // order: from leftmost to right most type of that object a,b,c, etc.  after z it will go aa, ab, ac
-  var c1a, c1b, c1c, c1d;
-  var c2a, c2b, c2c, c2d;
+  var c1a, c1b, c1c;
+  var c2a;
   var g1a, g1b, g1c, g1d, g1e, g1f, g1g, g1h, g1i, g1j, g1k, g1l, g1m, g1n, g1o;
   var s1a;
   var g2a, g2b, g2c, g2d, g2e, g2f, g2g, g2h, g2i, g2j, g2k, g2l, g2m;
@@ -1141,6 +1135,7 @@ private static GetLevelFour() : LevelParams {
   var env2 = new DisplayObjectContainer('level3_bottom', '')
     .addChild(b2start = LevelFactory.MakeWall())
     .addChild(b2end = LevelFactory.MakeWall())
+    .addChild(c2a = LevelFactory.MakeCandle(MainGameColor.Neutral))
     .addChild(s2a = LevelFactory.MakeSwitch(MainGameColor.Blue))
     .addChild(s2b = LevelFactory.MakeSwitch(MainGameColor.Red))
     .addChild(s2c = LevelFactory.MakeSwitch(MainGameColor.Blue))
@@ -1219,16 +1214,17 @@ private static GetLevelFour() : LevelParams {
   g1c.position = g1c.restPosition = new Vector(350, 152);
   g1c.targetPosition = g1c.position.add(new Vector(0, -90));
   s2a.position = new Vector(150, 244);
-  g1a.syncSwitch(s2a);
   g1a.syncSwitch(s2b);
+  g1a.syncSwitch(s2c);
   s2b.position = new Vector(250, 244);
   g1b.syncSwitch(s2a);
   g1b.syncSwitch(s2c);
   s2c.position = new Vector(350, 244);
+  g1c.syncSwitch(s2a);
   g1c.syncSwitch(s2b);
-  g1c.syncSwitch(s2c);
-  g2a.position = g2a.restPosition = new Vector(700, 152);
-  g2a.targetPosition = g2a.position.add(new Vector(0, -90));
+  g2a.position = g2a.restPosition = new Vector(675, 152);
+  g2a.targetPosition = g2a.position.add(new Vector(0, -180));
+  c2a.position = new Vector(675+32, 212);
   s1a.position = new Vector(50, 50);
   g2a.syncSwitch(s1a);
   c1a.position = new Vector(450, 200);
@@ -1442,17 +1438,17 @@ private static GetLevelFive() : LevelParams {
     .addChild(g1j = LevelFactory.MakeGate(MainGameColor.Neutral))
     .addChild(g1k = LevelFactory.MakeGateHoriz(MainGameColor.Neutral))
     .addChild(g1l = LevelFactory.MakeGate(MainGameColor.Neutral))
-    .addChild(g1m = LevelFactory.MakeTimedGate(MainGameColor.Blue, 0.9))
-    .addChild(g1n = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
-    .addChild(g1o = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
-    .addChild(g1p = LevelFactory.MakeTimedGate(MainGameColor.Red, 0.9))
-    .addChild(g1q = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
-    .addChild(g1r = LevelFactory.MakeTimedGate(MainGameColor.Blue, 0.9))
-    .addChild(g1s = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
-    .addChild(g1t = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
+    .addChild(g1m = LevelFactory.MakeTimedGate(MainGameColor.Blue, 0.95))
+    .addChild(g1n = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.95))
+    .addChild(g1o = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.95))
+    .addChild(g1p = LevelFactory.MakeTimedGate(MainGameColor.Red, 0.95))
+    .addChild(g1q = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.95))
+    .addChild(g1r = LevelFactory.MakeTimedGate(MainGameColor.Blue, 0.95))
+    .addChild(g1s = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.95))
+    .addChild(g1t = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.95))
     .addChild(g1u = LevelFactory.MakeGate(MainGameColor.Neutral))
     .addChild(g1v = LevelFactory.MakeGate(MainGameColor.Neutral))
-    .addChild(g1w = LevelFactory.MakeTimedGateHoriz(MainGameColor.Neutral, 7.5))
+    .addChild(g1w = LevelFactory.MakeTimedGateHoriz(MainGameColor.Neutral, 7.75))
     .addChild(q1a = LevelFactory.MakeCheckpoint())
     .addChild(q1b = LevelFactory.MakeCheckpoint())
     .addChild(p1 = LevelFactory.MakeGround(4000, 80))
@@ -1514,17 +1510,17 @@ private static GetLevelFive() : LevelParams {
     .addChild(g2j = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 2.0))
     .addChild(g2k = LevelFactory.MakeGate(MainGameColor.Neutral))
     .addChild(g2l = LevelFactory.MakeGateHoriz(MainGameColor.Neutral))
-    .addChild(g2m = LevelFactory.MakeTimedGate(MainGameColor.Red, 0.9))
-    .addChild(g2n = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
-    .addChild(g2o = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
-    .addChild(g2p = LevelFactory.MakeTimedGate(MainGameColor.Blue, 0.9))
-    .addChild(g2q = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
-    .addChild(g2r = LevelFactory.MakeTimedGate(MainGameColor.Red, 0.9))
-    .addChild(g2s = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
-    .addChild(g2t = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.9))
+    .addChild(g2m = LevelFactory.MakeTimedGate(MainGameColor.Red, 0.95))
+    .addChild(g2n = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.95))
+    .addChild(g2o = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.95))
+    .addChild(g2p = LevelFactory.MakeTimedGate(MainGameColor.Blue, 0.95))
+    .addChild(g2q = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.95))
+    .addChild(g2r = LevelFactory.MakeTimedGate(MainGameColor.Red, 0.95))
+    .addChild(g2s = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.95))
+    .addChild(g2t = LevelFactory.MakeTimedGate(MainGameColor.Neutral, 0.95))
     .addChild(g2u = LevelFactory.MakeGate(MainGameColor.Neutral))
     .addChild(g2v = LevelFactory.MakeGate(MainGameColor.Neutral))
-    .addChild(g2w = LevelFactory.MakeTimedGateHoriz(MainGameColor.Neutral, 7.5))
+    .addChild(g2w = LevelFactory.MakeTimedGateHoriz(MainGameColor.Neutral, 7.75))
     .addChild(q2a = LevelFactory.MakeCheckpoint())
     .addChild(q2b = LevelFactory.MakeCheckpoint())
     .addChild(q2c = LevelFactory.MakeCheckpoint())
@@ -1736,6 +1732,9 @@ private static GetLevelFive() : LevelParams {
   g2w.position = g2w.restPosition = new Vector(2050+128*4, 0);
   g2w.targetPosition = g2w.position.add(new Vector(0, 280));
   g2w.smoothFactor = 0.115;
+  [s1d, s2a, s2b, s2c, s2d, s2e, s2f, s2g, s2j].map((s : Switch) => {
+    s.addChild(new Sprite(s.id + '_x', 'CakeWalk/transparent_x.png'));
+  });
 
   return {
     topLevel: env1,
@@ -1748,7 +1747,7 @@ private static GetLevelFive() : LevelParams {
     bottomEndZone: end2,
     bottomXBounds: [0, 3000],
 
-    gameDuration: 300,
+    gameDuration: 325,
   };
 }
 
@@ -1801,7 +1800,7 @@ private static GetLevelTest() : LevelParams {
     topEndZone: end1,
     topXBounds: [0, 3000],
 
-    bottomLevel :env2,
+    bottomLevel: env2,
     bottomStartPoint: new Vector(50, 50),
     bottomEndZone: end2,
     bottomXBounds: [0, 3000],
