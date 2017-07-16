@@ -56,10 +56,11 @@ export class MainGame extends Game {
   private gameOverLock : boolean;
   private swapLock : boolean;
 
-  private gameState : MainGameState = MainGameState.MenuOpen;
+  private gameState : MainGameState;
+  private gameLevelNumber : number;
+  private gameDuration : number;
+  private gameLoadingFramesElapsed : number;
   private totalNumberOfLevels : number = 5; // total number of levels in game
-  private gameLevelNumber : number = 0; // which level players are on
-  private gameDuration : number = 100;  // amount of time (seconds) before game over
   private gameSongs : string[] = ['jacket', 'atop', 'ocean', 'distance', 'cake']; // order that songs are played
 
   constructor (canvas : HTMLCanvasElement) {
@@ -165,29 +166,10 @@ export class MainGame extends Game {
     this.gameOverLock = false;
     this.swapLock = false;
 
-    // load music
-    // NOTE bg music ids need to match gameSongs
-    SoundManager.instance.loadSound('jacket', 'CakeWalk/music/short_skirt_long_jacket.mp3');
-    SoundManager.instance.loadSound('atop', 'CakeWalk/music/atop_a_cake.mp3');
-    SoundManager.instance.loadSound('ocean', 'CakeWalk/music/cake_by_the_ocean.mp3');
-    SoundManager.instance.loadSound('distance', 'CakeWalk/music/the_distance.mp3');
-    SoundManager.instance.loadSound('cake', 'CakeWalk/music/cake_martinez.mp3');
-    SoundManager.instance.playMusic(this.gameSongs[0]);
-
-    // load all sound effects
-    SoundManager.instance.loadSound('loss', 'CakeWalk/music/loss.mp3');
-    SoundManager.instance.loadSound('tada', 'CakeWalk/music/tada.mp3');
-    SoundManager.instance.loadSound('burn', 'CakeWalk/music/burn.mp3');
-    SoundManager.instance.loadSound('checkpoint', 'CakeWalk/music/checkpoint.mp3');
-    SoundManager.instance.loadSound('jump', 'CakeWalk/music/jump.mp3');
-    SoundManager.instance.loadSound('squash', 'CakeWalk/music/squash.mp3');
-    SoundManager.instance.loadSound('thud', 'CakeWalk/music/thud.mp3');
-    SoundManager.instance.loadSound('swap_red', 'CakeWalk/music/swap1.mp3');
-    SoundManager.instance.loadSound('swap_blue', 'CakeWalk/music/swap2.mp3');
-    SoundManager.instance.loadSound('button', 'CakeWalk/music/buttonclick.mp3');
-
-    // create and keep all the level data in memory
-    LevelFactory.PreloadLevels();
+    // game state
+    this.gameLevelNumber = 0;
+    this.gameState = MainGameState.Loading;
+    this.gameLoadingFramesElapsed = 0;
 
     // create collision matrix
     // 0 - neutral objects that collide both players
@@ -202,6 +184,7 @@ export class MainGame extends Game {
 
     if (MainGame.IsDebug) {
       this.menu.visible = false;
+      this.menu.setGameLoaded();
       this.menu.setGameStarted();
       this.gameState = MainGameState.InGame;
       this.gameLevelNumber = -1;
@@ -214,7 +197,41 @@ export class MainGame extends Game {
   update(dt : number = 0) : void{
     super.update(dt);
 
-    if (this.gameState == MainGameState.MenuOpen && !this.menuLock) {
+    if (this.gameState == MainGameState.Loading) {
+      // skip some frames to get loading screen up, then do CPU intensive work
+      if (this.gameLoadingFramesElapsed < 5) {
+        this.gameLoadingFramesElapsed += 1;
+        return;
+      }
+
+      // load music NOTE bg music ids need to match gameSongs
+      SoundManager.instance.loadSound('jacket', 'CakeWalk/music/short_skirt_long_jacket.mp3');
+      SoundManager.instance.loadSound('atop', 'CakeWalk/music/atop_a_cake.mp3');
+      SoundManager.instance.loadSound('ocean', 'CakeWalk/music/cake_by_the_ocean.mp3');
+      SoundManager.instance.loadSound('distance', 'CakeWalk/music/the_distance.mp3');
+      SoundManager.instance.loadSound('cake', 'CakeWalk/music/cake_martinez.mp3');
+      SoundManager.instance.playMusic(this.gameSongs[0]);
+
+      // load sound effects
+      SoundManager.instance.loadSound('loss', 'CakeWalk/music/loss.mp3');
+      SoundManager.instance.loadSound('tada', 'CakeWalk/music/tada.mp3');
+      SoundManager.instance.loadSound('burn', 'CakeWalk/music/burn.mp3');
+      SoundManager.instance.loadSound('checkpoint', 'CakeWalk/music/checkpoint.mp3');
+      SoundManager.instance.loadSound('jump', 'CakeWalk/music/jump.mp3');
+      SoundManager.instance.loadSound('squash', 'CakeWalk/music/squash.mp3');
+      SoundManager.instance.loadSound('thud', 'CakeWalk/music/thud.mp3');
+      SoundManager.instance.loadSound('swap_red', 'CakeWalk/music/swap1.mp3');
+      SoundManager.instance.loadSound('swap_blue', 'CakeWalk/music/swap2.mp3');
+      SoundManager.instance.loadSound('button', 'CakeWalk/music/buttonclick.mp3');
+
+      // create and keep all the level data in memory
+      LevelFactory.PreloadLevels();
+
+      // now shift to MenuOpen
+      this.gameState = MainGameState.MenuOpen;
+      this.menu.setGameLoaded();
+
+    } else if (this.gameState == MainGameState.MenuOpen && !this.menuLock) {
       // if pause is pressed in game it closes the menu (second check is a proxy for "environment is loaded")
       if (this.getActionInput(MainGameAction.Pause) > 0 && this.world1.children.length > 2) {
         this.closeMenu();

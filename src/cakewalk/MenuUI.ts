@@ -29,6 +29,7 @@ export class MenuUI extends Sprite {
       t12 : TextObject, t13: TextObject;
     var tn0 : TextObject, tn1 : TextObject, tn2 : TextObject,
       tn3 : TextObject, tn4 : TextObject, tn5 : TextObject, tn6 : TextObject, tn7 : TextObject;
+    var tl : TextObject;
     this.addChild(this._cursor = new Sprite(id+'_cursor', 'CakeWalk/cake_small.png'))
     .addChild(new DisplayObjectContainer(id+'_mainmenu', '')
       .addChild(new DisplayObjectContainer(id+'mainmenu_options', '')
@@ -63,7 +64,8 @@ export class MenuUI extends Sprite {
       .addChild(tn5 = new TextObject(id+'_tn5'))
       .addChild(tn6 = new TextObject(id+'_tn6'))
       .addChild(tn7 = new TextObject(id+'_tn7'))
-    );
+    ).addChild(new DisplayObjectContainer(id+'_loading', '')
+      .addChild(tl = new TextObject(id+'_tl')));
 
     t0.position = new Vector(1280 / 2 - 150, 350);
     t0.text = 'Play Game!';
@@ -111,8 +113,11 @@ export class MenuUI extends Sprite {
     tn7.position = new Vector(1280 / 2 - 250, 475);
     tn7.text = 'Cake - Melanie Martinez, arranged by ZaneDobler';
 
+    tl.position = new Vector(1280 / 2 - 100, 350);
+    tl.text = 'Loading...';
+
     [t0, t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12,
-      t13, tn0, tn1, tn2, tn3, tn4, tn5, tn6, tn7].map((t : TextObject) => {
+      t13, tn0, tn1, tn2, tn3, tn4, tn5, tn6, tn7, tl].map((t : TextObject) => {
       t.color = new Vector(0, 0, 0);
       t.fontSize = 48;
       t.fontFamily = 'Sanchez';
@@ -133,8 +138,8 @@ export class MenuUI extends Sprite {
     this._gameStarted = false;
     this._optionIndex = 0;
     this._menuIndex = 0;
-    // hide all menus but first one
-    for(var i = 2; i < this.children.length; i++) {
+    // hide all menus (and the cursor) but the last one, leaving only "Loading" UI
+    for(var i = 0; i < this.children.length-1; i++) {
       this.getChild(i).visible = false;
     }
   }
@@ -215,6 +220,11 @@ export class MenuUI extends Sprite {
   setGameStarted() : void {
     this._gameStarted = true;
     this._startButton.text = 'Resume Game';
+  }
+
+  setGameLoaded() : void {
+    this.getChild(0).visible = this.getChild(1).visible = true;
+    this.getChild(this.children.length-1).visible = false;
   }
 
   reset() : void {

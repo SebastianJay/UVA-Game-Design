@@ -21,6 +21,7 @@ export const enum MainGameAction {
 }
 
 export const enum MainGameState {
+  Loading,
   MenuOpen,
   InGame,
   EndGameWin,
