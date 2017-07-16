@@ -9,6 +9,7 @@ import { Vector } from '../util/Vector';
  *  image dimensions, then the last object created may span extra width
  */
 export class TiledSpriteContainer extends DisplayObjectContainer {
+  private static _Overlap : number = 1.25;
   constructor(id : string, filename : string,
     private _targetWidth : number,
     private _targetHeight : number,
@@ -28,7 +29,7 @@ export class TiledSpriteContainer extends DisplayObjectContainer {
     for (var i = 0; i < numTiles; i++) {
       this.addChild(c = this._factoryMethod(this.id + '_' + i, this.filename));
       var c;
-      c.position.x = i * (imgWidth * scaleRatio);
+      c.position.x = i * (imgWidth * scaleRatio) - (TiledSpriteContainer._Overlap * i);
       c.localScale = new Vector(scaleRatio, scaleRatio);
     }
     this.displayImage.src = ''; // get rid of image in parent
