@@ -54,7 +54,8 @@ export class LevelFactory {
     return new TiledSpriteContainer('ground' + LevelFactory.Counter, 'CakeWalk/tableCombined.png', width, height,
       (id: string, filename: string) => {
         return new Platform(id, filename);
-      }
+      },
+      2.0
     );
   }
 

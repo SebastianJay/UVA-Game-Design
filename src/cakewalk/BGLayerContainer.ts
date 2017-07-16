@@ -32,7 +32,9 @@ export class BGLayerContainer extends DisplayObjectContainer {
         new TiledSpriteContainer(this.id+'_layer'+i, BGLayerContainer.LayerAssets[i], width, height,
           (id:string, filename:string) => {
             return new Sprite(id, filename);
-          })
+          },
+          3.0
+        )
       );
     }
   }
